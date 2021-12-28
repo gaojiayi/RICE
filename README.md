@@ -10,6 +10,6 @@
 [![](https://img.shields.io/twitter/follow/ApacheDubbo.svg?label=Follow&style=social&logoWidth=0)](https://twitter.com/intent/follow?screen_name=ApacheDubbo)
 [![Gitter](https://badges.gitter.im/alibaba/dubbo.svg)](https://gitter.im/alibaba/dubbo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-![rice_logo](https://github.com/gaojiayi/RICE/rice_logo.jpg)
+![rice_logo](https://github.com/gaojiayi/RICE/blob/master/rice_logo.jpg)
 
 
