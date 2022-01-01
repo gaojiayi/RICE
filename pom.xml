@@ -30,6 +30,7 @@
         <module>rice-dispatcher</module>
         <module>rice-processor</module>
         <module>rice-distribution</module>
+        <module>rice-repository</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -37,5 +38,18 @@
     <description>Distributed Cluster Scheduler</description>
     <url>https://github.com/apache/incubator-dubbo</url>
     <inceptionYear>2021</inceptionYear>
+
+    <dependencyManagement>
+        <dependencies>
+            <!--            定义依赖-->
+            <dependency>
+                <groupId>com.gaojy</groupId>
+                <artifactId>rice-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>
