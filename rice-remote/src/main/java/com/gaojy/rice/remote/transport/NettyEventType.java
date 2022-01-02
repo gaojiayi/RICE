@@ -14,16 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gaojy.rice.remote.annotation;
+package com.gaojy.rice.remote.transport;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.LOCAL_VARIABLE})
-public @interface CFNotNull {
+public enum NettyEventType {
+    CONNECT,
+    CLOSE,
+    IDLE,
+    EXCEPTION
 }
