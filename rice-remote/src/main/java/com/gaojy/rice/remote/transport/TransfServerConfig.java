@@ -2,11 +2,11 @@ package com.gaojy.rice.remote.transport;
 
 /**
  * @author gaojy
- * @ClassName TranfServerConfig.java
+ * @ClassName TransfServerConfig.java
  * @Description TODO
  * @createTime 2022/01/02 12:52:00
  */
-public class TranfServerConfig {
+public class TransfServerConfig {
     private int listenPort = 8888;
     private int serverWorkerThreads = 8;
     private int serverCallbackExecutorThreads = 0;

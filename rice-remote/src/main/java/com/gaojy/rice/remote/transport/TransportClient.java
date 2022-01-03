@@ -1,13 +1,19 @@
 package com.gaojy.rice.remote.transport;
 
 import com.gaojy.rice.common.RiceThreadFactory;
+import com.gaojy.rice.common.exception.RemotingConnectException;
+import com.gaojy.rice.common.exception.RemotingSendRequestException;
+import com.gaojy.rice.common.exception.RemotingTimeoutException;
+import com.gaojy.rice.common.exception.RemotingTooMuchRequestException;
 import com.gaojy.rice.remote.ChannelEventListener;
 import com.gaojy.rice.remote.IBaseRemote;
 import com.gaojy.rice.remote.InvokeCallback;
 import com.gaojy.rice.remote.common.RemoteHelper;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -22,7 +28,6 @@ import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import java.net.SocketAddress;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,19 +79,95 @@ public class TransportClient extends AbstractRemoteService implements IBaseRemot
     }
 
     @Override
-    public RiceRemoteContext invokeSync(String addr, RiceRemoteContext request, long timeoutMillis) {
-        return null;
+    public RiceRemoteContext invokeSync(String addr, RiceRemoteContext request, long timeoutMillis)
+        throws RemotingConnectException, RemotingTimeoutException, RemotingSendRequestException, InterruptedException {
+        final Channel channel = this.getAndCreateChannel(addr);
+        if (channel != null && channel.isActive()) {
+            try {
+                RiceRemoteContext response = this.invokeSyncImpl(channel, request, timeoutMillis);
+                return response;
+            } catch (RemotingSendRequestException e) {
+                log.warn("invokeSync: send request exception, so close the channel[{}]", addr);
+                this.closeChannel(channel);
+                throw e;
+            } catch (RemotingTimeoutException e) {
+                if (transfClientConfig.isClientCloseSocketIfTimeout()) {
+                    this.closeChannel(channel);
+                    log.warn("invokeSync: close socket because of timeout, {}ms, {}", timeoutMillis, addr);
+                }
+                log.warn("invokeSync: wait response timeout exception, the channel[{}]", addr);
+                throw e;
+            }
+        } else {
+            this.closeChannel(channel);
+            throw new RemotingConnectException(addr);
+        }
+
     }
 
     @Override
     public void invokeAsync(String addr, RiceRemoteContext request, long timeoutMillis,
-        InvokeCallback invokeCallback) {
+        InvokeCallback invokeCallback) throws InterruptedException, RemotingConnectException,
+        RemotingTooMuchRequestException, RemotingTimeoutException,
+        RemotingSendRequestException {
+        final Channel channel = this.getAndCreateChannel(addr);
+        if (channel != null && channel.isActive()) {
+            try {
+                this.invokeAsyncImpl(channel, request, timeoutMillis, invokeCallback);
+            } catch (RemotingSendRequestException e) {
+                log.warn("invokeAsync: send request exception, so close the channel[{}]", addr);
+                this.closeChannel(channel);
+                throw e;
+            }
+        } else {
+            this.closeChannel(channel);
+            throw new RemotingConnectException(addr);
+        }
 
     }
 
     @Override
-    public void invokeOneWay(String addr, RiceRemoteContext request) {
+    public void invokeOneWay(String addr, RiceRemoteContext request,
+        final long timeoutMillis) throws InterruptedException,
+        RemotingConnectException, RemotingTooMuchRequestException,
+        RemotingTimeoutException, RemotingSendRequestException {
+        final Channel channel = this.getAndCreateChannel(addr);
+        if (channel != null && channel.isActive()) {
+            try {
+                this.invokeOnewayImpl(channel, request, timeoutMillis);
+            } catch (RemotingSendRequestException e) {
+                log.warn("invokeOneway: send request exception, so close the channel[{}]", addr);
+                this.closeChannel(channel);
+                throw e;
+            }
+        } else {
+            this.closeChannel(channel);
+            throw new RemotingConnectException(addr);
+        }
+    }
 
+    private Channel getAndCreateChannel(final String addr) {
+        ChannelWrapper cw = getChannelTables().get(addr);
+        if (cw != null && cw.isActive()) {
+            return cw.getChannel();
+        }
+        ChannelFuture channelFuture = this.bootstrap.connect(RemoteHelper.string2SocketAddress(addr));
+        log.info("createChannel: begin to connect remote host[{}] asynchronously", addr);
+        cw = new ChannelWrapper(channelFuture);
+        getChannelTables().put(addr, cw);
+
+        if (channelFuture.awaitUninterruptibly(this.transfClientConfig.getConnectTimeoutMillis())) {
+            if (cw.isActive()) {
+                log.info("createChannel: connect remote host[{}] success, {}", addr, channelFuture.toString());
+                return cw.getChannel();
+            } else {
+                log.warn("createChannel: connect remote host[" + addr + "] failed, " + channelFuture.toString(), channelFuture.cause());
+            }
+        } else {
+            log.warn("createChannel: connect remote host[{}] timeout {}ms, {}", addr, this.transfClientConfig.getConnectTimeoutMillis(),
+                channelFuture.toString());
+        }
+        return channelFuture.channel();
     }
 
     @Override
@@ -109,7 +190,7 @@ public class TransportClient extends AbstractRemoteService implements IBaseRemot
                         // 网络事件处理器
                         new NettyClientConnectManageHandler(),
                         // 接收数据处理
-                        new NettyChannelReadHandler());
+                        new NettyChannelReceivedHandler());
                 }
             });
 

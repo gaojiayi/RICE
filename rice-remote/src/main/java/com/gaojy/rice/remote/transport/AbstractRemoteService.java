@@ -1,31 +1,38 @@
 package com.gaojy.rice.remote.transport;
 
 import com.gaojy.rice.common.BackgroundThread;
+import com.gaojy.rice.common.exception.RemotingSendRequestException;
+import com.gaojy.rice.common.exception.RemotingTimeoutException;
+import com.gaojy.rice.common.exception.RemotingTooMuchRequestException;
 import com.gaojy.rice.remote.ChannelEventListener;
+import com.gaojy.rice.remote.InvokeCallback;
 import com.gaojy.rice.remote.common.Pair;
 import com.gaojy.rice.remote.common.RemoteHelper;
+import com.gaojy.rice.remote.common.SemaphoreReleaseOnlyOnce;
 import com.gaojy.rice.remote.common.TransfUtil;
+import com.gaojy.rice.remote.protocol.RemotingSysResponseCode;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +57,8 @@ public abstract class AbstractRemoteService {
 
     protected final Semaphore semaphoreOneway;
     protected final Semaphore semaphoreAsync;
+
+    protected Pair<RiceRequestProcessor, ExecutorService> defaultRequestProcessor;
 
     /**
      * @description 响应对象容器  可并发迭代
@@ -92,14 +101,135 @@ public abstract class AbstractRemoteService {
     /**
      * @description 不管是客户端还是服务端，接收数据的处理逻辑都是NettyChannelReadHandler处理
      */
-    class NettyChannelReadHandler extends SimpleChannelInboundHandler<RiceRemoteContext> {
+    class NettyChannelReceivedHandler extends SimpleChannelInboundHandler<RiceRemoteContext> {
 
-        @Override protected void channelRead0(ChannelHandlerContext cxt, RiceRemoteContext message) throws Exception {
-            if (AbstractRemoteService.this.getClass().getSimpleName().toUpperCase().indexOf("server") > 0) {
-                // 获取client的PID
-                // 保存到channelTables  k = ip:pid  , v =  channel
+        @Override
+        protected void channelRead0(ChannelHandlerContext cxt, RiceRemoteContext message) throws Exception {
+//            if (AbstractRemoteService.this.getClass().getSimpleName().toUpperCase().indexOf("server") > 0) {
+//                // 获取client的PID
+//                // 保存到channelTables  k = ip:pid  , v =  channel
+//            }
+
+            processMessageReceived(cxt, message);
+
+        }
+    }
+
+    public void processMessageReceived(ChannelHandlerContext ctx, RiceRemoteContext msg) throws Exception {
+        final RiceRemoteContext cmd = msg;
+        if (cmd != null) {
+            switch (cmd.getType()) {
+                case REQUEST_COMMAND:
+                    processRequestCommand(ctx, cmd);
+                    break;
+                case RESPONSE_COMMAND:
+                    processResponseCommand(ctx, cmd);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    public void processResponseCommand(ChannelHandlerContext ctx, RiceRemoteContext cmd) {
+        final int opaque = cmd.getOpaque();
+        final ResponseFuture responseFuture = responseTable.get(opaque);
+        if (responseFuture != null) {
+            responseFuture.setResponseCommand(cmd);
+
+            responseFuture.release();
+
+            responseTable.remove(opaque);
+
+            if (responseFuture.getInvokeCallback() != null) {
+                executeInvokeCallback(responseFuture);
+            } else {
+                responseFuture.putResponse(cmd);
+            }
+        } else {
+            log.warn("receive response, but not matched any request, " + RemoteHelper.parseChannelRemoteAddr(ctx.channel()));
+            log.warn(cmd.toString());
+        }
+    }
+
+    public void processRequestCommand(final ChannelHandlerContext ctx, final RiceRemoteContext cmd) {
+        // 根据请求code，获取已经注册的处理器与线程池配对组
+        final Pair<RiceRequestProcessor, ExecutorService> matched = this.processorTable.get(cmd.getCode());
+        // 如果找不到 则使用默认处理器  在server端使用adminprocess作为默认处理器
+        final Pair<RiceRequestProcessor, ExecutorService> pair = null == matched ? this.defaultRequestProcessor : matched;
+        final int opaque = cmd.getOpaque();
+
+        if (pair != null) {
+            Runnable run = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        // 处理请求的具体逻辑，返回RemotingCommand响应数据
+                        final RiceRemoteContext response = pair.getObject1().processRequest(ctx, cmd);
+                        // 对于远程过来的请求类型不是单向请求的话  则设置opaque  ResponseType
+                        if (!cmd.isOnewayRPC()) {
+                            if (response != null) {
+                                response.setOpaque(opaque);
+                                response.markResponseType();
+                                try {
+                                    ctx.writeAndFlush(response);
+                                } catch (Throwable e) {
+                                    log.error("process request over, but response failed", e);
+                                    log.error(cmd.toString());
+                                    log.error(response.toString());
+                                }
+                            } else {
+
+                            }
+                        }
+                    } catch (Throwable e) {
+                        log.error("process request exception", e);
+                        log.error(cmd.toString());
+
+                        if (!cmd.isOnewayRPC()) {
+                            final RiceRemoteContext response = RiceRemoteContext.createResponseCommand(RemotingSysResponseCode.SYSTEM_ERROR, //
+                                RemoteHelper.exceptionSimpleDesc(e));
+                            response.setOpaque(opaque);
+                            ctx.writeAndFlush(response);
+                        }
+                    }
+                }
+            };
+
+            if (pair.getObject1().rejectRequest()) {
+                final RiceRemoteContext response = RiceRemoteContext.createResponseCommand(RemotingSysResponseCode.SYSTEM_BUSY,
+                    "[REJECTREQUEST]system busy, start flow control for a while");
+                response.setOpaque(opaque);
+                ctx.writeAndFlush(response);
+                return;
             }
 
+            try {
+                // 把任务包装成RequestTask  submit给对应的线程池
+                final RequestTask requestTask = new RequestTask(run, ctx.channel(), cmd);
+                pair.getObject2().submit(requestTask);
+            } catch (RejectedExecutionException e) {
+                if ((System.currentTimeMillis() % 10000) == 0) {
+                    log.warn(RemoteHelper.parseChannelRemoteAddr(ctx.channel()) //
+                        + ", too many requests and system thread pool busy, RejectedExecutionException " //
+                        + pair.getObject2().toString() //
+                        + " request code: " + cmd.getCode());
+                }
+
+                if (!cmd.isOnewayRPC()) {
+                    final RiceRemoteContext response = RiceRemoteContext.createResponseCommand(RemotingSysResponseCode.SYSTEM_BUSY,
+                        "[OVERLOAD]system busy, start flow control for a while");
+                    response.setOpaque(opaque);
+                    ctx.writeAndFlush(response);
+                }
+            }
+        } else {
+            String error = " request type " + cmd.getCode() + " not supported";
+            final RiceRemoteContext response =
+                RiceRemoteContext.createResponseCommand(RemotingSysResponseCode.REQUEST_CODE_NOT_SUPPORTED, error);
+            response.setOpaque(opaque);
+            ctx.writeAndFlush(response);
+            log.error(RemoteHelper.parseChannelRemoteAddr(ctx.channel()) + error);
         }
     }
 
@@ -174,9 +304,16 @@ public abstract class AbstractRemoteService {
 
     class ChannelWrapper {
         private final Channel channel;
+        private final ChannelFuture channelFuture;
 
         public ChannelWrapper(Channel channel) {
             this.channel = channel;
+            channelFuture = null;
+        }
+
+        public ChannelWrapper(ChannelFuture channelFuture) {
+            this.channelFuture = channelFuture;
+            this.channel = channelFuture.channel();
         }
 
         public boolean isActive() {
@@ -187,6 +324,9 @@ public abstract class AbstractRemoteService {
             return this.channel;
         }
 
+        public ChannelFuture getChannelFuture() {
+            return channelFuture;
+        }
     }
 
     class NettyEventExecutor extends BackgroundThread {
@@ -333,6 +473,144 @@ public abstract class AbstractRemoteService {
             this.publicExecutor.shutdown();
         }
 
+    }
+
+    public RiceRemoteContext invokeSyncImpl(final Channel channel, final RiceRemoteContext request,
+        final long timeoutMillis)
+        throws InterruptedException, RemotingSendRequestException, RemotingTimeoutException {
+        final int opaque = request.getOpaque();
+
+        try {
+            final ResponseFuture responseFuture = new ResponseFuture(opaque, timeoutMillis, null, null);
+            this.responseTable.put(opaque, responseFuture);
+            final SocketAddress addr = channel.remoteAddress();
+            channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture f) throws Exception {
+                    if (f.isSuccess()) {
+                        responseFuture.setSendRequestOK(true);
+                        return;
+                    } else {
+                        responseFuture.setSendRequestOK(false);
+                    }
+
+                    responseTable.remove(opaque);
+                    responseFuture.setCause(f.cause());
+                    responseFuture.putResponse(null);
+                    log.warn("send a request command to channel <" + addr + "> failed.");
+                }
+            });
+
+            RiceRemoteContext responseCommand = responseFuture.waitResponse(timeoutMillis);
+            if (null == responseCommand) {
+                if (responseFuture.isSendRequestOK()) {
+                    throw new RemotingTimeoutException(RemoteHelper.parseSocketAddressAddr(addr), timeoutMillis,
+                        responseFuture.getCause());
+                } else {
+                    throw new RemotingSendRequestException(RemoteHelper.parseSocketAddressAddr(addr), responseFuture.getCause());
+                }
+            }
+
+            return responseCommand;
+        } finally {
+            this.responseTable.remove(opaque);
+        }
+    }
+
+
+    public void invokeAsyncImpl(final Channel channel, final RiceRemoteContext request, final long timeoutMillis,
+        final InvokeCallback invokeCallback)
+        throws InterruptedException, RemotingTooMuchRequestException, RemotingTimeoutException, RemotingSendRequestException {
+        final int opaque = request.getOpaque();
+        boolean acquired = this.semaphoreAsync.tryAcquire(timeoutMillis, TimeUnit.MILLISECONDS);
+        if (acquired) {
+            final SemaphoreReleaseOnlyOnce once = new SemaphoreReleaseOnlyOnce(this.semaphoreAsync);
+
+            final ResponseFuture responseFuture = new ResponseFuture(opaque, timeoutMillis, invokeCallback, once);
+            this.responseTable.put(opaque, responseFuture);
+            try {
+                channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
+                    @Override
+                    public void operationComplete(ChannelFuture f) throws Exception {
+                        if (f.isSuccess()) {
+                            responseFuture.setSendRequestOK(true);
+                            return;
+                        } else {
+                            responseFuture.setSendRequestOK(false);
+                        }
+
+                        responseFuture.putResponse(null);
+                        responseTable.remove(opaque);
+                        try {
+                            /**
+                             * 异步调用失败   仍然会执行回调函数
+                             */
+                            executeInvokeCallback(responseFuture);
+                        } catch (Throwable e) {
+                            log.warn("excute callback in writeAndFlush addListener, and callback throw", e);
+                        } finally {
+                            responseFuture.release();
+                        }
+
+                        log.warn("send a request command to channel <{}> failed.", RemoteHelper.parseChannelRemoteAddr(channel));
+                    }
+                });
+            } catch (Exception e) {
+                responseFuture.release();
+                log.warn("send a request command to channel <" + RemoteHelper.parseChannelRemoteAddr(channel) + "> Exception", e);
+                throw new RemotingSendRequestException(RemoteHelper.parseChannelRemoteAddr(channel), e);
+            }
+        } else {
+            if (timeoutMillis <= 0) {
+                throw new RemotingTooMuchRequestException("invokeAsyncImpl invoke too fast");
+            } else {
+                String info =
+                    String.format("invokeAsyncImpl tryAcquire semaphore timeout, %dms, waiting thread nums: %d semaphoreAsyncValue: %d", //
+                        timeoutMillis, //
+                        this.semaphoreAsync.getQueueLength(), //
+                        this.semaphoreAsync.availablePermits()//
+                    );
+                log.warn(info);
+                throw new RemotingTimeoutException(info);
+            }
+        }
+    }
+
+    public void invokeOnewayImpl(final Channel channel, final RiceRemoteContext request, final long timeoutMillis)
+        throws InterruptedException, RemotingTooMuchRequestException, RemotingTimeoutException, RemotingSendRequestException {
+        request.markOnewayRPC();
+        boolean acquired = this.semaphoreOneway.tryAcquire(timeoutMillis, TimeUnit.MILLISECONDS);
+        if (acquired) {
+            final SemaphoreReleaseOnlyOnce once = new SemaphoreReleaseOnlyOnce(this.semaphoreOneway);
+            try {
+                channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
+                    @Override
+                    public void operationComplete(ChannelFuture f) throws Exception {
+                        once.release();
+                        if (!f.isSuccess()) {
+                            log.warn("send a request command to channel <" + channel.remoteAddress() + "> failed.");
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                once.release();
+                log.warn("write send a request command to channel <" + channel.remoteAddress() + "> failed.");
+                throw new RemotingSendRequestException(RemoteHelper.parseChannelRemoteAddr(channel), e);
+            }
+        } else {
+            if (timeoutMillis <= 0) {
+                throw new RemotingTooMuchRequestException("invokeOnewayImpl invoke too fast");
+            } else {
+                String info = String.format(
+                    "invokeOnewayImpl tryAcquire semaphore timeout, %dms, waiting thread nums: %d semaphoreAsyncValue: %d", //
+                    timeoutMillis, //
+                    this.semaphoreOneway.getQueueLength(), //
+                    this.semaphoreOneway.availablePermits()//
+                );
+                log.warn(info);
+                throw new RemotingTimeoutException(info);
+            }
+        }
     }
 
 }

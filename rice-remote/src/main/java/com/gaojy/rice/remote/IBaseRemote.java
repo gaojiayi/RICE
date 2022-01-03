@@ -1,5 +1,9 @@
 package com.gaojy.rice.remote;
 
+import com.gaojy.rice.common.exception.RemotingConnectException;
+import com.gaojy.rice.common.exception.RemotingSendRequestException;
+import com.gaojy.rice.common.exception.RemotingTimeoutException;
+import com.gaojy.rice.common.exception.RemotingTooMuchRequestException;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.RiceRequestProcessor;
 import java.util.concurrent.ExecutorService;
@@ -14,7 +18,8 @@ public interface IBaseRemote extends RemoteService {
      * @throws
      * @description 同步调用
      */
-    public RiceRemoteContext invokeSync(final String addr, final RiceRemoteContext request, final long timeoutMillis);
+    public RiceRemoteContext invokeSync(final String addr, final RiceRemoteContext request, final long timeoutMillis)
+        throws RemotingSendRequestException, RemotingTimeoutException, InterruptedException, RemotingConnectException;
 
     /**
      * @param addr
@@ -25,7 +30,8 @@ public interface IBaseRemote extends RemoteService {
      * @description 异步调用
      */
     public void invokeAsync(final String addr, final RiceRemoteContext request, final long timeoutMillis,
-        final InvokeCallback invokeCallback);
+        final InvokeCallback invokeCallback) throws InterruptedException, RemotingConnectException,
+        RemotingTooMuchRequestException, RemotingTimeoutException, RemotingSendRequestException;
 
     /**
      * @param addr
@@ -33,7 +39,9 @@ public interface IBaseRemote extends RemoteService {
      * @throws
      * @description 单向调用
      */
-    public void invokeOneWay(final String addr, final RiceRemoteContext request);
+    public void invokeOneWay(final String addr, final RiceRemoteContext request,final long timeoutMillis)
+        throws InterruptedException, RemotingConnectException, RemotingTooMuchRequestException,
+        RemotingTimeoutException, RemotingSendRequestException;
 
     /**
      * @param requestCode

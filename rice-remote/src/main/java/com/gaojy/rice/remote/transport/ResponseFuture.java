@@ -23,7 +23,7 @@ public class ResponseFuture {
     private final SemaphoreReleaseOnlyOnce once;
 
     private final AtomicBoolean executeCallbackOnlyOnce = new AtomicBoolean(false);
-    private volatile RiceRemoteContext riceRemoteContext;
+    private volatile RiceRemoteContext responseCommand;
     private volatile boolean sendRequestOK = true;
     private volatile Throwable cause;
 
@@ -60,11 +60,11 @@ public class ResponseFuture {
 
     public RiceRemoteContext waitResponse(final long timeoutMillis) throws InterruptedException {
         this.countDownLatch.await(timeoutMillis, TimeUnit.MILLISECONDS);
-        return this.riceRemoteContext;
+        return this.responseCommand;
     }
 
     public void putResponse(final RiceRemoteContext riceRemoteContext) {
-        this.riceRemoteContext = riceRemoteContext;
+        this.responseCommand = riceRemoteContext;
         this.countDownLatch.countDown();
     }
 
@@ -96,12 +96,12 @@ public class ResponseFuture {
         this.cause = cause;
     }
 
-    public RiceRemoteContext getRiceRemoteContext() {
-        return riceRemoteContext;
+    public RiceRemoteContext getResponseCommand() {
+        return responseCommand;
     }
 
-    public void setRiceRemoteContext(RiceRemoteContext riceRemoteContext) {
-        this.riceRemoteContext = riceRemoteContext;
+    public void setResponseCommand(RiceRemoteContext responseCommand) {
+        this.responseCommand = responseCommand;
     }
 
     public int getOpaque() {
@@ -110,7 +110,7 @@ public class ResponseFuture {
 
     @Override
     public String toString() {
-        return "ResponseFuture [responseCommand=" + riceRemoteContext + ", sendRequestOK=" + sendRequestOK
+        return "ResponseFuture [responseCommand=" + responseCommand + ", sendRequestOK=" + sendRequestOK
             + ", cause=" + cause + ", opaque=" + opaque + ", timeoutMillis=" + timeoutMillis
             + ", invokeCallback=" + invokeCallback + ", beginTimestamp=" + beginTimestamp
             + ", countDownLatch=" + countDownLatch + "]";

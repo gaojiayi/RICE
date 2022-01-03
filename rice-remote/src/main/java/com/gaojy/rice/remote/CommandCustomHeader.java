@@ -1,6 +1,6 @@
 package com.gaojy.rice.remote;
 
-import com.gaojy.rice.remote.exception.RemoteException;
+import com.gaojy.rice.common.exception.RemotingCommandException;
 
 /**
  * @author gaojy
@@ -9,6 +9,6 @@ import com.gaojy.rice.remote.exception.RemoteException;
  * @createTime 2022/01/03 00:30:00
  */
 public interface CommandCustomHeader {
-    void checkFields() throws RemoteException;
+    void checkFields() throws RemotingCommandException;
 
 }

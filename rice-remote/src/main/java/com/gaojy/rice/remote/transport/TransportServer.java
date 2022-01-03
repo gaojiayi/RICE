@@ -1,6 +1,10 @@
 package com.gaojy.rice.remote.transport;
 
 import com.gaojy.rice.common.RiceThreadFactory;
+import com.gaojy.rice.common.exception.RemotingConnectException;
+import com.gaojy.rice.common.exception.RemotingSendRequestException;
+import com.gaojy.rice.common.exception.RemotingTimeoutException;
+import com.gaojy.rice.common.exception.RemotingTooMuchRequestException;
 import com.gaojy.rice.remote.ChannelEventListener;
 import com.gaojy.rice.remote.IBaseRemote;
 import com.gaojy.rice.remote.InvokeCallback;
@@ -14,7 +18,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -28,10 +31,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import java.net.InetSocketAddress;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,25 +47,25 @@ public class TransportServer extends AbstractRemoteService implements IBaseRemot
     private final ServerBootstrap serverBootstrap;
     private final EventLoopGroup eventLoopGroupSelector;
     private final EventLoopGroup eventLoopGroupBoss;
-    private final TranfServerConfig tranfServerConfig;
+    private final TransfServerConfig TransfServerConfig;
     private DefaultEventExecutorGroup defaultEventExecutorGroup;
     private final ChannelEventListener channelEventListener;
 
     // TODO 使用配置端口
     private int port = 0;
 
-    public TransportServer(TranfServerConfig tranfServerConfig) {
-        this(tranfServerConfig, null);
+    public TransportServer(TransfServerConfig TransfServerConfig) {
+        this(TransfServerConfig, null);
     }
 
-    public TransportServer(TranfServerConfig tranfServerConfig,
+    public TransportServer(TransfServerConfig TransfServerConfig,
         ChannelEventListener channelEventListener) {
-        super(tranfServerConfig.getServerOnewaySemaphoreValue(), tranfServerConfig.getServerAsyncSemaphoreValue());
+        super(TransfServerConfig.getServerOnewaySemaphoreValue(), TransfServerConfig.getServerAsyncSemaphoreValue());
         this.serverBootstrap = new ServerBootstrap();
-        this.tranfServerConfig = tranfServerConfig;
+        this.TransfServerConfig = TransfServerConfig;
         this.channelEventListener = channelEventListener;
 
-        int publicThreadNums = tranfServerConfig.getServerCallbackExecutorThreads();
+        int publicThreadNums = TransfServerConfig.getServerCallbackExecutorThreads();
         if (publicThreadNums <= 0) {
             publicThreadNums = 4;
         }
@@ -75,43 +75,58 @@ public class TransportServer extends AbstractRemoteService implements IBaseRemot
         this.eventLoopGroupBoss = new NioEventLoopGroup(1, new RiceThreadFactory("NettyBoss_"));
 
         if (useEpoll()) {
-            this.eventLoopGroupSelector = new EpollEventLoopGroup(tranfServerConfig.getServerSelectorThreads(),
+            this.eventLoopGroupSelector = new EpollEventLoopGroup(TransfServerConfig.getServerSelectorThreads(),
                 new RiceThreadFactory("NettyServerEPOLLSelector_"));
         } else {
-            this.eventLoopGroupSelector = new NioEventLoopGroup(tranfServerConfig.getServerSelectorThreads(),
+            this.eventLoopGroupSelector = new NioEventLoopGroup(TransfServerConfig.getServerSelectorThreads(),
                 new RiceThreadFactory("NettyServerNIOSelector_"));
         }
     }
 
-    @Override
-    public RiceRemoteContext invokeSync(String addr, RiceRemoteContext request, long timeoutMillis) {
-        return null;
+    @Override public RiceRemoteContext invokeSync(String addr, RiceRemoteContext request,
+        long timeoutMillis) throws RemotingSendRequestException, RemotingTimeoutException,
+        InterruptedException, RemotingConnectException {
+        ChannelWrapper wrapper = getChannelTables().get(addr);
+        if (wrapper != null && wrapper.isActive()) {
+            return this.invokeSyncImpl(wrapper.getChannel(), request, timeoutMillis);
+        }
+        throw new RemotingConnectException(addr);
+    }
+
+    @Override public void invokeAsync(String addr, RiceRemoteContext request, long timeoutMillis,
+        InvokeCallback invokeCallback) throws InterruptedException, RemotingConnectException,
+        RemotingTooMuchRequestException, RemotingTimeoutException, RemotingSendRequestException {
+        ChannelWrapper wrapper = getChannelTables().get(addr);
+        if (wrapper != null && wrapper.isActive()) {
+            this.invokeAsyncImpl(wrapper.getChannel(), request, timeoutMillis, invokeCallback);
+        } else {
+            throw new RemotingConnectException(addr);
+        }
+
+    }
+
+    @Override public void invokeOneWay(String addr, RiceRemoteContext request,
+        long timeoutMillis) throws InterruptedException, RemotingConnectException,
+        RemotingTooMuchRequestException, RemotingTimeoutException, RemotingSendRequestException {
+        ChannelWrapper wrapper = getChannelTables().get(addr);
+        if (wrapper != null && wrapper.isActive()) {
+            this.invokeOnewayImpl(wrapper.getChannel(), request, timeoutMillis);
+        } else {
+            throw new RemotingConnectException(addr);
+        }
+
     }
 
     @Override
-    public void invokeAsync(String addr, RiceRemoteContext request, long timeoutMillis,
-        InvokeCallback invokeCallback) {
-
-    }
-
-    @Override
-    public void invokeOneWay(String addr, RiceRemoteContext request) {
-
-    }
-
-    @Override public ChannelEventListener getChannelEventListener() {
+    public ChannelEventListener getChannelEventListener() {
         return channelEventListener;
     }
 
-    @Override
-    public void registerProcessor(int requestCode, RiceRequestProcessor processor,
-        ExecutorService executor) {
 
-    }
 
     @Override
     public void start() {
-        this.defaultEventExecutorGroup = new DefaultEventExecutorGroup(tranfServerConfig.getServerWorkerThreads(),
+        this.defaultEventExecutorGroup = new DefaultEventExecutorGroup(TransfServerConfig.getServerWorkerThreads(),
             new RiceThreadFactory("TransportServerCoreThread_"));
 
         ServerBootstrap childHandler =
@@ -121,9 +136,9 @@ public class TransportServer extends AbstractRemoteService implements IBaseRemot
                 .option(ChannelOption.SO_REUSEADDR, true)
                 .option(ChannelOption.SO_KEEPALIVE, false)
                 .childOption(ChannelOption.TCP_NODELAY, true)
-                .childOption(ChannelOption.SO_SNDBUF, tranfServerConfig.getServerSocketSndBufSize())
-                .childOption(ChannelOption.SO_RCVBUF, tranfServerConfig.getServerSocketRcvBufSize())
-                .localAddress(new InetSocketAddress(this.tranfServerConfig.getListenPort()))
+                .childOption(ChannelOption.SO_SNDBUF, TransfServerConfig.getServerSocketSndBufSize())
+                .childOption(ChannelOption.SO_RCVBUF, TransfServerConfig.getServerSocketRcvBufSize())
+                .localAddress(new InetSocketAddress(this.TransfServerConfig.getListenPort()))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
@@ -131,13 +146,13 @@ public class TransportServer extends AbstractRemoteService implements IBaseRemot
                             defaultEventExecutorGroup,
                             new NettyEncoder(TransportServer.this),
                             new NettyDecoder(TransportServer.this),
-                            new IdleStateHandler(0, 0, tranfServerConfig.getServerChannelMaxIdleTimeSeconds()),
+                            new IdleStateHandler(0, 0, TransfServerConfig.getServerChannelMaxIdleTimeSeconds()),
                             new NettyServerConnectManageHandler(),
-                            new NettyChannelReadHandler());
+                            new NettyChannelReceivedHandler());
                     }
                 });
 
-        if (tranfServerConfig.isServerPooledByteBufAllocatorEnable()) {
+        if (TransfServerConfig.isServerPooledByteBufAllocatorEnable()) {
             childHandler.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
         }
 
@@ -172,7 +187,7 @@ public class TransportServer extends AbstractRemoteService implements IBaseRemot
      */
     private boolean useEpoll() {
         return TransfUtil.isLinuxPlatform()
-            && tranfServerConfig.isUseEpollNativeSelector()
+            && TransfServerConfig.isUseEpollNativeSelector()
             && Epoll.isAvailable();
 
     }
@@ -262,5 +277,10 @@ public class TransportServer extends AbstractRemoteService implements IBaseRemot
 
             closeChannel(ctx.channel());
         }
+    }
+    public static void main(String[] args) {
+        TransfServerConfig config = new TransfServerConfig();
+        IBaseRemote server = new TransportServer(config);
+        server.start();
     }
 }
