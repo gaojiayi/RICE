@@ -19,6 +19,9 @@ RICE可以实现动态任务分配，当一个server调度器挂机之后，原�
 
 另外作者把这个项目叫RICE，也是因为当时有这个想法的时候，正好是袁隆平爷爷的变故，RICE的中文名是米饭，水稻的意思，也是为了纪念这位共和国伟人。
 
+### 部署
+![rice_deploy](https://github.com/gaojiayi/RICE/blob/master/doc/rice_deploy.png)
+
 ### 功能
 
 

@@ -2,9 +2,6 @@ package com.gaojy.rice.common.utils;
 
 import com.gaojy.rice.common.constants.LoggerName;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 
 import static org.fusesource.jansi.Ansi.Color.*;
@@ -26,7 +23,7 @@ import org.slf4j.LoggerFactory;
 public class RiceBanner {
     private static Logger log = LoggerFactory.getLogger(LoggerName.COMMON_LOGGER_NAME);
 
-    public static void show(String path, int color_index) {
+    public static void show(int color_index) {
         Ansi.Color color;
         switch (color_index) {
             case 0:
@@ -63,8 +60,7 @@ public class RiceBanner {
             in = new BufferedReader(new InputStreamReader(stream));
             String str = "";
             while ((str = in.readLine()) != null) {
-                //log.info(ansi().fg(color).a(str).reset().toString());
-               String  a = ansi().fg(color).a(str).reset().toString();
+                log.info(ansi().fg(color).a(str).reset().toString());
                 System.out.println(ansi().fg(color).a(str).reset());
             }
         } catch (Exception e) {
@@ -79,9 +75,5 @@ public class RiceBanner {
             }
             AnsiConsole.systemUninstall();
         }
-    }
-
-    public static void main(String[] args) {
-        show("./rice.banner",2);
     }
 }
