@@ -5,6 +5,7 @@ import com.gaojy.rice.common.exception.RemotingCommandException;
 import com.gaojy.rice.common.exception.RemotingConnectException;
 import com.gaojy.rice.common.exception.RemotingSendRequestException;
 import com.gaojy.rice.common.exception.RemotingTimeoutException;
+import com.gaojy.rice.common.protocol.header.CommandCustomHeader;
 import com.gaojy.rice.remote.transport.RiceRequestProcessor;
 import com.gaojy.rice.remote.transport.TransfServerConfig;
 import com.gaojy.rice.remote.transport.TransfClientConfig;
@@ -73,6 +74,7 @@ public class TestRiceRemoting {
         requestHeader.setCount(1);
         requestHeader.setMessageTitle("Welcome");
         RiceRemoteContext request = RiceRemoteContext.createRequestCommand(0, requestHeader);
+        request.setSerializeTypeCurrentRPC(SerializeType.RICE);
         RiceRemoteContext response = transportClient.invokeSync("localhost:8888", request, 1000 * 30);
         assertTrue(response != null);
         assertThat(response.getLanguage()).isEqualTo(LanguageCode.JAVA);

@@ -282,5 +282,6 @@ public class TransportServer extends AbstractRemoteService implements IBaseRemot
         TransfServerConfig config = new TransfServerConfig();
         IBaseRemote server = new TransportServer(config);
         server.start();
+        System.out.println("server start successful");
     }
 }

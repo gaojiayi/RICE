@@ -4,7 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.gaojy.rice.common.annotation.CFNotNull;
 import com.gaojy.rice.common.exception.RemotingCommandException;
 import com.gaojy.rice.common.utils.StringUtil;
-import com.gaojy.rice.remote.CommandCustomHeader;
+import com.gaojy.rice.common.protocol.header.CommandCustomHeader;
 import com.gaojy.rice.remote.common.RemoteHelper;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

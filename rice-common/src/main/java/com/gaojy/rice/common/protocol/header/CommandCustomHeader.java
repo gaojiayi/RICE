@@ -1,4 +1,4 @@
-package com.gaojy.rice.remote;
+package com.gaojy.rice.common.protocol.header;
 
 import com.gaojy.rice.common.exception.RemotingCommandException;
 
