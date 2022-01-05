@@ -1,4 +1,4 @@
-package com.gaojy.rice.processor;
+package com.gaojy.rice.processor.api;
 
 /**
  * @author gaojy

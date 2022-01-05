@@ -3,18 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>rice-parent</artifactId>
+        <artifactId>rice-processor</artifactId>
         <groupId>com.gaojy</groupId>
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>rice-processor</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>rice-processor-api</module>
-        <module>rice-processor-spring</module>
-    </modules>
+    <artifactId>rice-processor-api</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -22,11 +17,13 @@
     </properties>
 
     <dependencies>
+
         <dependency>
-            <groupId>com.gaojy</groupId>
-            <artifactId>rice-remote</artifactId>
-            <version>${project.parent.version}</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
+
 
 </project>

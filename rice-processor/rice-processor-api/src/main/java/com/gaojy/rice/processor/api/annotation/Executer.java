@@ -1,4 +1,4 @@
-package com.gaojy.rice.processor.annotation;
+package com.gaojy.rice.processor.api.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -8,14 +8,18 @@ import java.lang.annotation.Target;
 
 /**
  * @author gaojy
- * @ClassName Task.java
+ * @ClassName Executer.java
  * @Description TODO
- * @createTime 2022/01/02 15:17:00
+ * @createTime 2022/01/04 19:06:00
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface Task {
+public @interface Executer {
 
     String taskCode() default "";
+
+    String taskName() default "";
+
+    String appId() default "";
 }

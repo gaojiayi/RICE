@@ -1,5 +1,5 @@
 
-package com.gaojy.rice.processor.log;
+package com.gaojy.rice.processor.api.log;
 
 import com.gaojy.rice.common.constants.LoggerName;
 import java.lang.reflect.Method;

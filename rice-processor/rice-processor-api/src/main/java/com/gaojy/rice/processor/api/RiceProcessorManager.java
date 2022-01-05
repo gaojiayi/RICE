@@ -1,9 +1,11 @@
-package com.gaojy.rice.processor;
+package com.gaojy.rice.processor.api;
 
 import com.gaojy.rice.common.utils.RiceBanner;
-import com.gaojy.rice.processor.log.RiceClientLogger;
+import com.gaojy.rice.processor.api.invoker.TaskInvoker;
+import com.gaojy.rice.processor.api.log.RiceClientLogger;
 import com.gaojy.rice.remote.IBaseRemote;
-import com.gaojy.rice.remote.transport.TransportServer;
+import java.util.HashMap;
+import java.util.Map;
 import org.slf4j.Logger;
 
 /**
@@ -18,6 +20,8 @@ public class RiceProcessorManager {
     private static Object monitorObj = new Object();
 
     private final IBaseRemote transportServer;
+
+    private Map<String, TaskInvoker> taskCollector = new HashMap<>();
 
     private RiceProcessorManager() {
         transportServer = null;

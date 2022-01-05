@@ -1,6 +1,6 @@
-package com.gaojy.rice.processor;
+package com.gaojy.rice.processor.api;
 
-import com.gaojy.rice.processor.log.RiceClientLogger;
+import com.gaojy.rice.processor.api.log.RiceClientLogger;
 import com.gaojy.rice.remote.transport.TransfSystemConfig;
 import java.io.IOException;
 import java.io.InputStream;

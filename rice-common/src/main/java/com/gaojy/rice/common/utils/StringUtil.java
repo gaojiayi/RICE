@@ -7,6 +7,7 @@ package com.gaojy.rice.common.utils;
  * @createTime 2022/01/03 00:23:00
  */
 public class StringUtil {
+    public static final String EMPTY = "";
 
     public static boolean isBlank(String str) {
         int strLen;
@@ -19,5 +20,24 @@ public class StringUtil {
             }
         }
         return true;
+    }
+
+    public static String join(String[] array) {
+        if (ArrayUtils.isEmpty(array)) {
+            return EMPTY;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String s : array) {
+            sb.append(s);
+        }
+        return sb.toString();
+    }
+
+    public static boolean isEmpty(String str) {
+        return str == null || str.isEmpty();
+    }
+
+    public static boolean isNotEmpty(String str) {
+        return !isEmpty(str);
     }
 }
