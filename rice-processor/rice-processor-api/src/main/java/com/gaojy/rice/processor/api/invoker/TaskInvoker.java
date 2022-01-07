@@ -27,47 +27,11 @@ public abstract class TaskInvoker {
     private static final Map<Class<? extends RiceBasicProcessor>, TaskInvoker> TASK_INVOKER_MAP = new ConcurrentHashMap<>();
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
     /**
-     * Object对象的方法
-     */
-    private static final String[] OBJECT_METHODS = new String[] {"getClass", "hashCode", "toString", "equals"};
-
-    /**
-     * Object对象对应的TaskInvoker
-     */
-    private static final TaskInvoker OBJECT_INVOKER = new TaskInvoker() {
-        @Override public String[] getMethodNames() {
-            return new String[0];
-        }
-
-        @Override public String[] getDeclaredMethodNames() {
-            return OBJECT_METHODS;
-        }
-
-        @Override public Object invokeMethod(Object instance, String mn, Class<?>[] types,
-            Object[] args) throws NoSuchMethodException, InvocationTargetException {
-            if ("getClass".equals(mn)) {
-                return instance.getClass();
-            }
-            if ("hashCode".equals(mn)) {
-                return instance.hashCode();
-            }
-            if ("toString".equals(mn)) {
-                return instance.toString();
-            }
-            if ("equals".equals(mn)) {
-                if (args.length == 1) {
-                    return instance.equals(args[0]);
-                }
-                throw new IllegalArgumentException("Invoke method [" + mn + "] argument number error.");
-            }
-            throw new NoSuchMethodException("Method [" + mn + "] not found.");
-        }
-    };
-
-    /**
      * 记录Invoker数量
      */
     private static AtomicLong INVOKER_CLASS_COUNTER = new AtomicLong(0);
+
+    private String taskCode;
 
     public static TaskInvoker getInvoker(Class<? extends RiceBasicProcessor> c) {
 
@@ -75,7 +39,7 @@ public abstract class TaskInvoker {
         TaskInvoker ret = TASK_INVOKER_MAP.get(c);
         if (ret == null) {
             // TODO
-            // 这边就是通过javassist来生成Wrapper
+            // 这边就是通过javassist来生成invoker
             ret = makeInvoker(c);
             TASK_INVOKER_MAP.put(c, ret);
         }
@@ -344,4 +308,23 @@ public abstract class TaskInvoker {
      * @return return value.
      */
     abstract public Object invokeMethod(Object instance, String mn, Class<?>[] types, Object[] args) throws NoSuchMethodException, InvocationTargetException;
+
+    /**
+     * get property value.
+     *
+     * @param instance instance.
+     * @param pn       property name.
+     * @return value.
+     */
+    abstract public Object getPropertyValue(Object instance, String pn) throws NoSuchPropertyException, IllegalArgumentException;
+
+    /**
+     * set property value.
+     *
+     * @param instance instance.
+     * @param pn       property name.
+     * @param pv       property value.
+     */
+    abstract public void setPropertyValue(Object instance, String pn, Object pv) throws NoSuchPropertyException, IllegalArgumentException;
+
 }

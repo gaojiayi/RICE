@@ -54,6 +54,8 @@ public class TransportServer extends AbstractRemoteService implements IBaseRemot
     // TODO 使用配置端口
     private int port = 0;
 
+    private String serverAddress;
+
     public TransportServer(TransfServerConfig TransfServerConfig) {
         this(TransfServerConfig, null);
     }
@@ -122,8 +124,6 @@ public class TransportServer extends AbstractRemoteService implements IBaseRemot
         return channelEventListener;
     }
 
-
-
     @Override
     public void start() {
         this.defaultEventExecutorGroup = new DefaultEventExecutorGroup(TransfServerConfig.getServerWorkerThreads(),
@@ -160,6 +160,8 @@ public class TransportServer extends AbstractRemoteService implements IBaseRemot
             ChannelFuture sync = this.serverBootstrap.bind().sync();
             InetSocketAddress addr = (InetSocketAddress) sync.channel().localAddress();
             this.port = addr.getPort();
+            this.serverAddress = addr.getAddress().getHostAddress();
+
         } catch (InterruptedException e1) {
             throw new RuntimeException("this.serverBootstrap.bind().sync() InterruptedException", e1);
         }
@@ -180,6 +182,14 @@ public class TransportServer extends AbstractRemoteService implements IBaseRemot
             }
         }, 1000 * 3, 1000);
 
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public String getServerAddress() {
+        return serverAddress;
     }
 
     /**
@@ -278,6 +288,7 @@ public class TransportServer extends AbstractRemoteService implements IBaseRemot
             closeChannel(ctx.channel());
         }
     }
+
     public static void main(String[] args) {
         TransfServerConfig config = new TransfServerConfig();
         IBaseRemote server = new TransportServer(config);

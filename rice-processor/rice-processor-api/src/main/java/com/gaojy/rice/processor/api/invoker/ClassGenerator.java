@@ -78,9 +78,6 @@ public final class ClassGenerator {
         return new ClassGenerator(getClassPool(loader));
     }
 
-    public static boolean isDynamicClass(Class<?> cl) {
-        return DC.class.isAssignableFrom(cl);
-    }
 
     public static ClassPool getClassPool(ClassLoader loader) {
         if (loader == null) {
