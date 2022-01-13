@@ -18,6 +18,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -247,6 +248,9 @@ public class TransportServer extends AbstractRemoteService implements IBaseRemot
             }
         }
 
+        /**
+         * @description  client连接失效
+         */
         @Override public void channelInactive(ChannelHandlerContext ctx) throws Exception {
             final String remoteAddress = RemoteHelper.parseChannelRemoteAddr(ctx.channel());
             log.info("NETTY SERVER PIPELINE: channelInactive, the channel[{}]", remoteAddress);

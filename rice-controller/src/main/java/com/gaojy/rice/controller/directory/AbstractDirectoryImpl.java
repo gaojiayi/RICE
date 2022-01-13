@@ -2,6 +2,7 @@ package com.gaojy.rice.controller.directory;
 
 import com.gaojy.rice.controller.directory.event.DirectoryEvent;
 import com.gaojy.rice.controller.directory.listener.DirectoryListener;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,9 +35,11 @@ public abstract class AbstractDirectoryImpl {
         if (listener != null) {
             listener.handler(event);
         }
-        nextDirectory.stream().forEach(d -> {
-            d.triggerListener(event);
-        });
+        if (nextDirectory.size() > 0) {
+            nextDirectory.stream().forEach(d -> {
+                d.triggerListener(event);
+            });
+        }
 
     }
 }

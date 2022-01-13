@@ -9,5 +9,6 @@ package com.gaojy.rice.common.constants;
 public class LoggerName {
     public static final String COMMON_LOGGER_NAME = "RiceCommon";
     public static final String CLIENT_LOGGER_NAME = "RiceProcessor";
+    public static final String CONTROLLER_LOGGER_NAME = "RiceController";
 
 }
