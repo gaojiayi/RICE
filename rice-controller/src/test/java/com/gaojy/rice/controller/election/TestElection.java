@@ -1,5 +1,6 @@
 package com.gaojy.rice.controller.election;
 
+import com.alipay.sofa.jraft.entity.PeerId;
 import com.gaojy.rice.controller.config.ControllerConfig;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,21 +21,49 @@ public class TestElection {
 
     @Test
     public void electionTest() throws InterruptedException {
+
         ControllerConfig config = new ControllerConfig();
         config.setController_election_port(8081);
         config.setAllControllerAddressStr("127.0.0.1:8081,127.0.0.1:8082,127.0.0.1:8083");
         config.setElectionDataPath("/tmp/server" + config.getController_election_port());
-        RiceElectionManager manager1 = new RiceElectionManager(config);
+        RiceElectionManager manager1 = new RiceElectionManager(config, new LeaderStateListener() {
+            @Override
+            public void onLeaderStart(long leaderTerm) {
+            }
+
+            @Override
+            public void onLeaderStop(long leaderTerm) {
+
+            }
+        });
         manager1.start();
 
         config.setController_election_port(8082);
         config.setElectionDataPath("/tmp/server" + config.getController_election_port());
-        RiceElectionManager manager2 = new RiceElectionManager(config);
+        RiceElectionManager manager2 = new RiceElectionManager(config, new LeaderStateListener() {
+            @Override
+            public void onLeaderStart(long leaderTerm) {
+            }
+
+            @Override
+            public void onLeaderStop(long leaderTerm) {
+
+            }
+        });
         manager2.start();
 
         config.setController_election_port(8083);
         config.setElectionDataPath("/tmp/server" + config.getController_election_port());
-        RiceElectionManager manager3 = new RiceElectionManager(config);
+        RiceElectionManager manager3 = new RiceElectionManager(config, new LeaderStateListener() {
+            @Override
+            public void onLeaderStart(long leaderTerm) {
+            }
+
+            @Override
+            public void onLeaderStop(long leaderTerm) {
+
+            }
+        });
         manager3.start();
 
         Thread.sleep(1000 * 3);

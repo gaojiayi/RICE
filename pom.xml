@@ -32,6 +32,8 @@
         <module>rice-distribution</module>
         <module>rice-repository</module>
         <module>rice-protocol</module>
+        <module>rice-http-agent</module>
+        <module>rice-http-agent/rice-http-api</module>
     </modules>
     <packaging>pom</packaging>
 

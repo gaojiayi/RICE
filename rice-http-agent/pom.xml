@@ -9,17 +9,15 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>rice-repository</artifactId>
+    <artifactId>rice-http-agent</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>rice-repository-mysql</module>
-        <module>rice-repository-api</module>
+        <module>rice-http-jetty</module>
     </modules>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
-
 
 </project>

@@ -23,7 +23,27 @@
         </dependency>
         <dependency>
             <groupId>com.gaojy</groupId>
-            <artifactId>rice-common</artifactId>
+            <artifactId>rice-remote</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-http-api</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-http-jetty</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-repository-api</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-repository-mysql</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
@@ -36,6 +56,7 @@
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
 </project>
