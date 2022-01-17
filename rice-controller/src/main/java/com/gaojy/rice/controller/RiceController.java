@@ -53,7 +53,8 @@ public class RiceController implements LeaderStateListener {
     public Long getShortPollingTimeMills() {
         return 1000L;
     }
-    public Repository getRepository(){
+
+    public Repository getRepository() {
         return this.repository;
     }
 }

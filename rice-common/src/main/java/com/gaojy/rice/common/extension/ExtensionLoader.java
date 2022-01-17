@@ -3,18 +3,15 @@ package com.gaojy.rice.common.extension;
 import com.gaojy.rice.common.utils.ArrayUtils;
 import com.gaojy.rice.common.utils.ClassHelper;
 import com.gaojy.rice.common.utils.Holder;
-import com.gaojy.rice.common.utils.ReflectUtils;
 import com.gaojy.rice.common.utils.StringUtil;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
@@ -53,6 +50,8 @@ public class ExtensionLoader<T> {
 
     private static final String RICE_INTERNAL_DIRECTORY = RICE_DIRECTORY + "internal/";
 
+    private final ConcurrentMap<Class<?>, String> cachedNames = new ConcurrentHashMap<>();
+
     //private final ExtensionFactory objectFactory;
     private ExtensionLoader(Class<?> type) {
         this.type = type;
@@ -63,7 +62,6 @@ public class ExtensionLoader<T> {
     private static <T> boolean withExtensionAnnotation(Class<T> type) {
         return type.isAnnotationPresent(SPI.class);
     }
-
 
     public static <T> ExtensionLoader<T> getExtensionLoader(Class<T> type) {
         if (type == null) {
@@ -136,13 +134,6 @@ public class ExtensionLoader<T> {
                 EXTENSION_INSTANCES.putIfAbsent(clazz, clazz.newInstance());
                 instance = (T) EXTENSION_INSTANCES.get(clazz);
             }
-//            Set<Class<?>> wrapperClasses = cachedWrapperClasses;
-//            //将该instance依次使用包装类包裹
-//            if (CollectionUtils.isNotEmpty(wrapperClasses)) {
-//                for (Class<?> wrapperClass : wrapperClasses) {
-//                    instance = injectExtension((T) wrapperClass.getConstructor(type).newInstance(instance));
-//                }
-//            }
             return instance;
         } catch (Throwable t) {
             throw new IllegalStateException("Extension instance (name: " + name + ", class: " +
@@ -221,7 +212,8 @@ public class ExtensionLoader<T> {
         }
     }
 
-    private void loadResource(Map<String, Class<?>> extensionClasses, ClassLoader classLoader, java.net.URL resourceURL) {
+    private void loadResource(Map<String, Class<?>> extensionClasses, ClassLoader classLoader,
+        java.net.URL resourceURL) {
         try {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(resourceURL.openStream(), StandardCharsets.UTF_8))) {
                 String line;
@@ -256,7 +248,8 @@ public class ExtensionLoader<T> {
         }
     }
 
-    private void loadClass(Map<String, Class<?>> extensionClasses, java.net.URL resourceURL, Class<?> clazz, String name) throws NoSuchMethodException {
+    private void loadClass(Map<String, Class<?>> extensionClasses, java.net.URL resourceURL, Class<?> clazz,
+        String name) throws NoSuchMethodException {
         //必须是该扩展点的实现
         if (!type.isAssignableFrom(clazz)) {
             throw new IllegalStateException("Error occurred when loading extension class (interface: " +
@@ -266,6 +259,32 @@ public class ExtensionLoader<T> {
         //这里判断是否有自定义的适配器类，如果有，后面获取适配器的时候，就可以直接用这个创建返回，不用dubbo动态创建
         if (clazz.isAnnotationPresent(Adaptive.class)) {
             cacheAdaptiveClass(clazz);
+        } else {
+            clazz.getConstructor();
+
+            String[] names = NAME_SEPARATOR.split(name);
+            if (ArrayUtils.isNotEmpty(names)) {
+                for (String n : names) {
+                    cacheName(clazz, n);
+                    //缓存扩展实现
+                    saveInExtensionClass(extensionClasses, clazz, name);
+                }
+            }
+        }
+    }
+
+    private void saveInExtensionClass(Map<String, Class<?>> extensionClasses, Class<?> clazz, String name) {
+        Class<?> c = extensionClasses.get(name);
+        if (c == null) {
+            extensionClasses.put(name, clazz);
+        } else if (c != clazz) {
+            throw new IllegalStateException("Duplicate extension " + type.getName() + " name " + name + " on " + c.getName() + " and " + clazz.getName());
+        }
+    }
+
+    private void cacheName(Class<?> clazz, String name) {
+        if (!cachedNames.containsKey(clazz)) {
+            cachedNames.put(clazz, name);
         }
     }
 
@@ -286,7 +305,6 @@ public class ExtensionLoader<T> {
             }
         }
         StringBuilder buf = new StringBuilder("No such extension " + type.getName() + " by name " + name);
-
 
         int i = 1;
         for (Map.Entry<String, IllegalStateException> entry : exceptions.entrySet()) {

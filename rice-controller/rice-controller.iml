@@ -39,6 +39,13 @@
     <orderEntry type="library" name="Maven: io.netty:netty-all:4.1.42.Final" level="project" />
     <orderEntry type="module" module-name="rice-http-api" />
     <orderEntry type="module" module-name="rice-http-jetty" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-server:9.4.11.v20180605" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-http:9.4.11.v20180605" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util:9.4.11.v20180605" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-io:9.4.11.v20180605" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-servlet:9.4.11.v20180605" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-security:9.4.11.v20180605" level="project" />
+    <orderEntry type="library" name="Maven: javax.servlet:javax.servlet-api:3.1.0" level="project" />
     <orderEntry type="module" module-name="rice-repository-api" />
     <orderEntry type="module" module-name="rice-repository-mysql" />
     <orderEntry type="library" name="Maven: commons-dbutils:commons-dbutils:1.6" level="project" />

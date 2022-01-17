@@ -21,6 +21,8 @@
         <assertj_version>2.6.0</assertj_version>
         <jansi_version>1.11</jansi_version>
         <jraft_version>1.3.8</jraft_version>
+        <servlet_version>3.1.0</servlet_version>
+        <jetty_version>9.4.11.v20180605</jetty_version>
     </properties>
 
     <dependencyManagement>
@@ -81,6 +83,22 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>5.1.35</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jetty_version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlet</artifactId>
+                <version>${jetty_version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>${servlet_version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
