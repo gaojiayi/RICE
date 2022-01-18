@@ -13,15 +13,15 @@ import java.util.Map;
  */
 public class HttpResponse {
     private Map<String, Object> data = new HashMap<>();
-    private int statusCode = ResponseCode.OK;
+    private int respCode;
     private String errorMessae="";
 
     public HttpResponse(Map<String, Object> data) {
         this.data = data;
     }
 
-    public HttpResponse(int statusCode, String errorMessae) {
-        this.statusCode = statusCode;
+    public HttpResponse(int respCode, String errorMessae) {
+        this.respCode = respCode;
         this.errorMessae = errorMessae;
     }
 
@@ -33,12 +33,13 @@ public class HttpResponse {
         this.data = data;
     }
 
-    public int getStatusCode() {
-        return statusCode;
+
+    public int getRespCode() {
+        return respCode;
     }
 
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
+    public void setRespCode(int respCode) {
+        this.respCode = respCode;
     }
 
     public String getErrorMessae() {
@@ -51,7 +52,7 @@ public class HttpResponse {
 
     public String toJsonString() {
         Map<String, Object> resp = new HashMap<>();
-        resp.put("status_code", statusCode);
+        resp.put("resp_code", respCode);
         resp.put("error_message", errorMessae);
         resp.put("data", data);
         return JSON.toJSONString(resp);
@@ -59,10 +60,6 @@ public class HttpResponse {
 
 
 
-    class ResponseCode {
-        public static final int OK = 200;
-        public static final int INTERNAL_ERROR = 500;
-        public static final int BAD_REQUEST = 400;
-    }
+
 
 }

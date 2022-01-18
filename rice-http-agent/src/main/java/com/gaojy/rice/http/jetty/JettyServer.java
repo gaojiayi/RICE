@@ -27,6 +27,7 @@ public class JettyServer implements HttpServer {
         this.server = server;
         try {
             this.server.start();
+            closed = Boolean.FALSE;
         } catch (Exception e) {
             throw new IllegalStateException("Failed to start jetty server, cause: "
                     + e.getMessage(), e);

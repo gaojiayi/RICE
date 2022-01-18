@@ -14,6 +14,8 @@ public class ControllerConfig extends ElectionConstants {
 
     private int controller_election_port = controller_port + 10;
 
+    private int controller_console_port = controller_port + 5;
+
     private String electionDataPath = "/tmp/rice/controller/election";
 
     private String allControllerAddressStr = "";
@@ -58,5 +60,13 @@ public class ControllerConfig extends ElectionConstants {
 
     public void setAllControllerAddressStr(String allControllerAddressStr) {
         this.allControllerAddressStr = allControllerAddressStr;
+    }
+
+    public int getController_console_port() {
+        return controller_console_port;
+    }
+
+    public void setController_console_port(int controller_console_port) {
+        this.controller_console_port = controller_console_port;
     }
 }

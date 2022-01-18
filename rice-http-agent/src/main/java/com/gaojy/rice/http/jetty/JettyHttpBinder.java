@@ -2,6 +2,7 @@ package com.gaojy.rice.http.jetty;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.gaojy.rice.common.constants.LoggerName;
 import com.gaojy.rice.http.api.*;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -18,11 +19,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Jetty 服务器构建器
  */
 public class JettyHttpBinder implements HttpBinder {
+    private static final Logger log = LoggerFactory.getLogger(LoggerName.HTTP_AGENT_LOGGER_NAME);
     private final int DEFAULT_THREADS = 200;
     private final String ROOT_PATH = "/rice";
     private final Server server;
@@ -72,7 +76,7 @@ public class JettyHttpBinder implements HttpBinder {
             Map<String, Object> paramMap = new HashMap<>();
             HttpRequest request = new HttpRequest(paramMap);
 
-            if (null != req.getContentType()  && req.getContentType().toLowerCase().indexOf("json") > 0) {
+            if (null != req.getContentType() && req.getContentType().toLowerCase().indexOf("json") > 0) {
                 String body = req.getReader().readLine();
                 if (StringUtil.isNotBlank(body)) {
                     JSONObject jsonBody = JSON.parseObject(body);
@@ -90,15 +94,18 @@ public class JettyHttpBinder implements HttpBinder {
                 });
             }
             HttpHandler h = JettyHttpBinder.this.handlers.get(this.path);
-            HttpResponse response = h.handler(request);
-            if (response.getStatusCode() != 200) {
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            } else {
-                resp.setStatus(HttpServletResponse.SC_OK);
-            }
+            HttpResponse response = null;
             resp.setCharacterEncoding("UTF-8");
             resp.setContentType("application/json");
-            resp.getWriter().print(response.toJsonString());
+            try {
+                response = h.handler(request);
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.getWriter().print(response.toJsonString());
+            } catch (Exception e) {
+                log.error("Api = {}, request param = {} , occur error:{},", this.path, paramMap, e);
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            }
+
         }
     }
 }
