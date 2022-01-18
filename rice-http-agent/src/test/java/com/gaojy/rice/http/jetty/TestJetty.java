@@ -7,6 +7,7 @@ import org.apache.http.Consts;
 import org.apache.http.client.fluent.Form;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -89,6 +90,7 @@ public class TestJetty {
 
     }
 
+    @AfterClass
     public static void closeServer() {
         server.close();
     }
