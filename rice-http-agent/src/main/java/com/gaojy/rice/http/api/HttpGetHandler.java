@@ -9,6 +9,5 @@ import com.gaojy.rice.common.extension.SPI;
 @SPI
 public interface HttpGetHandler extends HttpHandler {
 
-    public HttpResponse handler(HttpRequest request);
 
 }
