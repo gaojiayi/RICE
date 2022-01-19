@@ -3,6 +3,7 @@ package com.gaojy.rice.controller.maintain;
 import com.gaojy.rice.remote.common.RemoteHelper;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import java.util.Objects;
 
 /**
  * @author gaojy
@@ -12,13 +13,15 @@ import io.netty.channel.ChannelFuture;
  */
 public class ChannelWrapper {
     private final Channel channel;
+    private final String remoteAddr;
 
     public ChannelWrapper(Channel channel) {
         this.channel = channel;
+        remoteAddr = RemoteHelper.parseChannelRemoteAddr(channel);
     }
 
-    public String getRemoteAddr(){
-        return RemoteHelper.parseChannelRemoteAddr(channel);
+    public String getRemoteAddr() {
+        return remoteAddr;
     }
 
     public boolean isActive() {
@@ -29,5 +32,18 @@ public class ChannelWrapper {
         return this.channel;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof ChannelWrapper))
+            return false;
+        ChannelWrapper wrapper = (ChannelWrapper) o;
+        return getRemoteAddr().equals(wrapper.getRemoteAddr());
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(getRemoteAddr());
+    }
 }

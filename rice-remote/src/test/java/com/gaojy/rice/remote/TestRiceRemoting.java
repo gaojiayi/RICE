@@ -30,8 +30,8 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(JUnit4.class)
 public class TestRiceRemoting {
-    private static IBaseRemote transportClient;
-    private static IBaseRemote transportServer;
+    private static TransportClient transportClient;
+    private static TransportServer transportServer;
 
     public static TransportServer buildTransportServer() throws InterruptedException {
         TransfServerConfig config = new TransfServerConfig();

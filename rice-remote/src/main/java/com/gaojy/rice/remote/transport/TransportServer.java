@@ -8,11 +8,13 @@ import com.gaojy.rice.common.exception.RemotingTooMuchRequestException;
 import com.gaojy.rice.remote.ChannelEventListener;
 import com.gaojy.rice.remote.IBaseRemote;
 import com.gaojy.rice.remote.InvokeCallback;
+import com.gaojy.rice.remote.RemoteService;
 import com.gaojy.rice.remote.common.RemoteHelper;
 import com.gaojy.rice.remote.common.TransfUtil;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
@@ -42,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * @Description 服务端
  * @createTime 2022/01/02 11:47:00
  */
-public class TransportServer extends AbstractRemoteService implements IBaseRemote {
+public class TransportServer extends AbstractRemoteService implements RemoteService {
 
     private static final Logger log = LoggerFactory.getLogger(RemoteHelper.RICE_REMOTING);
     private final ServerBootstrap serverBootstrap;
@@ -86,38 +88,22 @@ public class TransportServer extends AbstractRemoteService implements IBaseRemot
         }
     }
 
-    @Override public RiceRemoteContext invokeSync(String addr, RiceRemoteContext request,
+    public RiceRemoteContext invokeSync(final Channel channel, RiceRemoteContext request,
         long timeoutMillis) throws RemotingSendRequestException, RemotingTimeoutException,
         InterruptedException, RemotingConnectException {
-        ChannelWrapper wrapper = getChannelTables().get(addr);
-        if (wrapper != null && wrapper.isActive()) {
-            return this.invokeSyncImpl(wrapper.getChannel(), request, timeoutMillis);
-        }
-        throw new RemotingConnectException(addr);
+        return this.invokeSyncImpl(channel, request, timeoutMillis);
     }
 
-    @Override public void invokeAsync(String addr, RiceRemoteContext request, long timeoutMillis,
+    public void invokeAsync(final Channel channel, RiceRemoteContext request, long timeoutMillis,
         InvokeCallback invokeCallback) throws InterruptedException, RemotingConnectException,
         RemotingTooMuchRequestException, RemotingTimeoutException, RemotingSendRequestException {
-        ChannelWrapper wrapper = getChannelTables().get(addr);
-        if (wrapper != null && wrapper.isActive()) {
-            this.invokeAsyncImpl(wrapper.getChannel(), request, timeoutMillis, invokeCallback);
-        } else {
-            throw new RemotingConnectException(addr);
-        }
-
+        this.invokeAsyncImpl(channel, request, timeoutMillis, invokeCallback);
     }
 
-    @Override public void invokeOneWay(String addr, RiceRemoteContext request,
+    public void invokeOneWay(final Channel channel, RiceRemoteContext request,
         long timeoutMillis) throws InterruptedException, RemotingConnectException,
         RemotingTooMuchRequestException, RemotingTimeoutException, RemotingSendRequestException {
-        ChannelWrapper wrapper = getChannelTables().get(addr);
-        if (wrapper != null && wrapper.isActive()) {
-            this.invokeOnewayImpl(wrapper.getChannel(), request, timeoutMillis);
-        } else {
-            throw new RemotingConnectException(addr);
-        }
-
+        this.invokeOnewayImpl(channel, request, timeoutMillis);
     }
 
     @Override
@@ -249,7 +235,7 @@ public class TransportServer extends AbstractRemoteService implements IBaseRemot
         }
 
         /**
-         * @description  client连接失效
+         * @description client连接失效
          */
         @Override public void channelInactive(ChannelHandlerContext ctx) throws Exception {
             final String remoteAddress = RemoteHelper.parseChannelRemoteAddr(ctx.channel());
@@ -291,12 +277,5 @@ public class TransportServer extends AbstractRemoteService implements IBaseRemot
 
             closeChannel(ctx.channel());
         }
-    }
-
-    public static void main(String[] args) {
-        TransfServerConfig config = new TransfServerConfig();
-        IBaseRemote server = new TransportServer(config);
-        server.start();
-        System.out.println("server start successful");
     }
 }

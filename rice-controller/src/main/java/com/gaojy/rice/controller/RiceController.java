@@ -86,6 +86,8 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
         if (httpServer != null && !httpServer.isClosed()) {
             httpServer.close();
         }
+        // 关闭数据源
+        repository.close();
 
     }
 
@@ -99,7 +101,6 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
         // httpBinder.addHttpHandler();
 
     }
-
 
     /**
      * master需要处理任务分配
@@ -137,7 +138,6 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
                 // 任务分配完成以后  就立刻返回数据task给对应的scheduler(长轮询)
             }
         }
-
 
     }
 
