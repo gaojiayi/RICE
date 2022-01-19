@@ -122,9 +122,9 @@ public class ConsistentHashingStrategy1 {
         System.out.println("=================删除192.168.0.3:111==========");
         Integer hash1 = getHash("192.168.0.3:111");
         sortedMap.remove(hash1);
-        Integer tail1 = sortedMap.tailMap(hash).isEmpty() ? sortedMap.firstKey() : sortedMap.tailMap(hash).firstKey();
+        Integer tail1 = sortedMap.tailMap(hash1).isEmpty() ? sortedMap.firstKey() : sortedMap.tailMap(hash1).firstKey();
 
-        Integer head1 = sortedMap.headMap(hash).isEmpty() ? sortedMap.lastKey() : sortedMap.headMap(hash).lastKey();
+        Integer head1 = sortedMap.headMap(hash1).isEmpty() ? sortedMap.lastKey() : sortedMap.headMap(hash1).lastKey();
         System.out.println("192.168.0.3:111 between " + sortedMap.get(head1) + " and " + sortedMap.get(tail1));
 
         Map<String, List<String>> ret2 = new HashMap<>();

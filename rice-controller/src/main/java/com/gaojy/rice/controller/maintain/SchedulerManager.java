@@ -57,17 +57,40 @@ public class SchedulerManager {
             Set<ChannelWrapper> newSchedulerNodes = new HashSet<>(schedulerNodes);
             newSchedulerNodes.add(new ChannelWrapper(channel));
             schedulerNodes = newSchedulerNodes;
+            // 如果是master
+            // 任务分配
         } finally {
             w.unlock();
         }
     }
 
-    public Boolean updateSchedulerStatus(Channel channel){
+    public Boolean updateSchedulerStatus(Channel channel) {
         // 比如获取最新的心跳时间
         return Boolean.TRUE;
     }
 
 
+    public void crashOrDown(Channel channel) {
+        // 判断是否在内存中
+
+        // 如果在 则移除
+
+        // 如果是master 则任务分配
+
+    }
+
+    public boolean is_scheduler(String remoteAddr) {
+        r.lock();
+        boolean is_scheduler = false;
+        try {
+            is_scheduler = schedulerNodes.stream()
+                    .map(ChannelWrapper::getRemoteAddr).collect(Collectors.toList())
+                    .contains(remoteAddr);
+        } finally {
+            r.unlock();
+        }
+        return is_scheduler;
+    }
 
 
 }
