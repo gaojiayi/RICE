@@ -7,9 +7,11 @@ import com.gaojy.rice.controller.election.LeaderStateListener;
 import com.gaojy.rice.controller.election.RiceElectionManager;
 import com.gaojy.rice.http.api.HttpBinder;
 import com.gaojy.rice.http.api.HttpServer;
+import com.gaojy.rice.remote.ChannelEventListener;
 import com.gaojy.rice.remote.transport.TransfServerConfig;
 import com.gaojy.rice.remote.transport.TransportServer;
 import com.gaojy.rice.repository.api.Repository;
+import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * @Description TODO
  * @createTime 2022/01/08 10:39:00
  */
-public class RiceController implements LeaderStateListener {
+public class RiceController implements LeaderStateListener, ChannelEventListener {
 
     private static final Logger log = LoggerFactory.getLogger(LoggerName.CONTROLLER_LOGGER_NAME);
 
@@ -40,7 +42,7 @@ public class RiceController implements LeaderStateListener {
     public RiceController(ControllerConfig controllerConfig, TransfServerConfig transfServerConfig) {
         this.controllerConfig = controllerConfig;
         this.transfServerConfig = transfServerConfig;
-        this.remotingServer = new TransportServer(this.transfServerConfig);
+        this.remotingServer = new TransportServer(this.transfServerConfig, this);
         this.riceElectionManager = new RiceElectionManager(this.controllerConfig, this);
 
         // 注册业务处理器
@@ -97,7 +99,6 @@ public class RiceController implements LeaderStateListener {
     }
 
 
-
     /**
      * master需要处理任务分配
      */
@@ -113,5 +114,29 @@ public class RiceController implements LeaderStateListener {
 
     public Repository getRepository() {
         return this.repository;
+    }
+
+    @Override
+    public void onChannelConnect(String remoteAddr, Channel channel) {
+
+    }
+
+    @Override
+    public void onChannelClose(String remoteAddr, Channel channel) {
+        if (this.riceElectionManager.isLeader()) {
+            // 如果发现是调度器下线了  那么就触发任务分配
+        }
+
+
+    }
+
+    @Override
+    public void onChannelException(String remoteAddr, Channel channel) {
+
+    }
+
+    @Override
+    public void onChannelIdle(String remoteAddr, Channel channel) {
+
     }
 }

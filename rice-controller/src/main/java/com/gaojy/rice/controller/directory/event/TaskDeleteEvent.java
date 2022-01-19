@@ -1,7 +1,6 @@
 package com.gaojy.rice.controller.directory.event;
 
 import com.gaojy.rice.controller.directory.Directory;
-import com.sun.javafx.event.DirectEvent;
 
 /**
  * @author gaojy
