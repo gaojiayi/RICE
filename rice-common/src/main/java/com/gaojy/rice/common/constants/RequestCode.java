@@ -12,4 +12,11 @@ public class RequestCode {
 
     // from processor
     public static final int REGISTER_PROCESSOR = 200;
+
+    // 处理日志上报
+    public static final int LOG_REPORT = 210;
+
+
+    public static final int HEART_BEAT = 10;
+
 }

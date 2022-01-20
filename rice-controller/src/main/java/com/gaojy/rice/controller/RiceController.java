@@ -94,6 +94,14 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
     private void doProcessorRegister() {
         // 处理器注册请求把处理器先保存数据库，然后获取对应的几个调度器，依次通过控制器通知调度器。 失败，则由processor重试
 
+        // 调度器注册处理
+
+        // 调度器心跳处理
+
+        //  调度器拉取任务change处理
+
+        //  调度器上报状态处理
+
     }
 
     // http handler处理器注册
@@ -106,7 +114,6 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
      * master需要处理任务分配
      */
 
-    // 另外启动http用于控制台操作
     public Boolean isLongPollingEnable() {
         return true;
     }
