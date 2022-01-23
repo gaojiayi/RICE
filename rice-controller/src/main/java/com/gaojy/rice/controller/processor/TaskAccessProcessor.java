@@ -41,7 +41,9 @@ public class TaskAccessProcessor implements RiceRequestProcessor {
         ExportTaskRequestHeader requestHeader = (ExportTaskRequestHeader) request.decodeCommandCustomHeader(ExportTaskRequestHeader.class);
         ExportTaskRequestBody exportTaskRequestBody = ExportTaskRequestBody.decode(request.getBody(), ExportTaskRequestBody.class);
 
-        // 查询数据库表
+        // 写数据库
+
+        // 请求对应的 scheduler server，处理器上线通知
 
         response.setCode(ResponseCode.SUCCESS);
         response.setRemark(null);

@@ -22,6 +22,10 @@ public class ControllerConfig extends ElectionConstants {
 
     private String localHost = "127.0.0.1";
 
+    private int taskAccessThreadPoolNums = 16;
+
+    private int schedulerManagerThreadPoolNums = 16 + Runtime.getRuntime().availableProcessors() * 2;
+
     public String getLocalHost() {
         return localHost;
     }
@@ -68,5 +72,21 @@ public class ControllerConfig extends ElectionConstants {
 
     public void setController_console_port(int controller_console_port) {
         this.controller_console_port = controller_console_port;
+    }
+
+    public int getTaskAccessThreadPoolNums() {
+        return taskAccessThreadPoolNums;
+    }
+
+    public void setTaskAccessThreadPoolNums(int taskAccessThreadPoolNums) {
+        this.taskAccessThreadPoolNums = taskAccessThreadPoolNums;
+    }
+
+    public int getSchedulerManagerThreadPoolNums() {
+        return schedulerManagerThreadPoolNums;
+    }
+
+    public void setSchedulerManagerThreadPoolNums(int schedulerManagerThreadPoolNums) {
+        this.schedulerManagerThreadPoolNums = schedulerManagerThreadPoolNums;
     }
 }

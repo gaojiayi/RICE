@@ -1,11 +1,15 @@
 package com.gaojy.rice.controller;
 
+import com.gaojy.rice.common.RiceThreadFactory;
 import com.gaojy.rice.common.constants.LoggerName;
+import com.gaojy.rice.common.constants.RequestCode;
 import com.gaojy.rice.common.extension.ExtensionLoader;
 import com.gaojy.rice.controller.config.ControllerConfig;
 import com.gaojy.rice.controller.election.LeaderStateListener;
 import com.gaojy.rice.controller.election.RiceElectionManager;
 import com.gaojy.rice.controller.maintain.SchedulerManager;
+import com.gaojy.rice.controller.processor.SchedulerManagerProcessor;
+import com.gaojy.rice.controller.processor.TaskAccessProcessor;
 import com.gaojy.rice.http.api.HttpBinder;
 import com.gaojy.rice.http.api.HttpServer;
 import com.gaojy.rice.remote.ChannelEventListener;
@@ -13,6 +17,8 @@ import com.gaojy.rice.remote.transport.TransfServerConfig;
 import com.gaojy.rice.remote.transport.TransportServer;
 import com.gaojy.rice.repository.api.Repository;
 import io.netty.channel.Channel;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,11 +46,20 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
 
     private HttpServer httpServer;
 
+    private ExecutorService taskAccessExecutor;
+
+    private ExecutorService schedulerManagerExecutor;
+
     public RiceController(ControllerConfig controllerConfig, TransfServerConfig transfServerConfig) {
         this.controllerConfig = controllerConfig;
         this.transfServerConfig = transfServerConfig;
         this.remotingServer = new TransportServer(this.transfServerConfig, this);
         this.riceElectionManager = new RiceElectionManager(this.controllerConfig, this);
+
+        this.taskAccessExecutor = Executors.newFixedThreadPool(this.controllerConfig.getTaskAccessThreadPoolNums(),
+            new RiceThreadFactory("TaskAccessThread_"));
+        this.schedulerManagerExecutor = Executors.newFixedThreadPool(this.controllerConfig.getSchedulerManagerThreadPoolNums(),
+            new RiceThreadFactory("SchedulerManagerThread_"));
 
         // 注册业务处理器
         this.doProcessorRegister();
@@ -93,14 +108,18 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
 
     private void doProcessorRegister() {
         // 处理器注册请求把处理器先保存数据库，然后获取对应的几个调度器，依次通过控制器通知调度器。 失败，则由processor重试
+        remotingServer.registerProcessor(RequestCode.REGISTER_PROCESSOR, new TaskAccessProcessor(), this.taskAccessExecutor);
+
+        SchedulerManagerProcessor schedulerManagerProcessor = new SchedulerManagerProcessor();
 
         // 调度器注册处理
+        remotingServer.registerProcessor(RequestCode.SCHEDULER_REGISTER, schedulerManagerProcessor, this.schedulerManagerExecutor);
 
-        // 调度器心跳处理
+        // 调度器心跳处理 调度器上报状态处理
+        remotingServer.registerProcessor(RequestCode.SCHEDULER_HEART_BEAT, schedulerManagerProcessor, this.schedulerManagerExecutor);
 
         //  调度器拉取任务change处理
-
-        //  调度器上报状态处理
+        remotingServer.registerProcessor(RequestCode.SCHEDULER_PULL_TASK, schedulerManagerProcessor, this.schedulerManagerExecutor);
 
     }
 

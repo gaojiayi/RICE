@@ -19,6 +19,6 @@ public class RiceThreadFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(Runnable r) {
-        return new Thread(r, "threadName" + this.threadIndex.incrementAndGet());
+        return new Thread(r, this.threadName + this.threadIndex.incrementAndGet());
     }
 }

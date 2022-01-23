@@ -7,6 +7,7 @@ package com.gaojy.rice.common.constants;
  * @createTime 2022/01/07 16:35:00
  */
 public class RequestCode {
+
     // from scheduler
     public static final int INVOKE_PROCESSOR = 100;
 
@@ -16,7 +17,13 @@ public class RequestCode {
     // 处理日志上报
     public static final int LOG_REPORT = 210;
 
+    // 调度器的任务拉取
+    public static final int SCHEDULER_PULL_TASK = 300;
 
-    public static final int HEART_BEAT = 10;
+    //调度器的心跳
+    public static final int SCHEDULER_HEART_BEAT = 310;
+
+    //调度器的注册
+     public static final int SCHEDULER_REGISTER = 320;
 
 }
