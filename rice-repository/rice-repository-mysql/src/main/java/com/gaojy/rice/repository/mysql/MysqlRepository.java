@@ -2,6 +2,7 @@ package com.gaojy.rice.repository.mysql;
 
 import com.gaojy.rice.repository.api.Repository;
 import com.gaojy.rice.repository.api.task.RiceTaskChangeRecordDao;
+import javax.sql.DataSource;
 
 /**
  * @author gaojy
@@ -11,10 +12,13 @@ import com.gaojy.rice.repository.api.task.RiceTaskChangeRecordDao;
  */
 public class MysqlRepository implements Repository {
 
-
     @Override
     public void connect() {
+        DataSourceFactory.getConnection();
+    }
 
+    public DataSource getDataSource() {
+        return DataSourceFactory.getDataSource();
     }
 
     @Override

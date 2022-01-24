@@ -98,7 +98,7 @@ public class RiceProcessorManager {
             e.printStackTrace();
         } finally {
             // 处理器刚启动的时候 会上报task信息，使用短连接进行注册
-            client.shutdown();
+            //  client.shutdown();
         }
 
         // 如果返回失败  则 destory 并 抛出异常
@@ -115,6 +115,8 @@ public class RiceProcessorManager {
 
     private void register() {
         server.registerProcessor(RequestCode.INVOKE_PROCESSOR,
+            new DefaultTaskScheduleProcessor(this), this.remotingExecutor);
+        server.registerProcessor(RequestCode.SCHEDULER_HEART_BEAT,
             new DefaultTaskScheduleProcessor(this), this.remotingExecutor);
 
     }
