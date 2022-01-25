@@ -9,12 +9,11 @@ import com.gaojy.rice.processor.api.annotation.Executer;
 import com.gaojy.rice.processor.api.log.RiceClientLogger;
 import com.gaojy.rice.remote.transport.TransfClientConfig;
 import com.gaojy.rice.remote.transport.TransfServerConfig;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
+
 import org.slf4j.Logger;
 
 /**
@@ -28,7 +27,7 @@ public class ProcessorConfig {
     public static final String RICE_PRO_CONFIG_FILE_PATH_KEY = "rice.processor.config.file.path";
     public static final String DEFAULT_RICE_CONFIG_FILE_PATH = "rice.properties";
     public static final String RICE_PRO_CONFIG_FILE_PATH = System.getProperty(RICE_PRO_CONFIG_FILE_PATH_KEY
-        , DEFAULT_RICE_CONFIG_FILE_PATH);
+            , DEFAULT_RICE_CONFIG_FILE_PATH);
     private final Properties p = new Properties();
     private transient InputStream in = null;
     private Map<TaskDetailData, Class<? extends RiceBasicProcessor>> processorMap = new HashMap<>();
@@ -41,7 +40,8 @@ public class ProcessorConfig {
 
     private String appId;
 
-    private int collectorPort;
+    private String controllerServers;
+
 
     public ProcessorConfig() {
         try {
@@ -119,7 +119,7 @@ public class ProcessorConfig {
 
         if (StringUtil.isNotEmpty(p.getProperty(ConfigConstants.SERVER_ASYNC_SEMAPHORE_VALUE))) {
             transfServerConfig.setServerAsyncSemaphoreValue(
-                Integer.parseInt(p.getProperty(ConfigConstants.SERVER_ASYNC_SEMAPHORE_VALUE)));
+                    Integer.parseInt(p.getProperty(ConfigConstants.SERVER_ASYNC_SEMAPHORE_VALUE)));
         }
         // TODO Other service Config
 
@@ -138,7 +138,7 @@ public class ProcessorConfig {
     }
 
     public void setProcessorMap(
-        Map<TaskDetailData, Class<? extends RiceBasicProcessor>> processorMap) {
+            Map<TaskDetailData, Class<? extends RiceBasicProcessor>> processorMap) {
         this.processorMap = processorMap;
     }
 
@@ -158,11 +158,13 @@ public class ProcessorConfig {
         this.transfServerConfig = transfServerConfig;
     }
 
-    public String getMainControllerAddress(){
-        return "";
+
+    public List<String> getControllerServerList() {
+        if (StringUtil.isNotEmpty(controllerServers)) {
+            return Arrays.asList(controllerServers.split(","));
+        }
+        return null;
     }
 
-    public int getCollectorPort() {
-        return collectorPort;
-    }
+
 }

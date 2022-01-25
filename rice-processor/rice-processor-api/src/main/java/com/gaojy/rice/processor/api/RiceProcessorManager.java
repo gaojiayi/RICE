@@ -1,6 +1,8 @@
 package com.gaojy.rice.processor.api;
 
 import com.gaojy.rice.common.RiceThreadFactory;
+import com.gaojy.rice.common.balance.Balance;
+import com.gaojy.rice.common.balance.RoundRobinBalance;
 import com.gaojy.rice.common.constants.RequestCode;
 import com.gaojy.rice.common.exception.RegisterProcessorException;
 import com.gaojy.rice.common.exception.RemotingCommandException;
@@ -20,8 +22,10 @@ import com.gaojy.rice.remote.protocol.RemotingSysResponseCode;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.TransportClient;
 import com.gaojy.rice.remote.transport.TransportServer;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import org.slf4j.Logger;
 
 /**
@@ -50,8 +54,8 @@ public class RiceProcessorManager {
         server = new TransportServer(config.getTransfServerConfig());
         client = new TransportClient(config.getTransfClientConfig());
         remotingExecutor =
-            Executors.newFixedThreadPool(config.getTransfServerConfig().getServerWorkerThreads(),
-                new RiceThreadFactory("RemotingExecutorThread_"));
+                Executors.newFixedThreadPool(config.getTransfServerConfig().getServerWorkerThreads(),
+                        new RiceThreadFactory("RemotingExecutorThread_"));
 
     }
 
@@ -81,25 +85,10 @@ public class RiceProcessorManager {
 
         // 将所有的task包装成请求对象  并暴露给控制器
         Exception exception = null;
-        try {
-            RiceRemoteContext context = buildRegisterRequest();
-            doRegister(context);
-        } catch (RemotingConnectException e) {
-            e.printStackTrace();
-        } catch (RemotingSendRequestException e) {
-            e.printStackTrace();
-        } catch (RemotingTimeoutException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (RemotingCommandException e) {
-            e.printStackTrace();
-        } catch (RegisterProcessorException e) {
-            e.printStackTrace();
-        } finally {
-            // 处理器刚启动的时候 会上报task信息，使用短连接进行注册
-            //  client.shutdown();
-        }
+
+        RiceRemoteContext context = buildRegisterRequest();
+        doRegister(context);
+
 
         // 如果返回失败  则 destory 并 抛出异常
         if (exception != null) {
@@ -115,9 +104,9 @@ public class RiceProcessorManager {
 
     private void register() {
         server.registerProcessor(RequestCode.INVOKE_PROCESSOR,
-            new DefaultTaskScheduleProcessor(this), this.remotingExecutor);
+                new DefaultTaskScheduleProcessor(this), this.remotingExecutor);
         server.registerProcessor(RequestCode.SCHEDULER_HEART_BEAT,
-            new DefaultTaskScheduleProcessor(this), this.remotingExecutor);
+                new DefaultTaskScheduleProcessor(this), this.remotingExecutor);
 
     }
 
@@ -135,32 +124,42 @@ public class RiceProcessorManager {
         return requestCommand;
     }
 
-    void doRegister(RiceRemoteContext riceRemoteContext) throws RemotingConnectException,
-        RemotingSendRequestException, RemotingTimeoutException, InterruptedException,
-        RemotingCommandException, RegisterProcessorException {
-        String addr = config.getMainControllerAddress() + ":" + config.getCollectorPort();
-        RiceRemoteContext registerResult = client.invokeSync(addr, riceRemoteContext, 3 * 1000);
-        switch (registerResult.getCode()) {
-            case RemotingSysResponseCode.SUCCESS: {
-                ExportTaskResponseHeader header = (ExportTaskResponseHeader) registerResult.decodeCommandCustomHeader(ExportTaskResponseHeader.class);
-                if (!header.getTaskSchedulerInfo().isEmpty()) {
-                    header.getTaskSchedulerInfo().forEach((k, v) -> {
-                        if (StringUtil.isNotEmpty(v)) {
-                            log.info("taskcode:" + k + " will scheduled by server " + v);
-                        } else {
-                            log.info("taskcode:" + k + " have not been assigned yet ");
+    void doRegister(RiceRemoteContext riceRemoteContext) {
+        Balance balance = new RoundRobinBalance<>(config.getControllerServerList());
+        String addr = null;
+        int retryConnCount = 5;
+        while (retryConnCount >= 0) {
+            try {
+                addr = balance.select();
+                RiceRemoteContext registerResult = client.invokeSync(addr, riceRemoteContext, 3 * 1000);
+                switch (registerResult.getCode()) {
+                    case RemotingSysResponseCode.SUCCESS: {
+                        ExportTaskResponseHeader header = (ExportTaskResponseHeader) registerResult.decodeCommandCustomHeader(ExportTaskResponseHeader.class);
+                        if (!header.getTaskSchedulerInfo().isEmpty()) {
+                            header.getTaskSchedulerInfo().forEach((k, v) -> {
+                                if (StringUtil.isNotEmpty(v)) {
+                                    log.info("taskcode:" + k + " will scheduled by server " + v);
+                                } else {
+                                    log.info("taskcode:" + k + " have not been assigned yet ");
+                                }
+
+                            });
                         }
+                        return;
 
-                    });
+                    }
+                    default:
+                        break;
+
                 }
-                return;
-
+            } catch (RemotingConnectException | RemotingTimeoutException
+                    | RemotingSendRequestException | InterruptedException | RemotingCommandException e) {
+                log.error("Register to controller Exception, controller address is " + addr);
             }
-            default:
-                break;
-
+            retryConnCount--;
         }
-        throw new RegisterProcessorException("Register to controller Exception, controller address is " + addr);
+
+        throw new RegisterProcessorException("Register to controller Exception");
     }
 
     public static void main(String[] args) {

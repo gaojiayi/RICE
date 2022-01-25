@@ -1,6 +1,6 @@
 package com.gaojy.rice.repository.mysql;
 
-import com.gaojy.rice.repository.mysql.entity.RiceAppInfo;
+import com.gaojy.rice.repository.api.entity.RiceAppInfo;
 import java.util.Date;
 import java.sql.SQLException;
 import org.apache.commons.dbutils.BasicRowProcessor;
