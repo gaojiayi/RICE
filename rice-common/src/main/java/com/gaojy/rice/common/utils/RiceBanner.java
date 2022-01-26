@@ -61,7 +61,6 @@ public class RiceBanner {
             String str = "";
             while ((str = in.readLine()) != null) {
                 log.info(ansi().fg(color).a(str).reset().toString());
-                System.out.println(ansi().fg(color).a(str).reset());
             }
         } catch (Exception e) {
             log.error("Print RICE banner info exception:" + e);

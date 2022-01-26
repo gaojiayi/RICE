@@ -170,12 +170,5 @@ public class ClasspathPackageScanner implements PackageScanner {
         return name.endsWith(".jar");
     }
 
-    /**
-     * For test purpose.
-     */
-    public static void main(String[] args) throws Exception {
-        PackageScanner scan = new ClasspathPackageScanner("com.gaojy.rice.processor.api");
-        scan.getFullyQualifiedClassNameList();
-    }
 
 }

@@ -16,6 +16,7 @@ import com.gaojy.rice.common.protocol.header.processor.ExportTaskResponseHeader;
 import com.gaojy.rice.common.utils.RiceBanner;
 import com.gaojy.rice.common.utils.StringUtil;
 import com.gaojy.rice.processor.api.config.ProcessorConfig;
+import com.gaojy.rice.processor.api.invoker.TaskInvoker;
 import com.gaojy.rice.processor.api.log.RiceClientLogger;
 import com.gaojy.rice.processor.api.register.DefaultTaskScheduleProcessor;
 import com.gaojy.rice.remote.protocol.RemotingSysResponseCode;
@@ -44,12 +45,7 @@ public class RiceProcessorManager {
     // 处理业务线程池
     private final ExecutorService remotingExecutor;
 
-    private RiceProcessorManager() {
-        this(new ProcessorConfig());
-
-    }
-
-    public RiceProcessorManager(ProcessorConfig config) {
+    private RiceProcessorManager(ProcessorConfig config) {
         this.config = config;
         server = new TransportServer(config.getTransfServerConfig());
         client = new TransportClient(config.getTransfClientConfig());
@@ -63,7 +59,8 @@ public class RiceProcessorManager {
         if (manager == null) {
             synchronized (monitorObj) {
                 if (manager == null) {
-                    manager = new RiceProcessorManager();
+                    ProcessorConfig config = new ProcessorConfig();
+                    manager = new RiceProcessorManager(config);
                     return manager;
                 }
             }
@@ -73,27 +70,21 @@ public class RiceProcessorManager {
 
     public void export() {
         // 收集所有的task 并缓存起来
+        TaskInvoker.init(config);
 
-        //  校验task 有没有重复的task
 
         // 注册业务处理器  启动监听
         register();
         this.server.start();
 
+        this.client.start();
+
         // 创建网络事件监听器
         // TODO:
-
-        // 将所有的task包装成请求对象  并暴露给控制器
-        Exception exception = null;
 
         RiceRemoteContext context = buildRegisterRequest();
         doRegister(context);
 
-
-        // 如果返回失败  则 destory 并 抛出异常
-        if (exception != null) {
-            throw new RuntimeException(exception);
-        }
         // 如果控制器成功返回 打印banner
         RiceBanner.show(7);
     }
@@ -116,8 +107,8 @@ public class RiceProcessorManager {
         header.setAppId(config.getAppId());
         header.setNetAddress(server.getServerAddress());
         final ExportTaskRequestBody body = new ExportTaskRequestBody();
-        config.getProcessorMap().keySet().stream().forEach(task -> {
-            body.addTask(task);
+        TaskInvoker.getTaskInvokerMap().values().stream().forEach(invoker -> {
+            body.addTask(invoker.getTaskDetailData());
         });
         RiceRemoteContext requestCommand = RiceRemoteContext.createRequestCommand(RequestCode.REGISTER_PROCESSOR, header);
         requestCommand.setBody(body.encode());
@@ -162,7 +153,4 @@ public class RiceProcessorManager {
         throw new RegisterProcessorException("Register to controller Exception");
     }
 
-    public static void main(String[] args) {
-        RiceProcessorManager.getManager().export();
-    }
 }

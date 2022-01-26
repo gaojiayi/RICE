@@ -6,5 +6,7 @@ package com.gaojy.rice.processor.api;
  * @Description TODO
  * @createTime 2022/01/04 19:44:00
  */
-public interface RiceMapProcessor {
+public interface RiceMapProcessor extends RiceBasicProcessor {
+
+    public void map();
 }

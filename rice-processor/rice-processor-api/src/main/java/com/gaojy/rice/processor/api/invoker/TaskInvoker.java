@@ -1,13 +1,24 @@
 package com.gaojy.rice.processor.api.invoker;
 
+import com.gaojy.rice.common.TaskType;
+import com.gaojy.rice.common.exception.ProcessorException;
+import com.gaojy.rice.common.protocol.body.processor.TaskDetailData;
 import com.gaojy.rice.common.utils.ClassHelper;
 import com.gaojy.rice.common.utils.ReflectUtils;
 import com.gaojy.rice.processor.api.RiceBasicProcessor;
+import com.gaojy.rice.processor.api.annotation.Executer;
+import com.gaojy.rice.processor.api.config.ClasspathPackageScanner;
+import com.gaojy.rice.processor.api.config.ProcessorConfig;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 /**
  * @author gaojy
@@ -24,16 +36,76 @@ import java.util.regex.Matcher;
  */
 public abstract class TaskInvoker {
 
-    private static final Map<Class<? extends RiceBasicProcessor>, TaskInvoker> TASK_INVOKER_MAP = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, TaskInvoker> TASK_INVOKER_MAP = new ConcurrentHashMap<>();
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
     /**
      * 记录Invoker数量
      */
     private static AtomicLong INVOKER_CLASS_COUNTER = new AtomicLong(0);
 
-    private String taskCode;
+    private static Map<String, Class<?>> TASK_CODE_CLASS_MAP = new HashMap<>();
 
-    public static TaskInvoker getInvoker(Class<? extends RiceBasicProcessor> c) {
+    private static Map<String, Object> TASK_CODE_INSTANCE_MAP = new HashMap<>();
+
+    private TaskDetailData taskDetailData;
+
+    public static void init(ProcessorConfig config) {
+        List<String> taskPackages = config.getTaskPackage();
+        if (taskPackages != null && taskPackages.size() > 0) {
+            taskPackages.stream().forEach(s -> {
+                ClasspathPackageScanner scanner = new ClasspathPackageScanner(s);
+                try {
+                    List<String> allClazzes = scanner.getFullyQualifiedClassNameList();
+                    if (allClazzes != null && allClazzes.size() > 0) {
+                        allClazzes.forEach(className -> {
+                            try {
+                                Class clazz = Class.forName(className);
+                                Executer executer = (Executer) clazz.getDeclaredAnnotation(Executer.class);
+                                if (executer != null) {
+                                    Class prevClass = TASK_CODE_CLASS_MAP.putIfAbsent(executer.taskCode(), clazz);
+                                    if (prevClass != null) {
+                                        throw new ProcessorException("Multiple taskcodes should not exist,taskcode=" + executer.taskCode());
+                                    }
+                                    TASK_CODE_INSTANCE_MAP.put(executer.taskCode(), clazz.newInstance());
+                                    TaskInvoker invoker = getInvoker(clazz);
+                                    // TODO 判断taskType
+                                    TaskType taskType = TaskType.RICE_BASE_TASK_TYPE;
+                                    if (clazz.getInterfaces()[0].getSimpleName().toLowerCase().indexOf("mapreduce") > 0) {
+                                        taskType = TaskType.RICE_MAP_REDUCE_TYPE;
+                                    }
+                                    TaskDetailData data = new TaskDetailData(executer.taskCode(), executer.taskName(),
+                                        className, taskType);
+                                    invoker.taskDetailData = data;
+                                    //invoker.setPropertyValue(invoker, "taskDetailData", data);
+                                }
+                            } catch (ClassNotFoundException e) {
+                                throw new ProcessorException("className:" + className + "not found" + e);
+                            } catch (InstantiationException | IllegalAccessException e) {
+                                throw new ProcessorException("className:" + className + "instantiation error," + e);
+                            }
+                        });
+
+                    }
+                } catch (IOException e) {
+                    throw new ProcessorException("scan package :" + s + " error," + e);
+
+                }
+            });
+        } else {
+            throw new ProcessorException("Config scan package error,taskPackages=" + taskPackages);
+        }
+
+    }
+
+    public static TaskInvoker getInvoker(String taskCode) {
+        return getInvoker(TASK_CODE_CLASS_MAP.get(taskCode));
+    }
+
+    public Object getInvokerInstance(String taskCode) {
+        return TASK_CODE_INSTANCE_MAP.get(taskCode);
+    }
+
+    public static TaskInvoker getInvoker(Class<?> c) {
 
         // 缓存了class 与  TaskInvoker
         TaskInvoker ret = TASK_INVOKER_MAP.get(c);
@@ -307,7 +379,8 @@ public abstract class TaskInvoker {
      * @param args     argument array.
      * @return return value.
      */
-    abstract public Object invokeMethod(Object instance, String mn, Class<?>[] types, Object[] args) throws NoSuchMethodException, InvocationTargetException;
+    abstract public Object invokeMethod(Object instance, String mn, Class<?>[] types,
+        Object[] args) throws NoSuchMethodException, InvocationTargetException;
 
     /**
      * get property value.
@@ -316,7 +389,8 @@ public abstract class TaskInvoker {
      * @param pn       property name.
      * @return value.
      */
-    abstract public Object getPropertyValue(Object instance, String pn) throws NoSuchPropertyException, IllegalArgumentException;
+    abstract public Object getPropertyValue(Object instance,
+        String pn) throws NoSuchPropertyException, IllegalArgumentException;
 
     /**
      * set property value.
@@ -325,6 +399,14 @@ public abstract class TaskInvoker {
      * @param pn       property name.
      * @param pv       property value.
      */
-    abstract public void setPropertyValue(Object instance, String pn, Object pv) throws NoSuchPropertyException, IllegalArgumentException;
+    abstract public void setPropertyValue(Object instance, String pn,
+        Object pv) throws NoSuchPropertyException, IllegalArgumentException;
 
+    public static Map<Class<?>, TaskInvoker> getTaskInvokerMap() {
+        return TASK_INVOKER_MAP;
+    }
+
+    public TaskDetailData getTaskDetailData() {
+        return taskDetailData;
+    }
 }

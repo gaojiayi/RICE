@@ -103,6 +103,9 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
         }
         // 关闭数据源
         repository.close();
+        // 关闭网络处理线程池
+        taskAccessExecutor.shutdown();
+        schedulerManagerExecutor.shutdown();
 
     }
 
