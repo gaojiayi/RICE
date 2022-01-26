@@ -4,11 +4,13 @@ import com.gaojy.rice.common.constants.RequestCode;
 import com.gaojy.rice.common.constants.ResponseCode;
 import com.gaojy.rice.common.exception.RemotingCommandException;
 import com.gaojy.rice.common.protocol.body.processor.ExportTaskRequestBody;
+import com.gaojy.rice.common.protocol.body.processor.ExportTaskResponseBody;
 import com.gaojy.rice.common.protocol.header.processor.ExportTaskRequestHeader;
 import com.gaojy.rice.common.protocol.header.processor.ExportTaskResponseHeader;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.RiceRequestProcessor;
 import io.netty.channel.ChannelHandlerContext;
+import java.util.HashMap;
 
 /**
  * @author gaojy
@@ -44,7 +46,11 @@ public class TaskAccessProcessor implements RiceRequestProcessor {
         // 写数据库
 
         // 请求对应的 scheduler server，处理器上线通知
-
+        ExportTaskResponseBody responseBody = new ExportTaskResponseBody();
+        HashMap<String, String> map = new HashMap<>();
+        map.put("testcode","127.0.0.1");
+        responseBody.setTaskSchedulerInfo(map);
+        response.setBody(responseBody.encode());
         response.setCode(ResponseCode.SUCCESS);
         response.setRemark(null);
         return response;

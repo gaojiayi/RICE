@@ -26,11 +26,11 @@
             <artifactId>rice-remote</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.gaojy</groupId>
-            <artifactId>rice-repository-api</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.gaojy</groupId>-->
+<!--            <artifactId>rice-repository-api</artifactId>-->
+<!--            <version>${project.parent.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.gaojy</groupId>
             <artifactId>rice-http-agent</artifactId>

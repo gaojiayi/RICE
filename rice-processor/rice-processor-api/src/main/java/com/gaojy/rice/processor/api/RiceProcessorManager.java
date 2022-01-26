@@ -10,9 +10,8 @@ import com.gaojy.rice.common.exception.RemotingConnectException;
 import com.gaojy.rice.common.exception.RemotingSendRequestException;
 import com.gaojy.rice.common.exception.RemotingTimeoutException;
 import com.gaojy.rice.common.protocol.body.processor.ExportTaskRequestBody;
-import com.gaojy.rice.common.protocol.header.CommandCustomHeader;
+import com.gaojy.rice.common.protocol.body.processor.ExportTaskResponseBody;
 import com.gaojy.rice.common.protocol.header.processor.ExportTaskRequestHeader;
-import com.gaojy.rice.common.protocol.header.processor.ExportTaskResponseHeader;
 import com.gaojy.rice.common.utils.RiceBanner;
 import com.gaojy.rice.common.utils.StringUtil;
 import com.gaojy.rice.processor.api.config.ProcessorConfig;
@@ -125,9 +124,11 @@ public class RiceProcessorManager {
                 RiceRemoteContext registerResult = client.invokeSync(addr, riceRemoteContext, 3 * 1000);
                 switch (registerResult.getCode()) {
                     case RemotingSysResponseCode.SUCCESS: {
-                        ExportTaskResponseHeader header = (ExportTaskResponseHeader) registerResult.decodeCommandCustomHeader(ExportTaskResponseHeader.class);
-                        if (!header.getTaskSchedulerInfo().isEmpty()) {
-                            header.getTaskSchedulerInfo().forEach((k, v) -> {
+                        ExportTaskResponseBody body = ExportTaskResponseBody.decode(registerResult.getBody(),ExportTaskResponseBody.class);
+
+                        //ExportTaskResponseHeader header = (ExportTaskResponseHeader) registerResult.decodeCommandCustomHeader(ExportTaskResponseHeader.class);
+                        if (!body.getTaskSchedulerInfo().isEmpty()) {
+                            body.getTaskSchedulerInfo().forEach((k, v) -> {
                                 if (StringUtil.isNotEmpty(v)) {
                                     log.info("taskcode:" + k + " will scheduled by server " + v);
                                 } else {
@@ -144,7 +145,7 @@ public class RiceProcessorManager {
 
                 }
             } catch (RemotingConnectException | RemotingTimeoutException
-                    | RemotingSendRequestException | InterruptedException | RemotingCommandException e) {
+                    | RemotingSendRequestException | InterruptedException e) {
                 log.error("Register to controller Exception, controller address is " + addr);
             }
             retryConnCount--;

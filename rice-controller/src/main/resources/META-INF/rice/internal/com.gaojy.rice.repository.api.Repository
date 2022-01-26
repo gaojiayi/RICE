@@ -1,1 +1,1 @@
-mysql=com.gaojy.rice.repository.mysql.MysqlRepository.java
+mysql=com.gaojy.rice.repository.mysql.MysqlRepository
