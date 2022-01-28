@@ -19,6 +19,7 @@ import com.gaojy.rice.repository.api.Repository;
 import io.netty.channel.Channel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +84,6 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
 
     @Override
     public void onLeaderStop(long leaderTerm) {
-
     }
 
     public void start() {
@@ -111,9 +111,9 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
 
     private void doProcessorRegister() {
         // 处理器注册请求把处理器先保存数据库，然后获取对应的几个调度器，依次通过控制器通知调度器。 失败，则由processor重试
-        remotingServer.registerProcessor(RequestCode.REGISTER_PROCESSOR, new TaskAccessProcessor(), this.taskAccessExecutor);
+        remotingServer.registerProcessor(RequestCode.REGISTER_PROCESSOR, new TaskAccessProcessor(this), this.taskAccessExecutor);
 
-        SchedulerManagerProcessor schedulerManagerProcessor = new SchedulerManagerProcessor();
+        SchedulerManagerProcessor schedulerManagerProcessor = new SchedulerManagerProcessor(this);
 
         // 调度器注册处理
         remotingServer.registerProcessor(RequestCode.SCHEDULER_REGISTER, schedulerManagerProcessor, this.schedulerManagerExecutor);
@@ -178,5 +178,9 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
     @Override
     public void onChannelIdle(String remoteAddr, Channel channel) {
 
+    }
+
+    public Boolean isMaster() {
+        return riceElectionManager.isLeader();
     }
 }

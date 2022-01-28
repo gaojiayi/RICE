@@ -1,6 +1,7 @@
 package com.gaojy.rice.controller.processor;
 
 import com.gaojy.rice.common.constants.RequestCode;
+import com.gaojy.rice.controller.RiceController;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.RiceRequestProcessor;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,14 +17,19 @@ public class SchedulerManagerProcessor implements RiceRequestProcessor {
 
     private final ReentrantLock heart_beat_lock = new ReentrantLock();
 
+    private final RiceController riceController;
+
+    public SchedulerManagerProcessor(RiceController riceController) {
+        this.riceController = riceController;
+    }
+
     @Override
     public RiceRemoteContext processRequest(ChannelHandlerContext ctx, RiceRemoteContext request) throws Exception {
         switch (request.getCode()) {
             case RequestCode.SCHEDULER_REGISTER:
+            case RequestCode.SCHEDULER_HEART_BEAT: // 2 step 向其他的控制器注册调度器
                 return null;
-            case RequestCode.SCHEDULER_HEART_BEAT:
-                return null;
-            case RequestCode.SCHEDULER_PULL_TASK:
+            case RequestCode.SCHEDULER_PULL_TASK: // 1 step  如果是-1的时间戳，说明是新的调度器
                 return null;
             default:
                 return null;
@@ -55,7 +61,11 @@ public class SchedulerManagerProcessor implements RiceRequestProcessor {
         return null;
     }
 
+    /**
+     * 1 缓存scheduler channel 2 如果是主控制器 则更新对应处理器的最近活跃时间
+     */
     public void heartBeatHandler() {
+
         heart_beat_lock.lock();
         try {
 
@@ -64,6 +74,15 @@ public class SchedulerManagerProcessor implements RiceRequestProcessor {
         } finally {
             heart_beat_lock.unlock();
         }
+    }
+
+    public RiceRemoteContext pullTasks(ChannelHandlerContext ctx, RiceRemoteContext request) {
+        if (this.riceController.isMaster()) {
+
+        } else {
+
+        }
+        return null;
     }
 
 }

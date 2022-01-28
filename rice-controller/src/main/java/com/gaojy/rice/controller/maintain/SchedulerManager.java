@@ -1,10 +1,12 @@
 package com.gaojy.rice.controller.maintain;
 
+import com.gaojy.rice.common.protocol.body.processor.TaskDetailData;
 import io.netty.channel.Channel;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -44,7 +46,7 @@ public class SchedulerManager {
         List<String> rets = null;
         try {
             rets = schedulerNodes.stream().filter(c -> c.isActive()).
-                    map(ChannelWrapper::getRemoteAddr).collect(Collectors.toList());
+                map(ChannelWrapper::getRemoteAddr).collect(Collectors.toList());
         } finally {
             r.unlock();
         }
@@ -69,7 +71,6 @@ public class SchedulerManager {
         return Boolean.TRUE;
     }
 
-
     public void crashOrDown(Channel channel) {
         // 判断是否在内存中
 
@@ -84,13 +85,19 @@ public class SchedulerManager {
         boolean is_scheduler = false;
         try {
             is_scheduler = schedulerNodes.stream()
-                    .map(ChannelWrapper::getRemoteAddr).collect(Collectors.toList())
-                    .contains(remoteAddr);
+                .map(ChannelWrapper::getRemoteAddr).collect(Collectors.toList())
+                .contains(remoteAddr);
         } finally {
             r.unlock();
         }
         return is_scheduler;
     }
 
+    public Boolean notifyTaskRegister(String schedulerServer, String taskCode, String processorAddr) {
+        ChannelWrapper cw = schedulerNodes.stream().filter(node
+            -> node.getRemoteAddr().equals(schedulerServer)).findAny().orElse(null);
+        return false;
+
+    }
 
 }

@@ -1,4 +1,4 @@
-package com.gaojy.rice.repository.api.task;
+package com.gaojy.rice.repository.api.dao;
 
 /**
  * @author gaojy

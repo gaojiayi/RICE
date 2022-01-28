@@ -60,7 +60,7 @@ public class TestProcessor {
         TransportServer transportServer = this.buildTransportServer();
 
         transportServer.registerProcessor(RequestCode.REGISTER_PROCESSOR,
-            new TaskAccessProcessor(), Executors.newCachedThreadPool());
+            new TaskAccessProcessor(null), Executors.newCachedThreadPool());
         transportServer.start();
 
         ExportTaskRequestHeader header = new ExportTaskRequestHeader();
