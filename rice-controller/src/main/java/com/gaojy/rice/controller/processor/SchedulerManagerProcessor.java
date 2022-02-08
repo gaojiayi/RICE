@@ -1,7 +1,9 @@
 package com.gaojy.rice.controller.processor;
 
 import com.gaojy.rice.common.constants.RequestCode;
+import com.gaojy.rice.common.protocol.body.scheduler.SchedulerHeartBeatBody;
 import com.gaojy.rice.controller.RiceController;
+import com.gaojy.rice.controller.maintain.SchedulerManager;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.RiceRequestProcessor;
 import io.netty.channel.ChannelHandlerContext;
@@ -10,7 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author gaojy
  * @ClassName SchedulerManagerProcessor.java
- * @Description 1 处理心跳(包含处理器上报)  2 调度器拉拉取任务  3 调度器注册
+ * @Description 1 处理心跳(包含处理器上报)  2 调度器拉拉取任务  3 调度器向主控制器注册(触发任务再分配)
  * @createTime 2022/01/23 19:27:00
  */
 public class SchedulerManagerProcessor implements RiceRequestProcessor {
@@ -28,6 +30,7 @@ public class SchedulerManagerProcessor implements RiceRequestProcessor {
         switch (request.getCode()) {
             case RequestCode.SCHEDULER_REGISTER:
             case RequestCode.SCHEDULER_HEART_BEAT: // 2 step 向其他的控制器注册调度器
+                this.heartBeatHandler(ctx, request);
                 return null;
             case RequestCode.SCHEDULER_PULL_TASK: // 1 step  如果是-1的时间戳，说明是新的调度器
                 return null;
@@ -52,28 +55,43 @@ public class SchedulerManagerProcessor implements RiceRequestProcessor {
      * @return
      */
     public synchronized RiceRemoteContext registerScheduler(ChannelHandlerContext ctx, RiceRemoteContext request) {
-
+        if (this.riceController.isMaster()) {
+            // 任务再分配 并生成任务分配记录
+        }
         return null;
 
     }
 
     public synchronized RiceRemoteContext crashDownScheduler() {
+        // 当发送调度器宕机  可再次分配任务
         return null;
     }
 
     /**
      * 1 缓存scheduler channel 2 如果是主控制器 则更新对应处理器的最近活跃时间
      */
-    public void heartBeatHandler() {
+    public void heartBeatHandler(ChannelHandlerContext ctx, RiceRemoteContext request) {
+        // 后续可以使用布隆过滤器优化
 
-        heart_beat_lock.lock();
-        try {
+        // 缓存scheduler channel
+        SchedulerManager.getManager().addSchedulerIfAbsent(ctx.channel());
 
-        } catch (Exception e) {
+        // 如果是主控制器 则更新对应处理器的最近活跃时间
+        if (this.riceController.isMaster()) {
+            heart_beat_lock.lock();
+            try {
+                //解析数据
+                SchedulerHeartBeatBody beatBody = SchedulerHeartBeatBody
+                    .decode(request.getBody(), SchedulerHeartBeatBody.class);
+                // 批量更新
 
-        } finally {
-            heart_beat_lock.unlock();
+            } catch (Exception e) {
+
+            } finally {
+                heart_beat_lock.unlock();
+            }
         }
+
     }
 
     public RiceRemoteContext pullTasks(ChannelHandlerContext ctx, RiceRemoteContext request) {

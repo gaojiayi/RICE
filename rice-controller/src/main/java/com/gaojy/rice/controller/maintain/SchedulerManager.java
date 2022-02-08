@@ -1,6 +1,9 @@
 package com.gaojy.rice.controller.maintain;
 
+import com.gaojy.rice.common.constants.LoggerName;
+import com.gaojy.rice.common.exception.ControllerException;
 import com.gaojy.rice.common.protocol.body.processor.TaskDetailData;
+import com.gaojy.rice.remote.common.RemoteHelper;
 import io.netty.channel.Channel;
 
 import java.util.HashSet;
@@ -11,6 +14,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author gaojy
@@ -19,6 +24,7 @@ import java.util.stream.Collectors;
  * @createTime 2022/01/18 22:48:00
  */
 public class SchedulerManager {
+    private static final Logger logger = LoggerFactory.getLogger(LoggerName.CONTROLLER_LOGGER_NAME);
     private Set<ChannelWrapper> schedulerNodes = new HashSet<>();
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final Lock r = lock.readLock();    //读锁
@@ -96,8 +102,26 @@ public class SchedulerManager {
     public Boolean notifyTaskRegister(String schedulerServer, String taskCode, String processorAddr) {
         ChannelWrapper cw = schedulerNodes.stream().filter(node
             -> node.getRemoteAddr().equals(schedulerServer)).findAny().orElse(null);
+        if (cw != null && cw.isActive()) {
+            // 将处理器及所关联的任务信息通知给调度器
+
+        } else {
+            logger.error("Not found active schedulerServer:{} channel in Controller", schedulerServer);
+        }
         return false;
 
+    }
+
+    public void addSchedulerIfAbsent(Channel channel) {
+        String schedulerServer = RemoteHelper.parseChannelRemoteAddr(channel);
+        ChannelWrapper cw = schedulerNodes.stream().filter(node
+            -> node.getRemoteAddr().equals(schedulerServer)).findAny().orElse(null);
+        if (cw != null && cw.isActive()) {
+            logger.info("schedulerServer:{} channel exist in Controller", schedulerServer);
+        } else {
+            ChannelWrapper wrapper = new ChannelWrapper(channel);
+            schedulerNodes.add(wrapper);
+        }
     }
 
 }
