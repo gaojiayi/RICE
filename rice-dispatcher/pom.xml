@@ -27,6 +27,10 @@
             <artifactId>rice-repository-mysql</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.alipay.sofa</groupId>
+            <artifactId>jraft-core</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
