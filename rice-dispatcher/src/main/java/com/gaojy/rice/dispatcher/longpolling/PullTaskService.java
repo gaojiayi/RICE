@@ -60,7 +60,7 @@ public class PullTaskService extends BackgroundThread {
             // 异步向主控制器发送长轮询
             String mainController = this.riceDispatchScheduler.getElectionClient().getMasterController();
 
-            //
+            //this.riceDispatchScheduler.getTransportClient().invokeAsync();
 
             // 如果发生异常  比如请求异常  选举异常   则放到延迟队列中
         } catch (InterruptedException | TimeoutException e) {
