@@ -3,6 +3,8 @@ package com.gaojy.rice.dispatcher.common;
 import com.gaojy.rice.dispatcher.RiceDispatchScheduler;
 import com.gaojy.rice.remote.transport.TransportClient;
 
+import java.util.concurrent.TimeoutException;
+
 /**
  * @author gaojy
  * @ClassName DispatcherAPIWrapper.java
@@ -18,7 +20,21 @@ public class DispatcherAPIWrapper {
         transportClient = this.riceDispatchScheduler.getTransportClient();
     }
 
-    public void pullTask() {
+    // 第一次拉取 重新分配任务
+    public void pullTask() throws InterruptedException, TimeoutException {
+        String mainController = this.riceDispatchScheduler.getElectionClient().getMasterController();
+
+    }
+
+    //
+    public void heartBeatToController() throws InterruptedException, TimeoutException {
+        String mainController = this.riceDispatchScheduler.getElectionClient().getMasterController();
+
+    }
+
+    // 调度器第一次启动或者发生控制器重新选举的时候调用   控制器保存channel
+    public void registerScheduler() throws InterruptedException, TimeoutException {
+        String mainController = this.riceDispatchScheduler.getElectionClient().getMasterController();
 
     }
 
@@ -26,13 +42,7 @@ public class DispatcherAPIWrapper {
 
     }
 
-
-    public void heartBeat() {
-
-    }
-
-    // 调度器第一次启动或者发生控制器重新选举的时候调用
-    public void registerScheduler() {
+    public void heartBeatToProcessorr() throws InterruptedException, TimeoutException {
 
     }
 

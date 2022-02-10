@@ -27,12 +27,13 @@ public class SchedulerManagerProcessor implements RiceRequestProcessor {
 
     @Override
     public RiceRemoteContext processRequest(ChannelHandlerContext ctx, RiceRemoteContext request) throws Exception {
+        // 只有主控制器执行
         switch (request.getCode()) {
-            case RequestCode.SCHEDULER_REGISTER:
+            case RequestCode.SCHEDULER_REGISTER: //  增加channel
             case RequestCode.SCHEDULER_HEART_BEAT: // 2 step 向其他的控制器注册调度器
                 this.heartBeatHandler(ctx, request);
                 return null;
-            case RequestCode.SCHEDULER_PULL_TASK: // 1 step  如果是-1的时间戳，说明是新的调度器
+            case RequestCode.SCHEDULER_PULL_TASK: // 1 step  如果是-1的时间戳，说明是新的调度器  重新分配任务
                 return null;
             default:
                 return null;
