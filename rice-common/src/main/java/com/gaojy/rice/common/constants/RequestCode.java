@@ -23,8 +23,7 @@ public class RequestCode {
     //调度器的心跳
     public static final int SCHEDULER_HEART_BEAT = 310;
 
-    //调度器的注册  当从控制器宕机这个时候注册了一个新的调度器，等这个从控制器恢复后，无法获取到这个新的调度器的状态。
-    @Deprecated
+    //调度器的注册
     public static final int SCHEDULER_REGISTER = 320;
 
 }

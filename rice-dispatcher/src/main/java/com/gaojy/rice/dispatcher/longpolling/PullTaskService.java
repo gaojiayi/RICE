@@ -3,6 +3,10 @@ package com.gaojy.rice.dispatcher.longpolling;
 import com.gaojy.rice.common.BackgroundThread;
 import com.gaojy.rice.common.RiceThreadFactory;
 import com.gaojy.rice.common.constants.LoggerName;
+import com.gaojy.rice.common.exception.RemotingConnectException;
+import com.gaojy.rice.common.exception.RemotingSendRequestException;
+import com.gaojy.rice.common.exception.RemotingTimeoutException;
+import com.gaojy.rice.common.exception.RemotingTooMuchRequestException;
 import com.gaojy.rice.dispatcher.RiceDispatchScheduler;
 
 import java.util.concurrent.Executors;
@@ -31,8 +35,7 @@ public class PullTaskService extends BackgroundThread {
     private final LinkedBlockingQueue<PullRequest> pullRequestQueue = new LinkedBlockingQueue<PullRequest>();
 
     private final ScheduledExecutorService scheduledExecutorService = Executors
-            .newSingleThreadScheduledExecutor(new RiceThreadFactory("PullTaskChangeServiceScheduledThread"));
-
+        .newSingleThreadScheduledExecutor(new RiceThreadFactory("PullTaskChangeServiceScheduledThread"));
 
     public PullTaskService(DispatcherAPIWrapper dispatcherAPIWrapper) {
         this.dispatcherAPIWrapper = dispatcherAPIWrapper;
@@ -64,14 +67,31 @@ public class PullTaskService extends BackgroundThread {
 
     public void pullTaskChange(PullRequest request) {
         try {
+            final PullCallback pullCallback = new PullCallback() {
+                @Override
+                public void onSuccess(PullResult pullResult) {
+                    // 将最新的一次更新记录时间戳赋值给 PullRequest
+
+                    // 构建任务调度实例
+
+                }
+
+                @Override
+                public void onException(Throwable e) {
+                    // log.error
+                    PullTaskService.this.executePullRequestLater(request, 1000);
+
+                }
+            };
             // 异步向主控制器发送长轮询
             //String mainController = this.riceDispatchScheduler.getElectionClient().getMasterController();
 
             //this.riceDispatchScheduler.getTransportClient().invokeAsync();
 
             // 如果发生异常  比如请求异常  选举异常   则放到延迟队列中
-            dispatcherAPIWrapper.pullTask();
-        } catch (InterruptedException | TimeoutException e) {
+            dispatcherAPIWrapper.pullTask(request, pullCallback);
+        } catch (InterruptedException | TimeoutException | RemotingConnectException
+            | RemotingSendRequestException | RemotingTimeoutException | RemotingTooMuchRequestException e) {
             log.error("pull task change exception,will try,exception={}", e);
             this.executePullRequestLater(request, 1000);
         }

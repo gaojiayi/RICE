@@ -39,4 +39,8 @@ public class ElectionClient {
         final PeerId leader = RouteTable.getInstance().selectLeader(groupId);
         return leader.getEndpoint().getIp() + ":" + leader.getEndpoint().getPort();
     }
+
+    public void close(){
+        cliClientService.shutdown();
+    }
 }

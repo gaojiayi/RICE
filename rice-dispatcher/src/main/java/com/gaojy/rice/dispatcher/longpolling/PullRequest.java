@@ -14,7 +14,13 @@ import java.util.List;
  */
 public class PullRequest {
 
-    private long lastTaskChangeTimestamp = -1;
+    private Long lastTaskChangeTimestamp = -1l;
 
+    public Long getLastTaskChangeTimestamp() {
+        return lastTaskChangeTimestamp;
+    }
 
+    public void setLastTaskChangeTimestamp(Long lastTaskChangeTimestamp) {
+        this.lastTaskChangeTimestamp = lastTaskChangeTimestamp;
+    }
 }
