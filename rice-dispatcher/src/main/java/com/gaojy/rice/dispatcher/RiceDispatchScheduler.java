@@ -75,7 +75,7 @@ public class RiceDispatchScheduler implements RiceDispatchSchedulerMBean {
 
     // 发起长轮询获取任务
 
-    // 发送注册
+    // 发送注册()
 
     // 任务调用分发
 

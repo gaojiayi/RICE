@@ -17,4 +17,24 @@ public class DispatcherAPIWrapper {
         this.riceDispatchScheduler = riceDispatchScheduler;
         transportClient = this.riceDispatchScheduler.getTransportClient();
     }
+
+    public void pullTask() {
+
+    }
+
+    public void invokeTask() {
+
+    }
+
+
+    public void heartBeat() {
+
+    }
+
+    // 调度器第一次启动或者发生控制器重新选举的时候调用
+    public void registerScheduler() {
+
+    }
+
+
 }
