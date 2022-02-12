@@ -1,6 +1,6 @@
 package com.gaojy.rice.common.protocol.body.processor;
 
-import com.gaojy.rice.common.TaskType;
+import com.gaojy.rice.common.constants.TaskType;
 import java.util.Objects;
 
 /**

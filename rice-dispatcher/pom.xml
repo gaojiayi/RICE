@@ -31,6 +31,12 @@
             <groupId>com.alipay.sofa</groupId>
             <artifactId>jraft-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-controller</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>

@@ -19,6 +19,7 @@ import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.ResponseFuture;
 import com.gaojy.rice.remote.transport.TransportClient;
 
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -101,12 +102,12 @@ public class DispatcherAPIWrapper {
 
     }
 
-    //同步调用
-    public void invokeTask() {
+    //异步调用
+    public void invokeTask(Set<String> address) {
 
     }
 
-    public void heartBeatToProcessor() throws InterruptedException, TimeoutException {
+    public void heartBeatToProcessor(String address) throws InterruptedException, TimeoutException {
 
     }
 

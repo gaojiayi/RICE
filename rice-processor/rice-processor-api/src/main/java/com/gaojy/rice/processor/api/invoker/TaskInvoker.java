@@ -1,6 +1,6 @@
 package com.gaojy.rice.processor.api.invoker;
 
-import com.gaojy.rice.common.TaskType;
+import com.gaojy.rice.common.constants.TaskType;
 import com.gaojy.rice.common.exception.ProcessorException;
 import com.gaojy.rice.common.protocol.body.processor.TaskDetailData;
 import com.gaojy.rice.common.utils.ClassHelper;
@@ -69,9 +69,9 @@ public abstract class TaskInvoker {
                                     TASK_CODE_INSTANCE_MAP.put(executer.taskCode(), clazz.newInstance());
                                     TaskInvoker invoker = getInvoker(clazz);
                                     // TODO 判断taskType
-                                    TaskType taskType = TaskType.RICE_BASE_TASK_TYPE;
+                                    TaskType taskType = TaskType.RICE_BASIC;
                                     if (clazz.getInterfaces()[0].getSimpleName().toLowerCase().indexOf("mapreduce") > 0) {
-                                        taskType = TaskType.RICE_MAP_REDUCE_TYPE;
+                                        taskType = TaskType.RICE_MAPREDUCE;
                                     }
                                     TaskDetailData data = new TaskDetailData(executer.taskCode(), executer.taskName(),
                                         className, taskType);

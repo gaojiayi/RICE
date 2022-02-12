@@ -1,6 +1,6 @@
 package com.gaojy.rice.processor.api.config;
 
-import com.gaojy.rice.common.TaskType;
+import com.gaojy.rice.common.constants.TaskType;
 import com.gaojy.rice.common.exception.DuplicateProcessorException;
 import com.gaojy.rice.common.protocol.body.processor.TaskDetailData;
 import com.gaojy.rice.common.utils.StringUtil;
@@ -9,7 +9,6 @@ import com.gaojy.rice.processor.api.annotation.Executer;
 import com.gaojy.rice.processor.api.log.RiceClientLogger;
 import com.gaojy.rice.remote.transport.TransfClientConfig;
 import com.gaojy.rice.remote.transport.TransfServerConfig;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -82,9 +81,9 @@ public class ProcessorConfig {
                             } else {
                                 taskName = taskCode = clazz.getSimpleName();
                             }
-                            TaskType taskType = TaskType.RICE_BASE_TASK_TYPE;
+                            TaskType taskType = TaskType.RICE_BASIC;
                             if (clazz.getSuperclass().getSimpleName().toLowerCase().indexOf("mapreduce") > 0) {
-                                taskType = TaskType.RICE_MAP_REDUCE_TYPE;
+                                taskType = TaskType.RICE_MAPREDUCE;
                             }
                             TaskDetailData detailData = new TaskDetailData(taskCode, taskName, clazzName, taskType);
                             Class prevProcessor = this.processorMap.putIfAbsent(detailData, clazz);

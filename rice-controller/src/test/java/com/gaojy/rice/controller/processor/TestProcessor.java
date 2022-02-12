@@ -1,8 +1,8 @@
 package com.gaojy.rice.controller.processor;
 
-import com.gaojy.rice.common.TaskType;
 import com.gaojy.rice.common.constants.RequestCode;
 import com.gaojy.rice.common.constants.ResponseCode;
+import com.gaojy.rice.common.constants.TaskType;
 import com.gaojy.rice.common.exception.RemotingConnectException;
 import com.gaojy.rice.common.exception.RemotingSendRequestException;
 import com.gaojy.rice.common.exception.RemotingTimeoutException;
@@ -75,7 +75,7 @@ public class TestProcessor {
         TaskDetailData data = new TaskDetailData();
         data.setTaskCode("TestTaskCode");
         data.setTaskName("TestTaskName");
-        data.setTaskType(TaskType.RICE_BASE_TASK_TYPE);
+        data.setTaskType(TaskType.RICE_BASIC);
         data.setClassName("com.gaojy.rice.common.protocol.body.processor.ExportTaskRequestBody");
         list.add(data);
         body.setTasks(list);
