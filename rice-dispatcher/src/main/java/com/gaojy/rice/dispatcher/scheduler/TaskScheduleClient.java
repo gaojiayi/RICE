@@ -41,8 +41,8 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.DISPATCHER_LOGGER_NAME);
     // 所有的调度使用一个时间轮
     private final HashedWheelTimer scheduleTimer;
-    private  String taskCode;
-    private  String taskName;
+    private String taskCode;
+    private String taskName;
     private TaskType taskType;
     private String parameters;
     private ScheduleType scheduleType = ScheduleType.CRON;
@@ -55,7 +55,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     private Set<String> processes = Collections.synchronizedSet(new HashSet<>());
     private AtomicReference<TaskSataus> taskSataus = new AtomicReference<>(TaskSataus.ONLINE);
     private DispatcherAPIWrapper outApiWrapper;
-    private ExecutorService executor;
+    private ExecutorService threadPool;
     // 任务启动时间
     private Long bootTime = System.currentTimeMillis();
     private PullTaskService pullTaskService;
@@ -69,23 +69,22 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
         this.scheduleTimer = taskScheduleManager.getScheduleTimer();
         this.outApiWrapper = taskScheduleManager.getOutApiWrapper();
         this.pullTaskService = taskScheduleManager.getPullTaskService();
-        executor = Executors.newFixedThreadPool(executeThreads, new RiceThreadFactory(taskCode + "_thread"));
+        threadPool = Executors.newFixedThreadPool(executeThreads, new RiceThreadFactory(taskCode + "_thread"));
         if (ScheduleType.CRON.equals(scheduleType)) {
             cexpStart = new CronExpression(timeExpression);
         }
 
         riceExecuter = TaskExecuterFactory.getExecuter(taskType, this);
 
-
     }
 
-    private void  buildClient(RiceTaskInfo taskInfo){
+    private void buildClient(RiceTaskInfo taskInfo) {
         try {
-            BeanUtils.copyProperties(taskInfo, this);
+            BeanUtils.copyProperties(this, taskInfo);
             this.executeType = ExecuteType.getType(taskInfo.getExecuteType());
             this.taskType = TaskType.getType(taskInfo.getTaskType());
             this.scheduleType = scheduleType.getType(taskInfo.getScheduleType());
-        } catch (IllegalAccessException|InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
 
@@ -152,12 +151,16 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     @Override
     public void shutdown() throws LifeCycleException {
         taskSataus.set(TaskSataus.OFFLINE);
-        executor.shutdown();
+        threadPool.shutdown();
 
     }
 
     @Override
     public boolean isStarted() {
         return taskSataus.get() != TaskSataus.OFFLINE;
+    }
+
+    public ExecutorService getThreadPool() {
+        return threadPool;
     }
 }

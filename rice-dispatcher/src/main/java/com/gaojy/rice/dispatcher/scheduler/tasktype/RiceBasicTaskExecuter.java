@@ -16,12 +16,19 @@ public class RiceBasicTaskExecuter implements RiceExecuter {
         this.client = client;
     }
 
+
     private void processor() {
 
     }
 
     @Override
     public void execute() {
+        client.getThreadPool().execute(this);
+
+    }
+
+    @Override
+    public void run() {
         processor();
     }
 }

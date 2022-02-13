@@ -6,7 +6,7 @@ package com.gaojy.rice.dispatcher.scheduler.tasktype;
  * @Description TODO
  * @createTime 2022/02/11 13:34:00
  */
-public interface RiceExecuter {
+public interface RiceExecuter extends Runnable {
 
     public void execute();
 }
