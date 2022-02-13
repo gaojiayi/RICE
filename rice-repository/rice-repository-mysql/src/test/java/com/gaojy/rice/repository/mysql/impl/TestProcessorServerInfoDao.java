@@ -1,7 +1,7 @@
 package com.gaojy.rice.repository.mysql.impl;
 
 import com.gaojy.rice.repository.api.dao.ProcessorServerInfoDao;
-import com.gaojy.rice.repository.api.entity.ProcessorServerInfo;
+import com.gaojy.rice.common.entity.ProcessorServerInfo;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;

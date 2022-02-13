@@ -26,4 +26,11 @@ public class RequestCode {
     //调度器的注册
     public static final int SCHEDULER_REGISTER = 320;
 
+
+    // 控制器通知任务重分配
+    public static final int CONTROLLER_TASK_REBALANCE = 400;
+
+    // 控制器直接call响应的调度器创建任务
+    public static final int CONTROLLER_TASK_CREATE = 401;
+
 }

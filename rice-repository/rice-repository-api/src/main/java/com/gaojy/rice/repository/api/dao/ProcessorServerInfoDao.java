@@ -1,8 +1,7 @@
 package com.gaojy.rice.repository.api.dao;
 
 import com.gaojy.rice.common.exception.RepositoryException;
-import com.gaojy.rice.repository.api.entity.ProcessorServerInfo;
-import java.sql.SQLException;
+import com.gaojy.rice.common.entity.ProcessorServerInfo;
 import java.util.List;
 
 /**

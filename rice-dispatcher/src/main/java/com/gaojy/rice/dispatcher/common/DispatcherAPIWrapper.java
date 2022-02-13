@@ -72,7 +72,6 @@ public class DispatcherAPIWrapper {
                 }
             }
         });
-
     }
 
     private PullResult processPullResponse(RiceRemoteContext response) {
@@ -80,7 +79,7 @@ public class DispatcherAPIWrapper {
     }
 
     //
-    public void heartBeatToController() throws InterruptedException, TimeoutException,
+    public void heartBeatToController(String controllers) throws InterruptedException, TimeoutException,
         RemotingConnectException, RemotingSendRequestException,
         RemotingTimeoutException, RemotingTooMuchRequestException {
         String mainController = this.riceDispatchScheduler.getElectionClient().getMasterController();
@@ -90,11 +89,11 @@ public class DispatcherAPIWrapper {
     }
 
     // 调度器第一次启动或者发生控制器重新选举的时候调用   控制器保存channel
-    public Boolean registerScheduler() throws InterruptedException, TimeoutException,
+    public Boolean registerScheduler(String addresses) throws InterruptedException, TimeoutException,
         RemotingConnectException, RemotingSendRequestException, RemotingTimeoutException {
-        String mainController = this.riceDispatchScheduler.getElectionClient().getMasterController();
+        // String mainController = this.riceDispatchScheduler.getElectionClient().getMasterController();
         RiceRemoteContext request = RiceRemoteContext.createRequestCommand(RequestCode.SCHEDULER_REGISTER, new SchedulerRegisterRequestHeader());
-        RiceRemoteContext response = this.transportClient.invokeSync(mainController, request, 1000 * 3);
+        RiceRemoteContext response = this.transportClient.invokeSync(addresses, request, 1000 * 3);
         if (response != null && response.getCode() == ResponseCode.SUCCESS) {
             return Boolean.TRUE;
         }
@@ -108,7 +107,7 @@ public class DispatcherAPIWrapper {
     }
 
     public void heartBeatToProcessor(String address) throws InterruptedException, TimeoutException {
-
+        //this.transportClient.invokeOneWay();
     }
 
 }

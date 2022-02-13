@@ -9,6 +9,8 @@ import com.gaojy.rice.common.exception.RemotingTimeoutException;
 import com.gaojy.rice.common.exception.RemotingTooMuchRequestException;
 import com.gaojy.rice.dispatcher.RiceDispatchScheduler;
 
+import com.gaojy.rice.dispatcher.scheduler.SchedulerManager;
+import java.util.Collections;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
@@ -37,8 +39,11 @@ public class PullTaskService extends BackgroundThread {
     private final ScheduledExecutorService scheduledExecutorService = Executors
         .newSingleThreadScheduledExecutor(new RiceThreadFactory("PullTaskChangeServiceScheduledThread"));
 
-    public PullTaskService(DispatcherAPIWrapper dispatcherAPIWrapper) {
+    private final SchedulerManager schedulerManager;
+
+    public PullTaskService(DispatcherAPIWrapper dispatcherAPIWrapper, SchedulerManager schedulerManager) {
         this.dispatcherAPIWrapper = dispatcherAPIWrapper;
+        this.schedulerManager = schedulerManager;
     }
 
     @Override
@@ -70,15 +75,26 @@ public class PullTaskService extends BackgroundThread {
             final PullCallback pullCallback = new PullCallback() {
                 @Override
                 public void onSuccess(PullResult pullResult) {
-                    // 将最新的一次更新记录时间戳赋值给 PullRequest
-
-                    // 构建任务调度实例
+                    try {
+                        // 构建任务调度实例
+                        if (pullResult.getTaskChangeRecordList() != null && pullResult.getTaskChangeRecordList().size() > 0) {
+                            pullResult.getTaskChangeRecordList().forEach(record -> {
+                                PullTaskService.this.schedulerManager.onChange(record);
+                            });
+                        }
+                        // 将最新的一次更新记录时间戳赋值给 PullRequest
+                        request.setLastTaskChangeTimestamp(pullResult.getRecodeMaxTimeStamp());
+                        PullTaskService.this.executePullRequestImmediately(request);
+                    } catch (Exception e) {
+                        log.error("Failed to process pullresult, taskcode:{},pullResult:{},error:{}", request.getTaskCode(), pullResult, e);
+                        PullTaskService.this.executePullRequestLater(request, 1000);
+                    }
 
                 }
 
                 @Override
                 public void onException(Throwable e) {
-                    // log.error
+                    log.error("Failed to process pullresult, taskcode:{},error:{}", request.getTaskCode(), e);
                     PullTaskService.this.executePullRequestLater(request, 1000);
 
                 }

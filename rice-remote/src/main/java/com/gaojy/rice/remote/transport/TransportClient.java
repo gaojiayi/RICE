@@ -227,7 +227,8 @@ public class TransportClient extends AbstractRemoteService implements IBaseRemot
         }
     }
 
-    @Override public ChannelEventListener getChannelEventListener() {
+    @Override
+    public ChannelEventListener getChannelEventListener() {
         return channelEventListener;
     }
 

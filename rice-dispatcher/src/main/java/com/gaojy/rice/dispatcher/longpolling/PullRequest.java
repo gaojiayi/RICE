@@ -1,10 +1,6 @@
 package com.gaojy.rice.dispatcher.longpolling;
 
-import com.gaojy.rice.repository.api.dao.RiceTaskChangeRecordDao;
-import com.gaojy.rice.repository.api.entity.RiceTaskInfo;
-import com.gaojy.rice.repository.api.entity.TaskChangeRecord;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author gaojy
@@ -14,7 +10,8 @@ import java.util.List;
  */
 public class PullRequest {
 
-    private Long lastTaskChangeTimestamp = -1l;
+    private  volatile Long lastTaskChangeTimestamp;
+    private String taskCode;
 
     public Long getLastTaskChangeTimestamp() {
         return lastTaskChangeTimestamp;
@@ -22,5 +19,18 @@ public class PullRequest {
 
     public void setLastTaskChangeTimestamp(Long lastTaskChangeTimestamp) {
         this.lastTaskChangeTimestamp = lastTaskChangeTimestamp;
+    }
+
+    public String getTaskCode() {
+        return taskCode;
+    }
+
+    public void setTaskCode(String taskCode) {
+        this.taskCode = taskCode;
+    }
+
+    public PullRequest(Long lastTaskChangeTimestamp, String taskCode) {
+        this.lastTaskChangeTimestamp = lastTaskChangeTimestamp;
+        this.taskCode = taskCode;
     }
 }

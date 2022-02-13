@@ -2,11 +2,9 @@ package com.gaojy.rice.repository.mysql.impl;
 
 import com.gaojy.rice.common.exception.RepositoryException;
 import com.gaojy.rice.repository.api.dao.RiceTaskInfoDao;
-import com.gaojy.rice.repository.api.entity.ProcessorServerInfo;
-import com.gaojy.rice.repository.api.entity.RiceTaskInfo;
+import com.gaojy.rice.common.entity.RiceTaskInfo;
 import com.gaojy.rice.repository.mysql.DataSourceFactory;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
 import javax.sql.DataSource;
 import org.apache.commons.dbutils.BasicRowProcessor;

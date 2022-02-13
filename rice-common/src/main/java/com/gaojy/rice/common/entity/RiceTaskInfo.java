@@ -1,4 +1,4 @@
-package com.gaojy.rice.repository.api.entity;
+package com.gaojy.rice.common.entity;
 import java.util.Date;
 
 /**

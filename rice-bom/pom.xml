@@ -115,11 +115,21 @@
                 <artifactId>logback-core</artifactId>
                 <version>1.0.13</version>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>com.sun.jdmk</groupId>-->
-<!--                <artifactId>jmxtools</artifactId>-->
-<!--                <version>1.2.1</version>-->
-<!--            </dependency>-->
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>1.8.3</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>3.2</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>1.1</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

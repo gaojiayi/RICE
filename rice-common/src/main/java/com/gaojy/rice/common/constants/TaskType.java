@@ -10,17 +10,27 @@ public enum TaskType {
     /**
      * 基本的RICE任务
      */
-    RICE_BASIC,
+    RICE_BASIC(0),
     /**
      * MAP 任务
      */
-    RICE_MAP,
+    RICE_MAP(1),
     /**
      * MAP REDUCE 任务
      */
-    RICE_MAPREDUCE,
+    RICE_MAPREDUCE(2),
     /**
      * 工作流任务
      */
-    RICE_WORKFLOW
+    RICE_WORKFLOW(3);
+
+    private int code;
+
+    TaskType(int code) {
+        this.code = code;
+    }
+
+    public  static TaskType getType(int type){
+        return TaskType.values()[type];
+    }
 }

@@ -1,5 +1,7 @@
 package com.gaojy.rice.common.constants;
 
+import java.util.Locale;
+
 /**
  * @author gaojy
  * @ClassName ExecuteType.java
@@ -15,5 +17,9 @@ public enum ExecuteType {
     /**
      * 单机执行
      */
-    STANDALONE
+    STANDALONE;
+
+    public static ExecuteType getType(String type){
+        return ExecuteType.valueOf(type.toUpperCase());
+    }
 }

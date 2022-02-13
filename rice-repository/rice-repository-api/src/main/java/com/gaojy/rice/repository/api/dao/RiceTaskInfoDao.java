@@ -1,6 +1,6 @@
 package com.gaojy.rice.repository.api.dao;
 
-import com.gaojy.rice.repository.api.entity.RiceTaskInfo;
+import com.gaojy.rice.common.entity.RiceTaskInfo;
 import java.util.List;
 
 /**

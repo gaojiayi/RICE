@@ -32,10 +32,16 @@
             <artifactId>jraft-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.gaojy</groupId>
-            <artifactId>rice-controller</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
         </dependency>
     </dependencies>
 

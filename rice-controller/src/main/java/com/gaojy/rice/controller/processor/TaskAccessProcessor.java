@@ -12,17 +12,14 @@ import com.gaojy.rice.controller.RiceController;
 import com.gaojy.rice.controller.maintain.SchedulerManager;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.RiceRequestProcessor;
-import com.gaojy.rice.repository.api.entity.ProcessorServerInfo;
-import com.gaojy.rice.repository.api.entity.RiceTaskInfo;
+import com.gaojy.rice.common.entity.ProcessorServerInfo;
+import com.gaojy.rice.common.entity.RiceTaskInfo;
 import io.netty.channel.ChannelHandlerContext;
-import java.sql.SQLException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author gaojy
