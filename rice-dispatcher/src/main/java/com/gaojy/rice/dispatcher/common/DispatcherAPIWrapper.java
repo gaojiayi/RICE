@@ -102,7 +102,7 @@ public class DispatcherAPIWrapper {
     }
 
     //异步调用
-    public void invokeTask(Set<String> address) {
+    public void invokeTask(String address, RiceRemoteContext request, InvokeCallback callback) {
 
     }
 

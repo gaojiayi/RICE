@@ -12,7 +12,6 @@ import com.gaojy.rice.common.timewheel.HashedWheelTimer;
 import com.gaojy.rice.dispatcher.common.DispatcherAPIWrapper;
 import com.gaojy.rice.dispatcher.longpolling.PullTaskService;
 import com.gaojy.rice.repository.api.Repository;
-import com.sun.org.apache.bcel.internal.generic.SWITCH;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;

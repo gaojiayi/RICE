@@ -17,9 +17,9 @@ public class RoundRobinTest {
         for (int i = 0; i < 100; i++) {
             all.add(String.valueOf(i));
         }
-        RoundRobinBalance balance = new RoundRobinBalance(all);
-        String s1  = (String) balance.select();
-        String s2  = (String) balance.select();
-        String s3  = (String) balance.select();
+        RoundRobinBalance balance = new RoundRobinBalance();
+        String s1  = (String) balance.select(all);
+        String s2  = (String) balance.select(all);
+        String s3  = (String) balance.select(all);
     }
 }

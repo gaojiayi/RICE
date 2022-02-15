@@ -115,12 +115,12 @@ public class RiceProcessorManager {
     }
 
     void doRegister(RiceRemoteContext riceRemoteContext) {
-        Balance balance = new RoundRobinBalance<>(config.getControllerServerList());
+        Balance balance = new RoundRobinBalance();
         String addr = null;
         int retryConnCount = 5;
         while (retryConnCount >= 0) {
             try {
-                addr = balance.select();
+                addr = balance.select(config.getControllerServerList());
                 RiceRemoteContext registerResult = client.invokeSync(addr, riceRemoteContext, 3 * 1000);
                 switch (registerResult.getCode()) {
                     case RemotingSysResponseCode.SUCCESS: {

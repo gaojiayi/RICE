@@ -2,6 +2,8 @@ package com.gaojy.rice.dispatcher.scheduler;
 
 import com.alipay.remoting.LifeCycleException;
 import com.gaojy.rice.common.RiceThreadFactory;
+import com.gaojy.rice.common.balance.Balance;
+import com.gaojy.rice.common.balance.RandomBalance;
 import com.gaojy.rice.common.constants.ExecuteType;
 import com.gaojy.rice.common.constants.LoggerName;
 import com.gaojy.rice.common.constants.ScheduleType;
@@ -16,17 +18,23 @@ import com.gaojy.rice.dispatcher.longpolling.PullRequest;
 import com.gaojy.rice.dispatcher.longpolling.PullTaskService;
 import com.gaojy.rice.dispatcher.scheduler.tasktype.RiceExecuter;
 import com.gaojy.rice.dispatcher.scheduler.tasktype.TaskExecuterFactory;
+import com.gaojy.rice.remote.InvokeCallback;
+import com.gaojy.rice.remote.protocol.RiceRemoteContext;
+import com.gaojy.rice.remote.transport.ResponseFuture;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +61,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     private int instanceRetryCount = 0;
     private CronExpression cexpStart;
     private Set<String> processes = Collections.synchronizedSet(new HashSet<>());
+
     private AtomicReference<TaskSataus> taskSataus = new AtomicReference<>(TaskSataus.ONLINE);
     private DispatcherAPIWrapper outApiWrapper;
     private ExecutorService threadPool;
@@ -60,7 +69,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     private Long bootTime = System.currentTimeMillis();
     private PullTaskService pullTaskService;
     private TaskScheduleManager taskScheduleManager;
-
+    private Balance balance = new RandomBalance();
     private final RiceExecuter riceExecuter;
 
     public TaskScheduleClient(RiceTaskInfo taskInfo,
@@ -99,14 +108,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
 
         // 不同的任务类型  具体的执行步骤又是不一样的
         if (taskSataus.get().equals(TaskSataus.ONLINE)) {
-            // todo:真正需要实现的逻辑
-
-            if (ExecuteType.STANDALONE.equals(executeType)) { // 单机执行
-                // 负载均衡  找到一个处理器
-            }
-
             riceExecuter.execute();
-
         } else if (taskSataus.get().equals(TaskSataus.PAUSE)) { //跳过本次执行
             log.info("taskCode={},status is pause", taskCode);
         }
@@ -117,10 +119,11 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
             Date firstStartTime = cexpStart.getNextValidTimeAfter(current);
             delay = firstStartTime.getTime() - current.getTime();
         }
-        if (ScheduleType.FIX_RATE.equals(scheduleType)) {
+        if (ScheduleType.FIX_RATE.equals(scheduleType) || ScheduleType.FIX_DELAY.equals(scheduleType)) {
             delay = Long.parseLong(timeExpression);
         }
-        // 固定延迟  则在回调中执行
+
+        // todo 下次的理论执行时间写数据库
 
         scheduleTimer.newTimeout(this, delay, TimeUnit.MILLISECONDS);
     }
@@ -145,7 +148,12 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     @Override
     public void startup() throws LifeCycleException {
         this.pullTaskService.executePullRequestImmediately(new PullRequest(this.bootTime, taskCode));
-        this.scheduleTimer.newTimeout(this, 0, TimeUnit.SECONDS);
+        Long delay = 0L;
+        if (ScheduleType.FIX_DELAY.equals(scheduleType)) {
+            // 固定延迟  则延迟调度
+            delay = Long.parseLong(timeExpression);
+        }
+        this.scheduleTimer.newTimeout(this, delay, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -162,5 +170,30 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
 
     public ExecutorService getThreadPool() {
         return threadPool;
+    }
+
+    public List<String> selectProcessores(ExecuteType type) {
+        List<String> selectRet = new ArrayList<>();
+        type = executeType == null ? this.executeType : type;
+        if (processes != null && processes.size() > 0) {
+            List<String> all = processes.stream().collect(Collectors.toList());
+            if (ExecuteType.STANDALONE.equals(executeType)) { // 单机执行
+                // 负载均衡  找到一个处理器
+                selectRet.add(balance.select(all));
+            }
+        }
+        return selectRet;
+    }
+
+    public void invoke(String processorAddr, RiceRemoteContext remoteContext) {
+        InvokeCallback callback = new InvokeCallback(){
+
+            @Override
+            public void operationComplete(ResponseFuture responseFuture) {
+                // 更新数据库
+                //
+            }
+        };
+        outApiWrapper.invokeTask(processorAddr, remoteContext,callback);
     }
 }
