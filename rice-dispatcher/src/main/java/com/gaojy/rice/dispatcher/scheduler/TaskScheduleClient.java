@@ -7,8 +7,9 @@ import com.gaojy.rice.common.balance.RandomBalance;
 import com.gaojy.rice.common.constants.ExecuteType;
 import com.gaojy.rice.common.constants.LoggerName;
 import com.gaojy.rice.common.constants.ScheduleType;
-import com.gaojy.rice.common.constants.TaskSataus;
+import com.gaojy.rice.common.constants.TaskStatus;
 import com.gaojy.rice.common.constants.TaskType;
+import com.gaojy.rice.common.entity.ProcessorServerInfo;
 import com.gaojy.rice.common.entity.RiceTaskInfo;
 import com.gaojy.rice.common.timewheel.HashedWheelTimer;
 import com.gaojy.rice.common.timewheel.Timeout;
@@ -30,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -60,9 +62,8 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     private int taskRetryCount = 0;
     private int instanceRetryCount = 0;
     private CronExpression cexpStart;
-    private Set<String> processes = Collections.synchronizedSet(new HashSet<>());
-
-    private AtomicReference<TaskSataus> taskSataus = new AtomicReference<>(TaskSataus.ONLINE);
+    private volatile Set<String> processes = new CopyOnWriteArraySet();
+    private AtomicReference<TaskStatus> taskStatus = new AtomicReference<>(TaskStatus.ONLINE);
     private DispatcherAPIWrapper outApiWrapper;
     private ExecutorService threadPool;
     // 任务启动时间
@@ -82,7 +83,6 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
         if (ScheduleType.CRON.equals(scheduleType)) {
             cexpStart = new CronExpression(timeExpression);
         }
-
         riceExecuter = TaskExecuterFactory.getExecuter(taskType, this);
 
     }
@@ -101,15 +101,15 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
 
     @Override
     public void run(Timeout timeout) throws Exception {
-        if (taskSataus.get().equals(TaskSataus.OFFLINE)) {
-            taskScheduleManager.deleteTask(taskCode);
+        if (taskStatus.get().equals(TaskStatus.OFFLINE)) {
+            taskScheduleManager.taskStatusChange(taskCode, TaskStatus.OFFLINE);
             return;
         }
 
         // 不同的任务类型  具体的执行步骤又是不一样的
-        if (taskSataus.get().equals(TaskSataus.ONLINE)) {
+        if (taskStatus.get().equals(TaskStatus.ONLINE)) {
             riceExecuter.execute();
-        } else if (taskSataus.get().equals(TaskSataus.PAUSE)) { //跳过本次执行
+        } else if (taskStatus.get().equals(TaskStatus.PAUSE)) { //跳过本次执行
             log.info("taskCode={},status is pause", taskCode);
         }
         // 计算下次执行
@@ -158,14 +158,14 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
 
     @Override
     public void shutdown() throws LifeCycleException {
-        taskSataus.set(TaskSataus.OFFLINE);
+        taskStatus.set(TaskStatus.OFFLINE);
         threadPool.shutdown();
 
     }
 
     @Override
     public boolean isStarted() {
-        return taskSataus.get() != TaskSataus.OFFLINE;
+        return taskStatus.get() != TaskStatus.OFFLINE;
     }
 
     public ExecutorService getThreadPool() {
@@ -186,7 +186,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     }
 
     public void invoke(String processorAddr, RiceRemoteContext remoteContext) {
-        InvokeCallback callback = new InvokeCallback(){
+        InvokeCallback callback = new InvokeCallback() {
 
             @Override
             public void operationComplete(ResponseFuture responseFuture) {
@@ -194,6 +194,22 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
                 //
             }
         };
-        outApiWrapper.invokeTask(processorAddr, remoteContext,callback);
+        outApiWrapper.invokeTask(processorAddr, remoteContext, callback);
+    }
+
+    public void initProcessores(List<ProcessorServerInfo> list) {
+        if (list != null && list.size() > 0) {
+            list.forEach(processor -> {
+                processes.add(processor.getAddress() + ":" + processor.getPort());
+            });
+        }
+    }
+
+    public AtomicReference<TaskStatus> getTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setProcesses(Set<String> processes) {
+        this.processes = processes;
     }
 }

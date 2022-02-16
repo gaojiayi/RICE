@@ -11,7 +11,12 @@ import java.util.List;
  */
 public interface RiceTaskInfoDao {
 
-   List<RiceTaskInfo> getInfoByCodes(List<String> taskCodes);
-    
+    List<RiceTaskInfo> getInfoByCodes(List<String> taskCodes);
+
+    public void addTask(RiceTaskInfo riceTaskInfo);
+
+    public void updateTask(RiceTaskInfo riceTaskInfo);
+
+    public void taskStatusChange(int status);
 
 }

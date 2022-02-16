@@ -3,6 +3,7 @@ package com.gaojy.rice.dispatcher.scheduler;
 import com.gaojy.rice.common.entity.ProcessorServerInfo;
 import com.gaojy.rice.common.entity.RiceTaskInfo;
 import com.gaojy.rice.common.entity.TaskChangeRecord;
+import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ import java.util.List;
  */
 public interface SchedulerManager {
 
-    public void addTask(RiceTaskInfo info, List<ProcessorServerInfo> processorServerInfoList);
+    public void addTask(RiceTaskInfo info, List<ProcessorServerInfo> processorServerInfoList) throws ParseException;
 
 
     public void taskReBalance(String currentScheduler, List<String> schedulerList);

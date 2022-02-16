@@ -15,4 +15,6 @@ public interface ProcessorServerInfoDao {
 
     public int batchCreateOrUpdateInfo(List<ProcessorServerInfo> processorServerInfoList) throws RepositoryException;
 
+    public List<ProcessorServerInfo>  getInfosByTask(String taskCode);
+
 }

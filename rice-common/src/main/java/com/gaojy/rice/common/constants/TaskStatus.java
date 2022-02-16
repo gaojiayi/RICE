@@ -6,12 +6,16 @@ package com.gaojy.rice.common.constants;
  * @Description TODO
  * @createTime 2022/02/11 14:32:00
  */
-public enum TaskSataus {
+public enum TaskStatus {
 
     OFFLINE(0), ONLINE(1), PAUSE(2);
     private int code;
 
-    TaskSataus(int code) {
+    TaskStatus(int code) {
         this.code = code;
+    }
+
+    public int getCode() {
+        return code;
     }
 }

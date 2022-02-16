@@ -35,4 +35,16 @@ public class RiceTaskInfoDaoImpl implements RiceTaskInfoDao {
             throw new RepositoryException(e);
         }
     }
+
+    @Override public void addTask(RiceTaskInfo riceTaskInfo) {
+
+    }
+
+    @Override public void updateTask(RiceTaskInfo riceTaskInfo) {
+
+    }
+
+    @Override public void taskStatusChange(int status) {
+
+    }
 }

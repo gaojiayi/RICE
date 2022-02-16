@@ -4,6 +4,8 @@ import com.alipay.remoting.LifeCycleException;
 import com.gaojy.rice.common.RiceThreadFactory;
 import com.gaojy.rice.common.constants.LoggerName;
 import com.gaojy.rice.common.constants.TaskOptType;
+import com.gaojy.rice.common.constants.TaskSataus;
+import com.gaojy.rice.common.constants.TaskStatus;
 import com.gaojy.rice.common.entity.ProcessorServerInfo;
 import com.gaojy.rice.common.entity.RiceTaskInfo;
 import com.gaojy.rice.common.entity.TaskChangeRecord;
@@ -12,15 +14,18 @@ import com.gaojy.rice.common.timewheel.HashedWheelTimer;
 import com.gaojy.rice.dispatcher.common.DispatcherAPIWrapper;
 import com.gaojy.rice.dispatcher.longpolling.PullTaskService;
 import com.gaojy.rice.repository.api.Repository;
+import java.text.ParseException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,54 +60,91 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
 
     @Override
     public void addTask(RiceTaskInfo info, List<ProcessorServerInfo> processorServerInfoList) {
+        TaskScheduleClient client = null;
+        try {
+            client = new TaskScheduleClient(info, this);
+            client.initProcessores(processorServerInfoList);
+            TaskScheduleClient prev = clients.put(info.getTaskCode(), client);
+            if (prev != null) {
+                prev.shutdown();
+            }
+            client.startup();
+            // 写数据库
+            repository.getRiceTaskInfoDao().addTask(info);
+            repository.getProcessorServerInfoDao().batchCreateOrUpdateInfo(processorServerInfoList);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
     }
 
-    public void deleteTask(String taskCode) {
+    public void taskStatusChange(String taskCode, TaskStatus status) {
+        TaskScheduleClient client = clients.get(taskCode);
+        if (client != null) {
+            client.getTaskStatus().set(status);
+        }
+        repository.getRiceTaskInfoDao().taskStatusChange(status.getCode());
+    }
+
+    private void updateTaskInfo(String taskCode) {
+        // TODO
 
     }
 
-    private void updateTask(String taskCode) {
-
-    }
-
-    private synchronized void taskProcessorChange(String taskCode) {
+    private void taskProcessorChange(String taskCode) {
         // 包括了taskcode的上线和下线
+        TaskScheduleClient client = clients.get(taskCode);
+        if (client != null) {
+            List<ProcessorServerInfo> servers = repository.getProcessorServerInfoDao().getInfosByTask(taskCode);
+            if (servers != null && servers.size() > 0) {
+                Set<String> collect = servers.stream().map(server -> {
+                    return server.getAddress() + ":" + server.getPort();
+                }).collect(Collectors.toSet());
+                Set<String> newProcessorList = new CopyOnWriteArraySet<>(collect);
+                client.setProcesses(newProcessorList);
+            }
+        }
 
     }
 
     @Override
     public void onChange(TaskChangeRecord record) {
         TaskOptType type = TaskOptType.getTaskOptType(record.getOptType());
-        if(taskIsRunning(record.getTaskCode())){
+        if (taskIsRunning(record.getTaskCode())) {
             switch (type) {
                 case TASK_PROCESSOR_ONLINE:
                 case TASK_PROCESSOR_OFFLINE:
                     this.taskProcessorChange(record.getTaskCode());
                     break;
                 case TASK_DELETE:
-                    this.deleteTask(record.getTaskCode());
+                    this.taskStatusChange(record.getTaskCode(), TaskStatus.OFFLINE);
+                    break;
+                case TASK_PAUSE:
+                    this.taskStatusChange(record.getTaskCode(), TaskStatus.PAUSE);
+                    break;
+                case TASK_RUNNING:
+                    this.taskStatusChange(record.getTaskCode(), TaskStatus.ONLINE);
                     break;
                 case TASK_UPDATE:
-                    this.updateTask(record.getTaskCode());
+                    this.updateTaskInfo(record.getTaskCode());
                     break;
                 default:
                     log.warn("Unknown task action type received");
             }
-        }else {
-            log.warn("The task:{} has stopped running",record.getTaskCode());
+        } else {
+            log.warn("The task:{} has stopped running", record.getTaskCode());
         }
-
 
     }
 
-    private boolean taskIsRunning(String taskCode){
+    private boolean taskIsRunning(String taskCode) {
         return clients.containsKey(taskCode) && clients.get(taskCode).isStarted();
     }
 
     @Override
     public void taskReBalance(String currentScheduler, List<String> schedulerList) {
         // 查询所有的taskcode
+
 
         // 根据一致性hash算法，获取落在当前调度器上的taskCode
 

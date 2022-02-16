@@ -90,4 +90,8 @@ public class ProcessorServerInfoDaoImpl implements ProcessorServerInfoDao {
         }
         return count;
     }
+
+    @Override public List<ProcessorServerInfo> getInfosByTask(String taskCode) {
+        return null;
+    }
 }

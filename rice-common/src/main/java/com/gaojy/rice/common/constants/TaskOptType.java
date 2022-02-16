@@ -16,7 +16,11 @@ public enum TaskOptType {
 
     TASK_DELETE(3),
 
-    TASK_UPDATE(4),
+    TASK_PAUSE(4),
+
+    TASK_RUNNING(5),
+
+    TASK_UPDATE(6),
 
     UNKNOWN(0);
 
