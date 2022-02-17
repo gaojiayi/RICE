@@ -66,7 +66,9 @@ public class RiceBasicTaskExecuter implements RiceExecuter {
                 try {
                     RiceBasicTaskExecuter.this.client.invoke(processor, requestCommand);
                     return;
-                } catch (RemotingConnectException | RemotingSendRequestException | RemotingTimeoutException | InterruptedException | RemotingTooMuchRequestException e) {
+                } catch (RemotingConnectException | RemotingSendRequestException
+                    | RemotingTimeoutException | InterruptedException
+                    | RemotingTooMuchRequestException e) {
                     // 单机模式  每次重试都要重新选择处理器
                     if (RiceBasicTaskExecuter.this.client.getExecuteType().equals(ExecuteType.STANDALONE)) {
                         List<String> strings = client.selectProcessores(ExecuteType.STANDALONE);

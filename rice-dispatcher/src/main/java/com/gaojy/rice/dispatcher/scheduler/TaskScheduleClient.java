@@ -222,10 +222,12 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
 
             @Override
             public void operationComplete(ResponseFuture responseFuture) {
-                Long taskInstanceId = ((TaskInvokeRequestHeader) remoteContext.readCustomHeader()).getTaskInstanceId();
+                // 从返回结果中获取instanceid
+                // Long taskInstanceId = ((TaskInvokeRequestHeader) remoteContext.readCustomHeader()).getTaskInstanceId();
                 // 更新数据库
                 TaskInstanceInfo instanceInfo = repository.getTaskInstanceInfoDao().getInstance(taskInstanceId);
                 instanceInfo.setStatus(TaskInstanceStatus.FINISHED.getCode());
+
                 if (responseFuture.isSendRequestOK()) {
                     return;
                 }

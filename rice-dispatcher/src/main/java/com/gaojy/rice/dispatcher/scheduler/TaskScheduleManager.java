@@ -219,6 +219,8 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
     @Override
     public void shutdown() throws LifeCycleException {
         this.heartBeatTimer.shutdown();
+        pullTaskService.shutdown();
+        clients.values().forEach(client -> client.shutdown());
         isStopped = true;
     }
 

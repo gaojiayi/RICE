@@ -102,8 +102,6 @@ public class RiceDispatchScheduler implements RiceDispatchSchedulerMBean, Channe
         transportClient.registerProcessor(RequestCode.CONTROLLER_TASK_CREATE,
             new TaskCreateProcessor(scheduleManager), null);
         transportClient.start();
-        // 长轮询
-        //pullTaskService.start();
 
         scheduleManager.startup();
 
