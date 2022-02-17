@@ -1,9 +1,11 @@
 package com.gaojy.rice.repository.api;
 
+import com.gaojy.rice.common.entity.TaskInstanceInfo;
 import com.gaojy.rice.common.extension.SPI;
 import com.gaojy.rice.repository.api.dao.ProcessorServerInfoDao;
 import com.gaojy.rice.repository.api.dao.RiceTaskChangeRecordDao;
 import com.gaojy.rice.repository.api.dao.RiceTaskInfoDao;
+import com.gaojy.rice.repository.api.dao.TaskInstanceInfoDao;
 
 /**
  * @author gaojy
@@ -23,4 +25,6 @@ public interface Repository {
     public ProcessorServerInfoDao getProcessorServerInfoDao();
 
     public RiceTaskInfoDao getRiceTaskInfoDao();
+
+    public TaskInstanceInfoDao getTaskInstanceInfoDao();
 }

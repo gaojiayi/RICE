@@ -47,4 +47,9 @@ public class RiceTaskInfoDaoImpl implements RiceTaskInfoDao {
     @Override public void taskStatusChange(int status) {
 
     }
+
+    @Override
+    public List<String> getAllValidTaskCode() {
+        return null;
+    }
 }

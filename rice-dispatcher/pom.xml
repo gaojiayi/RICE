@@ -31,6 +31,7 @@
             <groupId>com.alipay.sofa</groupId>
             <artifactId>jraft-core</artifactId>
         </dependency>
+        <!--   beanutils support     -->
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
@@ -43,6 +44,7 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
         </dependency>
+        <!--   beanutils support     -->
     </dependencies>
 
 </project>

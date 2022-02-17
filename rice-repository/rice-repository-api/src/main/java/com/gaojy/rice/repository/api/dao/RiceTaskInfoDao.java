@@ -19,4 +19,6 @@ public interface RiceTaskInfoDao {
 
     public void taskStatusChange(int status);
 
+    public List<String> getAllValidTaskCode();
+
 }

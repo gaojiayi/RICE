@@ -4,21 +4,20 @@ import com.alipay.remoting.LifeCycleException;
 import com.gaojy.rice.common.RiceThreadFactory;
 import com.gaojy.rice.common.constants.LoggerName;
 import com.gaojy.rice.common.constants.TaskOptType;
-import com.gaojy.rice.common.constants.TaskSataus;
 import com.gaojy.rice.common.constants.TaskStatus;
 import com.gaojy.rice.common.entity.ProcessorServerInfo;
 import com.gaojy.rice.common.entity.RiceTaskInfo;
 import com.gaojy.rice.common.entity.TaskChangeRecord;
 import com.gaojy.rice.common.extension.ExtensionLoader;
 import com.gaojy.rice.common.timewheel.HashedWheelTimer;
+import com.gaojy.rice.dispatcher.allocation.AllocationType;
+import com.gaojy.rice.dispatcher.allocation.TaskAllocationFactory;
 import com.gaojy.rice.dispatcher.common.DispatcherAPIWrapper;
 import com.gaojy.rice.dispatcher.longpolling.PullTaskService;
 import com.gaojy.rice.repository.api.Repository;
+
 import java.text.ParseException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executors;
@@ -26,6 +25,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +53,8 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
     private final PullTaskService pullTaskService;
 
     private final HashedWheelTimer scheduleTimer = new HashedWheelTimer(new RiceThreadFactory("scheduleTimer"));
+
+    private AllocationType taskAllocationStrategy = AllocationType.CONSISTENTHASH;
 
     public TaskScheduleManager(DispatcherAPIWrapper outApiWrapper) {
         this.outApiWrapper = outApiWrapper;
@@ -82,7 +85,12 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
         TaskScheduleClient client = clients.get(taskCode);
         if (client != null) {
             client.getTaskStatus().set(status);
+            if (status == TaskStatus.OFFLINE) {
+                client.shutdown();
+                clients.remove(taskCode);
+            }
         }
+
         repository.getRiceTaskInfoDao().taskStatusChange(status.getCode());
     }
 
@@ -96,7 +104,7 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
         TaskScheduleClient client = clients.get(taskCode);
         if (client != null) {
             List<ProcessorServerInfo> servers = repository.getProcessorServerInfoDao().getInfosByTask(taskCode);
-            if (servers != null && servers.size() > 0) {
+            if (CollectionUtils.isNotEmpty(servers)) {
                 Set<String> collect = servers.stream().map(server -> {
                     return server.getAddress() + ":" + server.getPort();
                 }).collect(Collectors.toSet());
@@ -143,17 +151,42 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
 
     @Override
     public void taskReBalance(String currentScheduler, List<String> schedulerList) {
-        // 查询所有的taskcode
-
+        // 查询所有的非下线taskcode
+        List<String> taskCodes = repository.getRiceTaskInfoDao().getAllValidTaskCode();
 
         // 根据一致性hash算法，获取落在当前调度器上的taskCode
 
-        // 再次查询数据库，初始化这些task
+        List<String> allocationTaskCodes = TaskAllocationFactory.getStrategy(taskAllocationStrategy)
+                .allocate(schedulerList, taskCodes).get(currentScheduler);
+
+        // 再次查询数据库，初始化这些task  已有的taskCode - 交
+        Collection<String> deleteTaskCode = CollectionUtils.subtract(clients.keySet(), allocationTaskCodes);
+        Collection<String> addTaskCode = CollectionUtils.subtract(allocationTaskCodes, clients.keySet());
+        deleteTaskCode.forEach(taskCode -> {
+            this.taskStatusChange(taskCode, TaskStatus.OFFLINE);
+        });
+        addTaskCode.forEach(taskCode -> {
+            // 根据taskcode查info  和 当前的处理器
+            List<String> tasks = new ArrayList<>();
+            tasks.add(taskCode);
+            List<RiceTaskInfo> infos = repository.getRiceTaskInfoDao().getInfoByCodes(tasks);
+            List<ProcessorServerInfo> processores = repository.getProcessorServerInfoDao().getInfosByTask(taskCode);
+            if (CollectionUtils.isNotEmpty(infos)) {
+                this.addTask(infos.get(0), processores);
+            }
+
+        });
     }
 
     @Override
     public void isolationProcessorForAllTasks(String address) {
-
+        clients.values().stream().filter(client ->{
+            return client.getProcesses().stream().anyMatch(processor->{
+                return processor.contains(address);
+            });
+        }).forEach(client ->{
+            client.isolationProcessor(address);
+        });
     }
 
     // 全局心跳
@@ -189,7 +222,8 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
         isStopped = true;
     }
 
-    @Override public boolean isStarted() {
+    @Override
+    public boolean isStarted() {
         return !isStopped;
     }
 

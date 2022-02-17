@@ -15,7 +15,7 @@ public class TaskInvokeRequestHeader implements CommandCustomHeader {
     private String taskCode;
 
     @CFNotNull
-    private String taskInstanceId;
+    private Long taskInstanceId;
 
     @CFNotNull
     private String schedulerServer;
@@ -29,6 +29,7 @@ public class TaskInvokeRequestHeader implements CommandCustomHeader {
 
     private int maxRetryTimes;
 
+    @CFNotNull
     private String appName;
 
     public String getTaskCode() {
@@ -39,11 +40,11 @@ public class TaskInvokeRequestHeader implements CommandCustomHeader {
         this.taskCode = taskCode;
     }
 
-    public String getTaskInstanceId() {
+    public Long getTaskInstanceId() {
         return taskInstanceId;
     }
 
-    public void setTaskInstanceId(String taskInstanceId) {
+    public void setTaskInstanceId(Long taskInstanceId) {
         this.taskInstanceId = taskInstanceId;
     }
 

@@ -39,8 +39,8 @@ public class DispatcherAPIWrapper {
 
     // 第一次拉取 重新分配任务  异步调用
     public void pullTask(final PullRequest pullRequest,
-        final PullCallback pullCallback) throws InterruptedException, TimeoutException, RemotingConnectException,
-        RemotingSendRequestException, RemotingTimeoutException, RemotingTooMuchRequestException {
+                         final PullCallback pullCallback) throws InterruptedException, TimeoutException, RemotingConnectException,
+            RemotingSendRequestException, RemotingTimeoutException, RemotingTooMuchRequestException {
         String addr = this.riceDispatchScheduler.getElectionClient().getMasterController();
         SchedulerPullTaskChangeRequestHeader header = new SchedulerPullTaskChangeRequestHeader();
         header.setLastTaskChangeTimestamp(pullRequest.getLastTaskChangeTimestamp());
@@ -65,7 +65,7 @@ public class DispatcherAPIWrapper {
                         pullCallback.onException(new DispatcherException("send request failed to " + addr + ". Request: " + requestCommand, responseFuture.getCause()));
                     } else if (responseFuture.isTimeout()) {
                         pullCallback.onException(new DispatcherException("wait response from " + addr + " timeout :" + responseFuture.getTimeoutMillis() + "ms" + ". Request: " + requestCommand,
-                            responseFuture.getCause()));
+                                responseFuture.getCause()));
                     } else {
                         pullCallback.onException(new DispatcherException("unknown reason. addr: " + addr + ", timeoutMillis: " + timeoutMillis + ". Request: " + requestCommand, responseFuture.getCause()));
                     }
@@ -80,8 +80,8 @@ public class DispatcherAPIWrapper {
 
     //
     public void heartBeatToController(String controllers) throws InterruptedException, TimeoutException,
-        RemotingConnectException, RemotingSendRequestException,
-        RemotingTimeoutException, RemotingTooMuchRequestException {
+            RemotingConnectException, RemotingSendRequestException,
+            RemotingTimeoutException, RemotingTooMuchRequestException {
         String mainController = this.riceDispatchScheduler.getElectionClient().getMasterController();
         SchedulerHeartBeatHeader header = new SchedulerHeartBeatHeader(); //后续可以添加一些系统指标
         RiceRemoteContext command = RiceRemoteContext.createRequestCommand(RequestCode.SCHEDULER_HEART_BEAT, header);
@@ -90,7 +90,7 @@ public class DispatcherAPIWrapper {
 
     // 调度器第一次启动或者发生控制器重新选举的时候调用   控制器保存channel
     public Boolean registerScheduler(String addresses) throws InterruptedException, TimeoutException,
-        RemotingConnectException, RemotingSendRequestException, RemotingTimeoutException {
+            RemotingConnectException, RemotingSendRequestException, RemotingTimeoutException {
         // String mainController = this.riceDispatchScheduler.getElectionClient().getMasterController();
         RiceRemoteContext request = RiceRemoteContext.createRequestCommand(RequestCode.SCHEDULER_REGISTER, new SchedulerRegisterRequestHeader());
         RiceRemoteContext response = this.transportClient.invokeSync(addresses, request, 1000 * 3);
@@ -102,7 +102,10 @@ public class DispatcherAPIWrapper {
     }
 
     //异步调用
-    public void invokeTask(String address, RiceRemoteContext request, InvokeCallback callback) {
+    public void invokeTask(String address, RiceRemoteContext request, long timeoutMillis, InvokeCallback callback) throws RemotingConnectException,
+            RemotingSendRequestException, RemotingTimeoutException,
+            InterruptedException, RemotingTooMuchRequestException {
+        this.transportClient.invokeAsync(address, request, timeoutMillis, callback);
 
     }
 

@@ -8,5 +8,5 @@ package com.gaojy.rice.dispatcher.scheduler.tasktype;
  */
 public interface RiceExecuter {
 
-    public void execute();
+    public void execute(Long taskInstanceId);
 }
