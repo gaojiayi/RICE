@@ -20,10 +20,9 @@ public class TaskInvokeRequestHeader implements CommandCustomHeader {
     @CFNotNull
     private String schedulerServer;
 
-    private String taskParameter;
-
     // 实例参数
     private String instanceParameter;
+
     // method
     private String methodName;
 
@@ -54,14 +53,6 @@ public class TaskInvokeRequestHeader implements CommandCustomHeader {
 
     public void setSchedulerServer(String schedulerServer) {
         this.schedulerServer = schedulerServer;
-    }
-
-    public String getTaskParameter() {
-        return taskParameter;
-    }
-
-    public void setTaskParameter(String taskParameter) {
-        this.taskParameter = taskParameter;
     }
 
     public String getInstanceParameter() {

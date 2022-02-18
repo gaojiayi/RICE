@@ -8,12 +8,11 @@ import com.gaojy.rice.common.constants.*;
 import com.gaojy.rice.common.entity.ProcessorServerInfo;
 import com.gaojy.rice.common.entity.RiceTaskInfo;
 import com.gaojy.rice.common.entity.TaskInstanceInfo;
-import com.gaojy.rice.common.exception.RemotingConnectException;
-import com.gaojy.rice.common.exception.RemotingSendRequestException;
-import com.gaojy.rice.common.exception.RemotingTimeoutException;
-import com.gaojy.rice.common.exception.RemotingTooMuchRequestException;
+import com.gaojy.rice.common.exception.*;
 import com.gaojy.rice.common.extension.ExtensionLoader;
+import com.gaojy.rice.common.protocol.body.scheduler.TaskInvokerResponseBody;
 import com.gaojy.rice.common.protocol.header.scheduler.TaskInvokeRequestHeader;
+import com.gaojy.rice.common.protocol.header.scheduler.TaskInvokerResponseHeader;
 import com.gaojy.rice.common.timewheel.HashedWheelTimer;
 import com.gaojy.rice.common.timewheel.Timeout;
 import com.gaojy.rice.common.timewheel.TimerTask;
@@ -222,31 +221,41 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
 
             @Override
             public void operationComplete(ResponseFuture responseFuture) {
-                // 从返回结果中获取instanceid
-                // Long taskInstanceId = ((TaskInvokeRequestHeader) remoteContext.readCustomHeader()).getTaskInstanceId();
+                RiceRemoteContext response = responseFuture.getResponseCommand();
                 // 更新数据库
+                Long taskInstanceId = ((TaskInvokeRequestHeader) remoteContext.readCustomHeader()).getTaskInstanceId();
                 TaskInstanceInfo instanceInfo = repository.getTaskInstanceInfoDao().getInstance(taskInstanceId);
                 instanceInfo.setStatus(TaskInstanceStatus.FINISHED.getCode());
+                if (response != null) {
+                    try {
+                        TaskInvokerResponseHeader responseHeader = (TaskInvokerResponseHeader) response
+                                .decodeCommandCustomHeader(TaskInvokerResponseHeader.class);
+                        TaskInvokerResponseBody body = TaskInvokerResponseBody.decode(response.getBody(),
+                                TaskInvokerResponseBody.class);
+                        // 更新实例状态
 
-                if (responseFuture.isSendRequestOK()) {
-                    return;
+
+                    } catch (RemotingCommandException e) {
+                        instanceInfo.setStatus(TaskInstanceStatus.EXCEPTION.getCode());
+                    }
+
+                } else {
+                    if (responseFuture.isSendRequestOK()) {
+                        instanceInfo.setStatus(TaskInstanceStatus.EXCEPTION.getCode());
+                    } else if (responseFuture.isTimeout()) {
+                        instanceInfo.setStatus(TaskInstanceStatus.TIMEOUT.getCode());
+                    } else {
+                        if (responseFuture.getCause() != null) {
+                            instanceInfo.setStatus(TaskInstanceStatus.EXCEPTION.getCode());
+                        }
+                    }
                 }
 
-
-                if (responseFuture.isTimeout()) {
-                    instanceInfo.setStatus(TaskInstanceStatus.TIMEOUT.getCode());
-                }
-
-                if (responseFuture.getCause() != null) {
-                    instanceInfo.setStatus(TaskInstanceStatus.EXCEPTION.getCode());
-                }
-
-                //
+                repository.getTaskInstanceInfoDao().updateTaskInstance(instanceInfo);
             }
         };
 
         outApiWrapper.invokeTask(processorAddr, remoteContext, timeoutMillis, callback);
-
 
     }
 
@@ -303,5 +312,21 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
 
     public void setTaskRetryCount(int taskRetryCount) {
         this.taskRetryCount = taskRetryCount;
+    }
+
+    public String getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(String parameters) {
+        this.parameters = parameters;
+    }
+
+    public int getInstanceRetryCount() {
+        return instanceRetryCount;
+    }
+
+    public void setInstanceRetryCount(int instanceRetryCount) {
+        this.instanceRetryCount = instanceRetryCount;
     }
 }

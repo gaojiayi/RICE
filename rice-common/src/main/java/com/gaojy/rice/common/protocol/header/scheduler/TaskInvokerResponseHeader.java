@@ -6,12 +6,74 @@ import com.gaojy.rice.common.protocol.header.CommandCustomHeader;
 /**
  * @author gaojy
  * @ClassName TaskInvokerResponseHeader.java
- * @Description TODO
+ * @Description 调度结果返回响应header
  * @createTime 2022/01/26 15:27:00
  */
 public class TaskInvokerResponseHeader implements CommandCustomHeader {
 
-    // private
+    private Long taskInstanceId;
+
+    private String taskCode;
+
+    private Long finishTime;
+
+    private Long runningTime;
+
+    /**
+     * 重试次数
+     */
+    private int retryTimes;
+
+    private String taskInstanceStatus;
+
+
+    public Long getTaskInstanceId() {
+        return taskInstanceId;
+    }
+
+    public void setTaskInstanceId(Long taskInstanceId) {
+        this.taskInstanceId = taskInstanceId;
+    }
+
+    public String getTaskCode() {
+        return taskCode;
+    }
+
+    public void setTaskCode(String taskCode) {
+        this.taskCode = taskCode;
+    }
+
+    public Long getFinishTime() {
+        return finishTime;
+    }
+
+    public void setFinishTime(Long finishTime) {
+        this.finishTime = finishTime;
+    }
+
+    public Long getRunningTime() {
+        return runningTime;
+    }
+
+    public void setRunningTime(Long runningTime) {
+        this.runningTime = runningTime;
+    }
+
+    public int getRetryTimes() {
+        return retryTimes;
+    }
+
+    public void setRetryTimes(int retryTimes) {
+        this.retryTimes = retryTimes;
+    }
+
+    public String getTaskInstanceStatus() {
+        return taskInstanceStatus;
+    }
+
+    public void setTaskInstanceStatus(String taskInstanceStatus) {
+        this.taskInstanceStatus = taskInstanceStatus;
+    }
 
     @Override
     public void checkFields() throws RemotingCommandException {

@@ -1,9 +1,6 @@
 package com.gaojy.rice.dispatcher.scheduler.tasktype;
 
-import com.gaojy.rice.common.constants.ExecuteType;
-import com.gaojy.rice.common.constants.LoggerName;
-import com.gaojy.rice.common.constants.RequestCode;
-import com.gaojy.rice.common.constants.TaskInstanceStatus;
+import com.gaojy.rice.common.constants.*;
 import com.gaojy.rice.common.entity.TaskInstanceInfo;
 import com.gaojy.rice.common.exception.RemotingConnectException;
 import com.gaojy.rice.common.exception.RemotingSendRequestException;
@@ -99,6 +96,11 @@ public class RiceBasicTaskExecuter implements RiceExecuter {
             TaskInvokeRequestHeader requestHeader = new TaskInvokeRequestHeader();
             requestHeader.setAppName(client.getAppName());
             requestHeader.setTaskCode(client.getTaskCode());
+            requestHeader.setInstanceParameter(client.getParameters());
+            requestHeader.setMethodName(ExecuterMethodName.process.name());
+            requestHeader.setSchedulerServer(this.processor);
+            requestHeader.setMaxRetryTimes(client.getInstanceRetryCount());
+            requestHeader.setTaskInstanceId(this.taskInstanceId);
             return requestHeader;
         }
 
