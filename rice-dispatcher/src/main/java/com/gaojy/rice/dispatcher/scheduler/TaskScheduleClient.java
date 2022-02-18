@@ -233,6 +233,8 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
                         TaskInvokerResponseBody body = TaskInvokerResponseBody.decode(response.getBody(),
                                 TaskInvokerResponseBody.class);
                         // 更新实例状态
+                        instanceInfo.setResult(body.toJson());
+
 
 
                     } catch (RemotingCommandException e) {
