@@ -9,6 +9,7 @@ import com.gaojy.rice.common.protocol.header.scheduler.TaskInvokeRequestHeader;
 import com.gaojy.rice.common.protocol.header.scheduler.TaskInvokerResponseHeader;
 import com.gaojy.rice.processor.api.ProcessResult;
 import com.gaojy.rice.processor.api.RiceProcessorManager;
+import com.gaojy.rice.processor.api.invoker.NoSuchMethodException;
 import com.gaojy.rice.processor.api.invoker.TaskInvoker;
 import com.gaojy.rice.remote.common.RemoteHelper;
 import com.gaojy.rice.remote.common.TransfUtil;
@@ -17,6 +18,8 @@ import com.gaojy.rice.remote.transport.RiceRequestProcessor;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author gaojy
@@ -44,22 +47,39 @@ public class DefaultTaskScheduleProcessor implements RiceRequestProcessor {
 
                 // 根据taskcode来获取对应的invoker
                 TaskInvoker invoker = TaskInvoker.getInvoker(requestHeader.getTaskCode());
+
+                RiceRemoteContext response = RiceRemoteContext.createResponseCommand(TaskInvokerResponseHeader.class);
+                TaskInvokerResponseHeader responseHeader = (TaskInvokerResponseHeader)response.readCustomHeader();
+
+                int retryTime = requestHeader.getMaxRetryTimes();
                 // TODO 重试次数判断
                 Long startTime = System.currentTimeMillis();
-                ProcessResult result = (ProcessResult)invoker.invokeMethod(invoker
-                        .getInvokerInstance(requestHeader.getTaskCode()), requestHeader.getMethodName(),
-                        new Class[]{}, new Object[]{});
+                ProcessResult result = null;
+                while (retryTime >= 0 && result == null){
+                    try {
+                         result = (ProcessResult)invoker.invokeMethod(invoker
+                                        .getInvokerInstance(requestHeader.getTaskCode()), requestHeader.getMethodName(),
+                                new Class[]{}, new Object[]{});
+                    } catch (NoSuchMethodException e) {
+                        responseHeader.setTaskInstanceStatus(TaskInstanceStatus.EXCEPTION.name());
+
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }catch (Exception e){
+
+                    }
+                    retryTime--;
+                }
+
                 Long finishTime = System.currentTimeMillis();
                 // 根据任务类型,调用处理器的处理方法
                 // 包装响应数据
-                RiceRemoteContext response = RiceRemoteContext.createResponseCommand(TaskInvokerResponseHeader.class);
-                TaskInvokerResponseHeader responseHeader = (TaskInvokerResponseHeader)response.readCustomHeader();
                 // SET header
 
                 responseHeader.setFinishTime(finishTime);
                 responseHeader.setTaskCode(requestHeader.getTaskCode());
                 responseHeader.setRunningTime(finishTime-startTime);
-                responseHeader.setRetryTimes();
+                responseHeader.setRetryTimes(requestHeader.getMaxRetryTimes() - retryTime +1);
                 responseHeader.setTaskInstanceStatus(TaskInstanceStatus.FINISHED.name());
                 // SET body
                 TaskInvokerResponseBody responseBody = new TaskInvokerResponseBody();
