@@ -200,7 +200,7 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
             addresses.forEach(address -> {
                 try {
                     outApiWrapper.heartBeatToProcessor(address);
-                } catch (InterruptedException | TimeoutException e) {
+                } catch (Exception e) {
                     log.error("Heartbeat sent to processor failed, address:{},error:{}", address, e);
                 }
             });

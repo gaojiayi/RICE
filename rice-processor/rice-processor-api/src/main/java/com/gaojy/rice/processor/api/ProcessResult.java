@@ -7,4 +7,5 @@ package com.gaojy.rice.processor.api;
  * @createTime 2022/01/02 13:57:00
  */
 public class ProcessResult {
+
 }

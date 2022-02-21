@@ -43,7 +43,6 @@ public class RiceBasicTaskExecuter implements RiceExecuter {
         strings.stream().forEach(address -> {
             client.getThreadPool().execute(new BasicTaskExecuterRunnable(address, taskInstanceId));
         });
-
     }
 
     public class BasicTaskExecuterRunnable implements Runnable {

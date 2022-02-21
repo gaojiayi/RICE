@@ -256,9 +256,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
                 repository.getTaskInstanceInfoDao().updateTaskInstance(instanceInfo);
             }
         };
-
         outApiWrapper.invokeTask(processorAddr, remoteContext, timeoutMillis, callback);
-
     }
 
     public void initProcessores(List<ProcessorServerInfo> list) {

@@ -1,5 +1,6 @@
 package com.gaojy.rice.processor.api.config;
 
+import com.gaojy.rice.common.constants.ElectionConstants;
 import com.gaojy.rice.common.constants.TaskType;
 import com.gaojy.rice.common.exception.DuplicateProcessorException;
 import com.gaojy.rice.common.protocol.body.processor.TaskDetailData;
@@ -21,7 +22,7 @@ import org.slf4j.Logger;
  * @Description 配置类
  * @createTime 2022/01/04 20:03:00
  */
-public class ProcessorConfig {
+public class ProcessorConfig extends ElectionConstants {
     Logger log = RiceClientLogger.getLog();
     public static final String RICE_PRO_CONFIG_FILE_PATH_KEY = "rice.processor.config.file.path";
     public static final String DEFAULT_RICE_CONFIG_FILE_PATH = "rice.properties";
@@ -163,6 +164,14 @@ public class ProcessorConfig {
             return Arrays.asList(controllerServers.split(","));
         }
         return null;
+    }
+
+    public String getControllerServers() {
+        return controllerServers;
+    }
+
+    public void setControllerServers(String controllerServers) {
+        this.controllerServers = controllerServers;
     }
 
     public List<String> getTaskPackage() {

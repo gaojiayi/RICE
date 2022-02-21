@@ -2,11 +2,13 @@ package com.gaojy.rice.dispatcher.common;
 
 import com.gaojy.rice.common.constants.RequestCode;
 import com.gaojy.rice.common.constants.ResponseCode;
+import com.gaojy.rice.common.entity.TaskChangeRecord;
 import com.gaojy.rice.common.exception.DispatcherException;
 import com.gaojy.rice.common.exception.RemotingConnectException;
 import com.gaojy.rice.common.exception.RemotingSendRequestException;
 import com.gaojy.rice.common.exception.RemotingTimeoutException;
 import com.gaojy.rice.common.exception.RemotingTooMuchRequestException;
+import com.gaojy.rice.common.protocol.body.scheduler.SchedulerPullTaskChangeResponseBody;
 import com.gaojy.rice.common.protocol.header.scheduler.SchedulerHeartBeatHeader;
 import com.gaojy.rice.common.protocol.header.scheduler.SchedulerPullTaskChangeRequestHeader;
 import com.gaojy.rice.common.protocol.header.scheduler.SchedulerRegisterRequestHeader;
@@ -18,8 +20,10 @@ import com.gaojy.rice.remote.InvokeCallback;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.ResponseFuture;
 import com.gaojy.rice.remote.transport.TransportClient;
+import org.apache.commons.collections.CollectionUtils;
 
-import java.util.Set;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -74,18 +78,44 @@ public class DispatcherAPIWrapper {
         });
     }
 
+    /**
+     * 将拉取的数据解析成PullResult
+     *
+     * @param response
+     * @return
+     */
     private PullResult processPullResponse(RiceRemoteContext response) {
+        if (response != null) {
+            PullResult pullResult = new PullResult();
+            SchedulerPullTaskChangeResponseBody body = SchedulerPullTaskChangeResponseBody.decode(response.getBody()
+                    , SchedulerPullTaskChangeResponseBody.class);
+            if (CollectionUtils.isNotEmpty(body.getTaskChangeRecordList())) {
+                pullResult.setTaskChangeRecordList(body.getTaskChangeRecordList());
+                Collections.sort(body.getTaskChangeRecordList(), new Comparator<TaskChangeRecord>() {
+                    @Override
+                    public int compare(TaskChangeRecord o1, TaskChangeRecord o2) {
+                        return Integer.parseInt(String.valueOf(o1.getCreateTime().getTime()
+                                - o2.getCreateTime().getTime()));
+                    }
+                });
+
+                Long latestUpdatedTime = body.getTaskChangeRecordList()
+                        .get(body.getTaskChangeRecordList().size() - 1).getCreateTime().getTime();
+                pullResult.setRecodeMaxTimeStamp(latestUpdatedTime);
+                return pullResult;
+            }
+        }
         return null;
     }
 
     //
-    public void heartBeatToController(String controllers) throws InterruptedException, TimeoutException,
+    public void heartBeatToController(String controller) throws InterruptedException, TimeoutException,
             RemotingConnectException, RemotingSendRequestException,
             RemotingTimeoutException, RemotingTooMuchRequestException {
-        String mainController = this.riceDispatchScheduler.getElectionClient().getMasterController();
+        // String mainController = this.riceDispatchScheduler.getElectionClient().getMasterController();
         SchedulerHeartBeatHeader header = new SchedulerHeartBeatHeader(); //后续可以添加一些系统指标
         RiceRemoteContext command = RiceRemoteContext.createRequestCommand(RequestCode.SCHEDULER_HEART_BEAT, header);
-        this.transportClient.invokeOneWay(mainController, command, 1000 * 3);
+        this.transportClient.invokeOneWay(controller, command, 1000 * 3);
     }
 
     // 调度器第一次启动或者发生控制器重新选举的时候调用   控制器保存channel
@@ -106,11 +136,14 @@ public class DispatcherAPIWrapper {
             RemotingSendRequestException, RemotingTimeoutException,
             InterruptedException, RemotingTooMuchRequestException {
         this.transportClient.invokeAsync(address, request, timeoutMillis, callback);
-
     }
 
-    public void heartBeatToProcessor(String address) throws InterruptedException, TimeoutException {
-        //this.transportClient.invokeOneWay();
+    public void heartBeatToProcessor(String address) throws InterruptedException, TimeoutException,
+            RemotingConnectException, RemotingSendRequestException,
+            RemotingTimeoutException, RemotingTooMuchRequestException {
+        SchedulerHeartBeatHeader header = new SchedulerHeartBeatHeader(); //后续可以添加一些系统指标
+        RiceRemoteContext command = RiceRemoteContext.createRequestCommand(RequestCode.SCHEDULER_HEART_BEAT, header);
+        this.transportClient.invokeOneWay(address, command, 1000 * 3);
     }
 
 }

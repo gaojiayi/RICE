@@ -14,6 +14,7 @@ import com.gaojy.rice.common.protocol.body.processor.ExportTaskResponseBody;
 import com.gaojy.rice.common.protocol.header.processor.ExportTaskRequestHeader;
 import com.gaojy.rice.common.utils.RiceBanner;
 import com.gaojy.rice.common.utils.StringUtil;
+import com.gaojy.rice.processor.api.common.ElectionClient;
 import com.gaojy.rice.processor.api.config.ProcessorConfig;
 import com.gaojy.rice.processor.api.invoker.TaskInvoker;
 import com.gaojy.rice.processor.api.log.RiceClientLogger;
@@ -25,6 +26,7 @@ import com.gaojy.rice.remote.transport.TransportServer;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 
@@ -44,6 +46,8 @@ public class RiceProcessorManager {
     // 处理业务线程池
     private final ExecutorService remotingExecutor;
 
+    private final ElectionClient electionClient;
+
     private RiceProcessorManager(ProcessorConfig config) {
         this.config = config;
         server = new TransportServer(config.getTransfServerConfig());
@@ -51,6 +55,8 @@ public class RiceProcessorManager {
         remotingExecutor =
                 Executors.newFixedThreadPool(config.getTransfServerConfig().getServerWorkerThreads(),
                         new RiceThreadFactory("RemotingExecutorThread_"));
+        electionClient = new ElectionClient(config);
+
 
     }
 
@@ -88,7 +94,11 @@ public class RiceProcessorManager {
         RiceBanner.show(7);
     }
 
-    public void destory() {
+    public void close() {
+        electionClient.close();
+        this.server.shutdown();
+
+        this.client.shutdown();
 
     }
 
@@ -114,17 +124,23 @@ public class RiceProcessorManager {
         return requestCommand;
     }
 
+    /**
+     * 向主控制器注册  并且最多重试5次
+     * @param riceRemoteContext
+     */
     void doRegister(RiceRemoteContext riceRemoteContext) {
-        Balance balance = new RoundRobinBalance();
+        //Balance balance = new RoundRobinBalance();
         String addr = null;
         int retryConnCount = 5;
         while (retryConnCount >= 0) {
             try {
-                addr = balance.select(config.getControllerServerList());
+                // 向主控制器注册
+                addr = electionClient.getMasterController();
+                //addr = balance.select(config.getControllerServerList());
                 RiceRemoteContext registerResult = client.invokeSync(addr, riceRemoteContext, 3 * 1000);
                 switch (registerResult.getCode()) {
                     case RemotingSysResponseCode.SUCCESS: {
-                        ExportTaskResponseBody body = ExportTaskResponseBody.decode(registerResult.getBody(),ExportTaskResponseBody.class);
+                        ExportTaskResponseBody body = ExportTaskResponseBody.decode(registerResult.getBody(), ExportTaskResponseBody.class);
 
                         //ExportTaskResponseHeader header = (ExportTaskResponseHeader) registerResult.decodeCommandCustomHeader(ExportTaskResponseHeader.class);
                         if (!body.getTaskSchedulerInfo().isEmpty()) {
@@ -134,7 +150,6 @@ public class RiceProcessorManager {
                                 } else {
                                     log.info("taskcode:" + k + " have not been assigned yet ");
                                 }
-
                             });
                         }
                         return;
@@ -145,10 +160,16 @@ public class RiceProcessorManager {
 
                 }
             } catch (RemotingConnectException | RemotingTimeoutException
-                    | RemotingSendRequestException | InterruptedException e) {
+                    | RemotingSendRequestException | InterruptedException | TimeoutException e) {
                 log.error("Register to controller Exception, controller address is " + addr);
             }
             retryConnCount--;
+
+            try {
+                Thread.sleep(1000L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         throw new RegisterProcessorException("Register to controller Exception");

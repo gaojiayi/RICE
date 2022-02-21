@@ -13,7 +13,6 @@ import com.gaojy.rice.common.utils.StringUtil;
 import com.gaojy.rice.dispatcher.common.DispatcherAPIWrapper;
 import com.gaojy.rice.dispatcher.common.ElectionClient;
 import com.gaojy.rice.dispatcher.config.DispatcherConfig;
-import com.gaojy.rice.dispatcher.longpolling.PullTaskService;
 import com.gaojy.rice.dispatcher.processor.TaskCreateProcessor;
 import com.gaojy.rice.dispatcher.processor.TaskRebalanceProcessor;
 import com.gaojy.rice.dispatcher.scheduler.TaskScheduleManager;
@@ -107,12 +106,16 @@ public class RiceDispatchScheduler implements RiceDispatchSchedulerMBean, Channe
 
         // 发送心跳
         executorService.scheduleAtFixedRate(() -> {
-            try {
-                apiWrapper.heartBeatToController(dispatcherConfig.getAllControllerAddressStr());
-            } catch (InterruptedException | TimeoutException | RemotingConnectException
-                | RemotingSendRequestException | RemotingTimeoutException | RemotingTooMuchRequestException e) {
-                log.error("heartBeatToController occur exception"+e);
-            }
+
+                Arrays.stream(dispatcherConfig.getAllControllerAddressStr().split(",")).forEach(address ->{
+                    try {
+                    apiWrapper.heartBeatToController(address);
+                    } catch (InterruptedException | TimeoutException | RemotingConnectException
+                            | RemotingSendRequestException | RemotingTimeoutException | RemotingTooMuchRequestException e) {
+                        log.error("heartBeatToController occur exception"+e);
+                    }
+                });
+
         }, 1000, 1000 * 3, TimeUnit.MILLISECONDS);
 
         // 打印banner
