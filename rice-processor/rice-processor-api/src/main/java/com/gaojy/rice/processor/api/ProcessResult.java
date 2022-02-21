@@ -1,5 +1,8 @@
 package com.gaojy.rice.processor.api;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author gaojy
  * @ClassName ProcessResult.java
@@ -8,4 +11,13 @@ package com.gaojy.rice.processor.api;
  */
 public class ProcessResult {
 
+    private Map data = new HashMap<>();
+
+    public Map getData() {
+        return data;
+    }
+
+    public void setData(Map data) {
+        this.data = data;
+    }
 }

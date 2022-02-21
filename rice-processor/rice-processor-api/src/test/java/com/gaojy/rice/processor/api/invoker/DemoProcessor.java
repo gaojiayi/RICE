@@ -19,7 +19,7 @@ public class DemoProcessor implements RiceMapProcessor {
         return null;
     }
 
-    public void map() {
-
+    @Override public ProcessResult map(TaskContext context) {
+        return null;
     }
 }

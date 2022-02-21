@@ -9,6 +9,7 @@ import com.gaojy.rice.common.protocol.header.scheduler.TaskInvokeRequestHeader;
 import com.gaojy.rice.common.protocol.header.scheduler.TaskInvokerResponseHeader;
 import com.gaojy.rice.processor.api.ProcessResult;
 import com.gaojy.rice.processor.api.RiceProcessorManager;
+import com.gaojy.rice.processor.api.TaskContext;
 import com.gaojy.rice.processor.api.invoker.NoSuchMethodException;
 import com.gaojy.rice.processor.api.invoker.TaskInvoker;
 import com.gaojy.rice.remote.common.RemoteHelper;
@@ -42,31 +43,28 @@ public class DefaultTaskScheduleProcessor implements RiceRequestProcessor {
 
         switch (request.getCode()) {
             case RequestCode.INVOKE_PROCESSOR:
-                TaskInvokeRequestHeader requestHeader = (TaskInvokeRequestHeader) request.decodeCommandCustomHeader(TaskInvokeRequestHeader.class);
                 // 获取来自scheduler的数据
-
+                TaskInvokeRequestHeader requestHeader = (TaskInvokeRequestHeader) request.decodeCommandCustomHeader(TaskInvokeRequestHeader.class);
                 // 根据taskcode来获取对应的invoker
                 TaskInvoker invoker = TaskInvoker.getInvoker(requestHeader.getTaskCode());
 
                 RiceRemoteContext response = RiceRemoteContext.createResponseCommand(TaskInvokerResponseHeader.class);
-                TaskInvokerResponseHeader responseHeader = (TaskInvokerResponseHeader)response.readCustomHeader();
+                TaskInvokerResponseHeader responseHeader = (TaskInvokerResponseHeader) response.readCustomHeader();
 
                 int retryTime = requestHeader.getMaxRetryTimes();
-                // TODO 重试次数判断
                 Long startTime = System.currentTimeMillis();
+                TaskContext taskContext = new TaskContext();
                 ProcessResult result = null;
-                while (retryTime >= 0 && result == null){
+                Throwable error = null;
+                while (retryTime >= 0) {
                     try {
-                         result = (ProcessResult)invoker.invokeMethod(invoker
-                                        .getInvokerInstance(requestHeader.getTaskCode()), requestHeader.getMethodName(),
-                                new Class[]{}, new Object[]{});
-                    } catch (NoSuchMethodException e) {
-                        responseHeader.setTaskInstanceStatus(TaskInstanceStatus.EXCEPTION.name());
-
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    }catch (Exception e){
-
+                        result = (ProcessResult) invoker.invokeMethod(invoker
+                                .getInvokerInstance(requestHeader.getTaskCode()), requestHeader.getMethodName(),
+                            new Class[] {TaskContext.class}, new Object[] {});
+                        break;
+                    } catch (Exception e) {
+                        log.error("Exception occurred while processing task:{},error:{}", requestHeader.getTaskCode(), e);
+                        error = e;
                     }
                     retryTime--;
                 }
@@ -78,13 +76,17 @@ public class DefaultTaskScheduleProcessor implements RiceRequestProcessor {
 
                 responseHeader.setFinishTime(finishTime);
                 responseHeader.setTaskCode(requestHeader.getTaskCode());
-                responseHeader.setRunningTime(finishTime-startTime);
-                responseHeader.setRetryTimes(requestHeader.getMaxRetryTimes() - retryTime +1);
+                responseHeader.setRunningTime(finishTime - startTime);
+                responseHeader.setRetryTimes(requestHeader.getMaxRetryTimes() - retryTime + 1);
                 responseHeader.setTaskInstanceStatus(TaskInstanceStatus.FINISHED.name());
                 // SET body
                 TaskInvokerResponseBody responseBody = new TaskInvokerResponseBody();
-                responseBody.setResultMap();
-
+                if (error != null) {
+                    responseBody.getResultMap().put("error", error.getMessage());
+                } else if (result != null) {
+                    responseBody.setResultMap(result.getData());
+                }
+                response.setBody(responseBody.encode());
                 return response;
             case RequestCode.SCHEDULER_HEART_BEAT:
                 String address = RemoteHelper.parseChannelRemoteAddr(ctx.channel());

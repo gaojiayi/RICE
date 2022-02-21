@@ -8,5 +8,5 @@ package com.gaojy.rice.processor.api;
  */
 public interface RiceMapProcessor extends RiceBasicProcessor {
 
-    public void map();
+    public ProcessResult map(TaskContext context);
 }
