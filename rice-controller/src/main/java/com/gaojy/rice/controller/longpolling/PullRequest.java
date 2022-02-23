@@ -1,7 +1,7 @@
 package com.gaojy.rice.controller.longpolling;
 
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
-import java.nio.channels.Channel;
+import io.netty.channel.Channel;
 
 /**
  * @author gaojy

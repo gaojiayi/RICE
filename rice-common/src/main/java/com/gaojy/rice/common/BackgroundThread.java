@@ -107,13 +107,11 @@ public abstract class BackgroundThread implements Runnable {
     }
 
     protected void waitForRunning(long interval) {
-        // set false， 意思是检测到有刷盘请求
         if (hasNotified.compareAndSet(true, false)) {
             this.onWaitEnd();
             return;
         }
 
-        //entry to wait  没有刷盘请求的话 就reset 之后await
         waitPoint.reset();
 
         try {

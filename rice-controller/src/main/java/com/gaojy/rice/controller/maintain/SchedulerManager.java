@@ -59,17 +59,50 @@ public class SchedulerManager {
         return rets;
     }
 
+    public List<ChannelWrapper> getActiveScheduler() {
+        r.lock();
+        List<ChannelWrapper> rets = null;
+        try {
+            rets = schedulerNodes.stream().filter(c -> c.isActive()).
+                collect(Collectors.toList());
+        } finally {
+            r.unlock();
+        }
+        return rets;
+    }
+
     public void registerScheduler(Channel channel) {
         w.lock();
         try {
-            Set<ChannelWrapper> newSchedulerNodes = new HashSet<>(schedulerNodes);
-            newSchedulerNodes.add(new ChannelWrapper(channel));
-            schedulerNodes = newSchedulerNodes;
-            // 如果是master
-            // 任务分配
+            ChannelWrapper wrapper = schedulerNodes.stream().filter(cw -> {
+                return cw.getRemoteAddr().equals(RemoteHelper.parseChannelRemoteAddr(channel));
+            }).findFirst().get();
+            if (wrapper != null && wrapper.isActive()) {
+                logger.info("The registered channel already exists, and the remote address is: {}"
+                    , RemoteHelper.parseChannelRemoteAddr(channel));
+            } else {
+                schedulerNodes.add(new ChannelWrapper(channel));
+            }
         } finally {
             w.unlock();
         }
+    }
+
+    public Channel getChannel(String address) {
+        r.lock();
+        Channel channel = null;
+        try {
+            ChannelWrapper wrapper = schedulerNodes.stream().filter(cw -> {
+                return cw.getRemoteAddr().equals(address) && cw.isActive();
+            }).findFirst().get();
+            if (wrapper != null) {
+                channel = wrapper.getChannel();
+            }
+        } finally {
+            r.unlock();
+        }
+
+        return channel;
     }
 
     public Boolean updateSchedulerStatus(Channel channel) {
@@ -114,13 +147,33 @@ public class SchedulerManager {
 
     public void addSchedulerIfAbsent(Channel channel) {
         String schedulerServer = RemoteHelper.parseChannelRemoteAddr(channel);
-        ChannelWrapper cw = schedulerNodes.stream().filter(node
-            -> node.getRemoteAddr().equals(schedulerServer)).findAny().orElse(null);
-        if (cw != null && cw.isActive()) {
-            logger.info("schedulerServer:{} channel exist in Controller", schedulerServer);
-        } else {
-            ChannelWrapper wrapper = new ChannelWrapper(channel);
-            schedulerNodes.add(wrapper);
+        w.lock();
+        try {
+            ChannelWrapper cw = schedulerNodes.stream().filter(node
+                -> node.getRemoteAddr().equals(schedulerServer)).findAny().orElse(null);
+            if (cw != null && cw.isActive()) {
+                logger.info("schedulerServer:{} channel exist in Controller", schedulerServer);
+            } else {
+                ChannelWrapper wrapper = new ChannelWrapper(channel);
+                schedulerNodes.add(wrapper);
+            }
+        } finally {
+            w.unlock();
+        }
+    }
+
+    public void closeScheduler(String schedulerServer) {
+        w.lock();
+        try {
+            ChannelWrapper cw = schedulerNodes.stream().filter(node
+                -> node.getRemoteAddr().equals(schedulerServer)).findAny().orElse(null);
+            if (cw != null && !cw.isActive()) {
+                schedulerNodes.remove(cw);
+            } else {
+                logger.info("The scheduler {} is not found, and the corresponding channel exists",schedulerServer);
+            }
+        } finally {
+            w.unlock();
         }
     }
 

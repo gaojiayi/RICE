@@ -2,6 +2,8 @@ package com.gaojy.rice.controller.processor;
 
 import com.gaojy.rice.common.constants.RequestCode;
 import com.gaojy.rice.common.constants.ResponseCode;
+import com.gaojy.rice.common.constants.TaskOptType;
+import com.gaojy.rice.common.entity.TaskChangeRecord;
 import com.gaojy.rice.common.exception.RemotingCommandException;
 import com.gaojy.rice.common.protocol.body.processor.ExportTaskRequestBody;
 import com.gaojy.rice.common.protocol.body.processor.ExportTaskResponseBody;
@@ -66,10 +68,21 @@ public class TaskAccessProcessor implements RiceRequestProcessor {
         List<ProcessorServerInfo> serverInfos = riceController.getRepository().getProcessorServerInfoDao()
             .getInfosByServer(requestHeader.getNetAddress(), requestHeader.getListenPort());
 
-        // 原有的处理器注册信息失效
-        serverInfos.stream().forEach(info -> info.setStatus(0));
-
         List<String> taskCodes = exportTaskRequestBody.getTasks().stream().map(TaskDetailData::getTaskCode).collect(Collectors.toList());
+
+        Long currentTime =  System.currentTimeMillis();
+        // 原有的处理器注册信息失效
+        serverInfos.stream().forEach(info -> {
+            info.setStatus(0);
+            if(!taskCodes.contains(info.getTaskCode())){
+                // 添加下线记录
+                TaskChangeRecord record = new TaskChangeRecord();
+                record.setCreateTime(new Date(currentTime));
+                record.setTaskCode(info.getTaskCode());
+                record.setOptType(TaskOptType.TASK_PROCESSOR_OFFLINE);
+            }
+        });
+
         taskCodes.stream().forEach(taskCode ->{
             ProcessorServerInfo info = new ProcessorServerInfo();
             info.setStatus(1);
@@ -80,10 +93,14 @@ public class TaskAccessProcessor implements RiceRequestProcessor {
             info.setLatestActiveTime(new Date());
             info.setVersion("");
             serverInfos.add(info);
+
+            new
         });
 
         // 写数据库
         riceController.getRepository().getProcessorServerInfoDao().batchCreateOrUpdateInfo(serverInfos);
+
+        // 写change表 并触发长轮询到达通知
 
         // 请求对应的 scheduler server，处理器上线通知(后续调度器只会更新处理器的心跳时间)
         List<RiceTaskInfo> taskinfos = riceController.getRepository().getRiceTaskInfoDao().getInfoByCodes(taskCodes);

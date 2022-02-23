@@ -54,13 +54,17 @@ public class DefaultTaskScheduleProcessor implements RiceRequestProcessor {
                 int retryTime = requestHeader.getMaxRetryTimes();
                 Long startTime = System.currentTimeMillis();
                 TaskContext taskContext = new TaskContext();
+                taskContext.setChannel(ctx.channel());
+                taskContext.setParameter(requestHeader.getInstanceParameter());
+                taskContext.setTaskCode(requestHeader.getTaskCode());
+                taskContext.setTaskInstanceId(requestHeader.getTaskInstanceId());
                 ProcessResult result = null;
                 Throwable error = null;
                 while (retryTime >= 0) {
                     try {
                         result = (ProcessResult) invoker.invokeMethod(invoker
                                 .getInvokerInstance(requestHeader.getTaskCode()), requestHeader.getMethodName(),
-                            new Class[] {TaskContext.class}, new Object[] {});
+                            new Class[] {TaskContext.class}, new Object[] {taskContext});
                         break;
                     } catch (Exception e) {
                         log.error("Exception occurred while processing task:{},error:{}", requestHeader.getTaskCode(), e);
@@ -72,6 +76,7 @@ public class DefaultTaskScheduleProcessor implements RiceRequestProcessor {
                 Long finishTime = System.currentTimeMillis();
                 // 根据任务类型,调用处理器的处理方法
                 // 包装响应数据
+
                 // SET header
 
                 responseHeader.setFinishTime(finishTime);

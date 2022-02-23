@@ -48,8 +48,9 @@ public class DispatcherAPIWrapper {
         String addr = this.riceDispatchScheduler.getElectionClient().getMasterController();
         SchedulerPullTaskChangeRequestHeader header = new SchedulerPullTaskChangeRequestHeader();
         header.setLastTaskChangeTimestamp(pullRequest.getLastTaskChangeTimestamp());
+        header.setTaskCode(pullRequest.getTaskCode());
         RiceRemoteContext requestCommand = RiceRemoteContext.createRequestCommand(RequestCode.SCHEDULER_PULL_TASK, header);
-        int timeoutMillis = 1000 * 3;
+        int timeoutMillis = 1000 * 10;
         this.transportClient.invokeAsync(addr, requestCommand, timeoutMillis, new InvokeCallback() {
             @Override
             public void operationComplete(ResponseFuture responseFuture) {

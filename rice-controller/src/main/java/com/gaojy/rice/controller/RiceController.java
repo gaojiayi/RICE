@@ -7,6 +7,7 @@ import com.gaojy.rice.common.extension.ExtensionLoader;
 import com.gaojy.rice.controller.config.ControllerConfig;
 import com.gaojy.rice.controller.election.LeaderStateListener;
 import com.gaojy.rice.controller.election.RiceElectionManager;
+import com.gaojy.rice.controller.longpolling.PullTaskRequestHoldService;
 import com.gaojy.rice.controller.maintain.SchedulerManager;
 import com.gaojy.rice.controller.processor.SchedulerManagerProcessor;
 import com.gaojy.rice.controller.processor.TaskAccessProcessor;
@@ -51,6 +52,10 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
 
     private ExecutorService schedulerManagerExecutor;
 
+    private SchedulerManagerProcessor schedulerManagerProcessor;
+
+    private PullTaskRequestHoldService pullTaskRequestHoldService;
+
     public RiceController(ControllerConfig controllerConfig, TransfServerConfig transfServerConfig) {
         this.controllerConfig = controllerConfig;
         this.transfServerConfig = transfServerConfig;
@@ -61,7 +66,7 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
             new RiceThreadFactory("TaskAccessThread_"));
         this.schedulerManagerExecutor = Executors.newFixedThreadPool(this.controllerConfig.getSchedulerManagerThreadPoolNums(),
             new RiceThreadFactory("SchedulerManagerThread_"));
-
+        this.pullTaskRequestHoldService = new PullTaskRequestHoldService(this);
         // 注册业务处理器
         this.doProcessorRegister();
         this.doHttpHandlers();
@@ -70,20 +75,13 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
     @Override
     public void onLeaderStart(long leaderTerm) {
         // 长轮询数据处理
-
-        // 处理调度器的心跳（包含处理器的状态）
-
-        // 扫描未被托管的task
-
-        // 如果是主控制器，则启动一系列的维护调度 比如定时打印等
-        // 处理调度器的任务长轮询  处理调度器的处理器状态上报
-
-        //
+        pullTaskRequestHoldService.start();
 
     }
 
     @Override
     public void onLeaderStop(long leaderTerm) {
+        pullTaskRequestHoldService.shutdown();
     }
 
     public void start() {
@@ -107,13 +105,17 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
         taskAccessExecutor.shutdown();
         schedulerManagerExecutor.shutdown();
 
+        if (!pullTaskRequestHoldService.isStopped()) {
+            pullTaskRequestHoldService.shutdown();
+        }
+
     }
 
     private void doProcessorRegister() {
         // 处理器注册请求把处理器先保存数据库，然后获取对应的几个调度器，依次通过控制器通知调度器。 失败，则由processor重试
         remotingServer.registerProcessor(RequestCode.REGISTER_PROCESSOR, new TaskAccessProcessor(this), this.taskAccessExecutor);
 
-        SchedulerManagerProcessor schedulerManagerProcessor = new SchedulerManagerProcessor(this);
+        schedulerManagerProcessor = new SchedulerManagerProcessor(this);
 
         // 调度器注册处理
         remotingServer.registerProcessor(RequestCode.SCHEDULER_REGISTER, schedulerManagerProcessor, this.schedulerManagerExecutor);
@@ -161,10 +163,11 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
 
         if (SchedulerManager.getManager().is_scheduler(remoteAddr)) {
             // 删除该scheulerserver
+            SchedulerManager.getManager().closeScheduler(remoteAddr);
+
             if (this.riceElectionManager.isLeader()) {
                 // 并且是leader 那么就触发任务分配
-
-                // 任务分配完成以后  就立刻返回数据task给对应的scheduler(长轮询)
+                schedulerManagerProcessor.crashDownScheduler(remoteAddr);
             }
         }
 
@@ -172,15 +175,23 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
 
     @Override
     public void onChannelException(String remoteAddr, Channel channel) {
-
+        this.onChannelClose(remoteAddr, channel);
     }
 
     @Override
     public void onChannelIdle(String remoteAddr, Channel channel) {
-
+        this.onChannelClose(remoteAddr, channel);
     }
 
     public Boolean isMaster() {
         return riceElectionManager.isLeader();
+    }
+
+    public ExecutorService getSchedulerManagerExecutor() {
+        return schedulerManagerExecutor;
+    }
+
+    public PullTaskRequestHoldService getPullTaskRequestHoldService() {
+        return pullTaskRequestHoldService;
     }
 }
