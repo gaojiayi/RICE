@@ -25,6 +25,7 @@ import com.gaojy.rice.remote.InvokeCallback;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.ResponseFuture;
 
+import com.sun.source.util.TaskListener;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     private Balance balance = new RandomBalance();
     private final RiceExecuter riceExecuter;
     private final Repository repository = ExtensionLoader.getExtensionLoader(Repository.class)
-            .getExtension("mysql");
+        .getExtension("mysql");
 
     private Long nextTaskInstanceId = -1L;
 
@@ -88,7 +89,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     private Long timeoutMillis = 5 * 1000 * 60L;
 
     public TaskScheduleClient(RiceTaskInfo taskInfo,
-                              TaskScheduleManager taskScheduleManager) throws ParseException {
+        TaskScheduleManager taskScheduleManager) throws ParseException {
         buildClient(taskInfo);
         this.scheduleTimer = taskScheduleManager.getScheduleTimer();
         this.outApiWrapper = taskScheduleManager.getOutApiWrapper();
@@ -128,8 +129,6 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
 
             riceExecuter.execute(nextTaskInstanceId);
 
-            nextTaskInstanceId = repository.getTaskInstanceInfoDao().createTaskInstance(buildNewTaskInstance());
-
         } else if (taskStatus.get().equals(TaskStatus.PAUSE)) { //跳过本次执行
             log.info("taskCode={},status is pause", taskCode);
         }
@@ -143,6 +142,11 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
         }
         if (ScheduleType.FIX_RATE.equals(scheduleType) || ScheduleType.FIX_DELAY.equals(scheduleType)) {
             delay = Long.parseLong(timeExpression);
+        }
+
+        if (taskStatus.get().equals(TaskStatus.ONLINE)) {
+            nextTaskInstanceId = repository.getTaskInstanceInfoDao().createTaskInstance(buildNewTaskInstance(delay));
+
         }
         scheduleTimer.newTimeout(this, delay, TimeUnit.MILLISECONDS);
 
@@ -175,12 +179,19 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
             // 固定延迟  则延迟调度
             delay = Long.parseLong(timeExpression);
         }
-        nextTaskInstanceId = repository.getTaskInstanceInfoDao().createTaskInstance(buildNewTaskInstance());
+        nextTaskInstanceId = repository.getTaskInstanceInfoDao().createTaskInstance(buildNewTaskInstance(delay));
         this.scheduleTimer.newTimeout(this, delay, TimeUnit.MILLISECONDS);
     }
 
-    private TaskInstanceInfo buildNewTaskInstance() {
-        return null;
+    private TaskInstanceInfo buildNewTaskInstance(Long delay) {
+        TaskInstanceInfo info = new TaskInstanceInfo();
+        info.setStatus(TaskInstanceStatus.WAIT.getCode());
+        info.setCreateTime(new Date());
+        info.setTaskCode(this.taskCode);
+        info.setExpectedTriggerTime(new Date(delay + System.currentTimeMillis()));
+        info.setInstanceParams(this.parameters);
+        info.setType(taskType.name());
+        return info;
     }
 
     @Override
@@ -215,8 +226,8 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     }
 
     public void invoke(String processorAddr, final RiceRemoteContext remoteContext)
-            throws RemotingConnectException, RemotingSendRequestException, RemotingTimeoutException,
-            InterruptedException, RemotingTooMuchRequestException {
+        throws RemotingConnectException, RemotingSendRequestException, RemotingTimeoutException,
+        InterruptedException, RemotingTooMuchRequestException {
         InvokeCallback callback = new InvokeCallback() {
 
             @Override
@@ -229,13 +240,11 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
                 if (response != null) {
                     try {
                         TaskInvokerResponseHeader responseHeader = (TaskInvokerResponseHeader) response
-                                .decodeCommandCustomHeader(TaskInvokerResponseHeader.class);
+                            .decodeCommandCustomHeader(TaskInvokerResponseHeader.class);
                         TaskInvokerResponseBody body = TaskInvokerResponseBody.decode(response.getBody(),
-                                TaskInvokerResponseBody.class);
+                            TaskInvokerResponseBody.class);
                         // 更新实例状态
                         instanceInfo.setResult(body.toJson());
-
-
 
                     } catch (RemotingCommandException e) {
                         instanceInfo.setStatus(TaskInstanceStatus.EXCEPTION.getCode());
@@ -280,7 +289,6 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
             return server.contains(ip);
         }).collect(Collectors.toList()));
     }
-
 
     public String getAppName() {
         return appName;

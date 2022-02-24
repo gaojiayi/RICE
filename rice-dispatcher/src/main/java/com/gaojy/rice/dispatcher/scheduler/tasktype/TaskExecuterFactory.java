@@ -16,6 +16,10 @@ public class TaskExecuterFactory {
         switch (taskType) {
             case RICE_BASIC:
                 return new RiceBasicTaskExecuter(client);
+            case RICE_MAP:
+                return new RiceMapTaskExecuter(client);
+            case RICE_MAPREDUCE:
+                return new RiceMapReduceTaskExecuter(client);
             default:
                 return null;
         }
