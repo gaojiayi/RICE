@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -257,5 +258,9 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
     public Long procesorLatestHeartBeat(String address) {
         Long time = processorHeartBeatRecord.get(address);
         return time == null ? 0L : time;
+    }
+
+    public List<String> getManageTask(){
+        return new ArrayList<>(clients.keySet());
     }
 }

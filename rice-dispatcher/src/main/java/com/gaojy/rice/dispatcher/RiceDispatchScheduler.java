@@ -122,6 +122,7 @@ public class RiceDispatchScheduler implements RiceDispatchSchedulerMBean, Channe
                         pd.setLatestActiveTime(scheduleManager.procesorLatestHeartBeat(p));
                         body.addProcessorDetail(pd);
                     });
+                    body.setTaskCodes(scheduleManager.getManageTask());
                     apiWrapper.heartBeatToController(address, body);
                 } catch (InterruptedException | TimeoutException | RemotingConnectException
                         | RemotingSendRequestException | RemotingTimeoutException | RemotingTooMuchRequestException e) {

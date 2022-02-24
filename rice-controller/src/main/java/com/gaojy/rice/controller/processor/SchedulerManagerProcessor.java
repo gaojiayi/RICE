@@ -15,15 +15,18 @@ import com.gaojy.rice.controller.longpolling.PullRequest;
 import com.gaojy.rice.controller.maintain.ChannelWrapper;
 import com.gaojy.rice.controller.maintain.ProcessorManager;
 import com.gaojy.rice.controller.maintain.SchedulerManager;
+import com.gaojy.rice.controller.maintain.TaskManager;
 import com.gaojy.rice.remote.common.RemoteHelper;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.RiceRequestProcessor;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
+
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +47,8 @@ public class SchedulerManagerProcessor implements RiceRequestProcessor {
     private SchedulerManager schedulerManager = SchedulerManager.getManager();
 
     private ProcessorManager processorManager = ProcessorManager.getManager();
+
+    private TaskManager taskManager = TaskManager.getTaskManager();
 
     public SchedulerManagerProcessor(RiceController riceController) {
         this.riceController = riceController;
@@ -143,15 +148,21 @@ public class SchedulerManagerProcessor implements RiceRequestProcessor {
     }
 
     public void heartBeatHandler(ChannelHandlerContext ctx, RiceRemoteContext request) {
-        logger.info("Heartbeat probe received from scheduler {}", RemoteHelper.parseChannelRemoteAddr(ctx.channel()));
-        SchedulerHeartBeatBody body = SchedulerHeartBeatBody.decode(request.getBody(),SchedulerHeartBeatBody.class);
-        body.getProcessorDetailList().forEach(pd->{
-            processorManager.putProcessorStatus(pd.getAddress(),pd.getLatestActiveTime());
+        String remoteAddr = RemoteHelper.parseChannelRemoteAddr(ctx.channel());
+        logger.info("Heartbeat probe received from scheduler {}", remoteAddr);
+        SchedulerHeartBeatBody body = SchedulerHeartBeatBody.decode(request.getBody(), SchedulerHeartBeatBody.class);
+        // 保存处理器状态
+        body.getProcessorDetailList().forEach(pd -> {
+            processorManager.putProcessorStatus(pd.getAddress(), pd.getLatestActiveTime());
+        });
+        // 保存任务分配调度结果
+        body.getTaskCodes().forEach(taskCode -> {
+            taskManager.allocateTaskScheduler(taskCode, remoteAddr);
         });
     }
 
     public RiceRemoteContext pullTasks(ChannelHandlerContext ctx,
-        RiceRemoteContext request) throws RemotingCommandException {
+                                       RiceRemoteContext request) throws RemotingCommandException {
         if (this.riceController.isMaster()) {
             SchedulerPullTaskChangeRequestHeader header = (SchedulerPullTaskChangeRequestHeader) request.decodeCommandCustomHeader(SchedulerPullTaskChangeRequestHeader.class);
             List<TaskChangeRecord> changes = riceController.getRepository().getRiceTaskChangeRecordDao().getChanges(header.getTaskCode(), header.getLastTaskChangeTimestamp());

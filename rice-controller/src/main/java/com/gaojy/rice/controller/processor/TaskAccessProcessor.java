@@ -112,8 +112,14 @@ public class TaskAccessProcessor implements RiceRequestProcessor {
             // 写数据库
             riceController.getRepository().getProcessorServerInfoDao().batchCreateOrUpdateInfo(serverInfos);
 
-            // 写change表 并触发长轮询到达通知
+            // 写change表
             riceController.getRepository().getRiceTaskChangeRecordDao().insert(records);
+
+            // 触发长轮询到达通知
+            records.forEach(record -> {
+                riceController.getPullTaskRequestHoldService().notifyTaskOccurChange(record.getTaskCode(), currentTime);
+            });
+
 
 //            // 请求对应的 scheduler server，处理器上线通知(后续调度器只会更新处理器的心跳时间)
 //            List<RiceTaskInfo> taskinfos = riceController.getRepository().getRiceTaskInfoDao().getInfoByCodes(taskCodes);

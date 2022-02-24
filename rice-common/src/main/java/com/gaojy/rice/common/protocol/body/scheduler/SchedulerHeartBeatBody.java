@@ -14,6 +14,7 @@ import java.util.Set;
  */
 public class SchedulerHeartBeatBody extends RemotingSerializable {
     List<ProcessorDetail> processorDetailList = new ArrayList<>();
+    List<String>    taskCodes = new ArrayList<>();
 
     public static class ProcessorDetail {
         private String address;
@@ -47,5 +48,13 @@ public class SchedulerHeartBeatBody extends RemotingSerializable {
 
     public  void addProcessorDetail(ProcessorDetail pd){
         processorDetailList.add(pd);
+    }
+
+    public List<String> getTaskCodes() {
+        return taskCodes;
+    }
+
+    public void setTaskCodes(List<String> taskCodes) {
+        this.taskCodes = taskCodes;
     }
 }
