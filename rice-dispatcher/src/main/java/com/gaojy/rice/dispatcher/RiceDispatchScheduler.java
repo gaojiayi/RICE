@@ -8,6 +8,7 @@ import com.gaojy.rice.common.exception.RemotingConnectException;
 import com.gaojy.rice.common.exception.RemotingSendRequestException;
 import com.gaojy.rice.common.exception.RemotingTimeoutException;
 import com.gaojy.rice.common.exception.RemotingTooMuchRequestException;
+import com.gaojy.rice.common.protocol.body.scheduler.SchedulerHeartBeatBody;
 import com.gaojy.rice.common.utils.RiceBanner;
 import com.gaojy.rice.common.utils.StringUtil;
 import com.gaojy.rice.dispatcher.common.DispatcherAPIWrapper;
@@ -21,11 +22,13 @@ import com.gaojy.rice.remote.common.TransfUtil;
 import com.gaojy.rice.remote.transport.TransfClientConfig;
 import com.gaojy.rice.remote.transport.TransportClient;
 import io.netty.channel.Channel;
+
 import java.lang.management.ManagementFactory;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +38,7 @@ import javax.management.ObjectName;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,9 +101,9 @@ public class RiceDispatchScheduler implements RiceDispatchSchedulerMBean, Channe
     public void start() throws Exception {
         startJMXManagement();
         transportClient.registerProcessor(RequestCode.CONTROLLER_TASK_REBALANCE,
-            new TaskRebalanceProcessor(scheduleManager), null);
+                new TaskRebalanceProcessor(scheduleManager), null);
         transportClient.registerProcessor(RequestCode.CONTROLLER_TASK_CREATE,
-            new TaskCreateProcessor(scheduleManager), null);
+                new TaskCreateProcessor(scheduleManager), null);
         transportClient.start();
 
         scheduleManager.startup();
@@ -107,14 +111,23 @@ public class RiceDispatchScheduler implements RiceDispatchSchedulerMBean, Channe
         // 发送心跳
         executorService.scheduleAtFixedRate(() -> {
 
-                Arrays.stream(dispatcherConfig.getAllControllerAddressStr().split(",")).forEach(address ->{
-                    try {
-                    apiWrapper.heartBeatToController(address);
-                    } catch (InterruptedException | TimeoutException | RemotingConnectException
-                            | RemotingSendRequestException | RemotingTimeoutException | RemotingTooMuchRequestException e) {
-                        log.error("heartBeatToController occur exception"+e);
-                    }
-                });
+            Arrays.stream(dispatcherConfig.getAllControllerAddressStr().split(",")).forEach(address -> {
+                try {
+                    // 每一次跟控制器的心跳都会上传有效的处理器信息
+                    Set<String> processores = scheduleManager.getValidProcessorAddress();
+                    SchedulerHeartBeatBody body = new SchedulerHeartBeatBody();
+                    processores.forEach(p->{
+                        SchedulerHeartBeatBody.ProcessorDetail pd = new SchedulerHeartBeatBody.ProcessorDetail();
+                        pd.setAddress(p);
+                        pd.setLatestActiveTime(scheduleManager.procesorLatestHeartBeat(p));
+                        body.addProcessorDetail(pd);
+                    });
+                    apiWrapper.heartBeatToController(address, body);
+                } catch (InterruptedException | TimeoutException | RemotingConnectException
+                        | RemotingSendRequestException | RemotingTimeoutException | RemotingTooMuchRequestException e) {
+                    log.error("heartBeatToController occur exception" + e);
+                }
+            });
 
         }, 1000, 1000 * 3, TimeUnit.MILLISECONDS);
 
@@ -153,11 +166,13 @@ public class RiceDispatchScheduler implements RiceDispatchSchedulerMBean, Channe
         this.handleControllerConnect(remoteAddr, channel);
     }
 
-    @Override public void onChannelClose(String remoteAddr, Channel channel) {
+    @Override
+    public void onChannelClose(String remoteAddr, Channel channel) {
         this.handleProcessorClose(remoteAddr);
     }
 
-    @Override public void onChannelException(String remoteAddr, Channel channel) {
+    @Override
+    public void onChannelException(String remoteAddr, Channel channel) {
         this.handleProcessorClose(remoteAddr);
     }
 
@@ -181,7 +196,7 @@ public class RiceDispatchScheduler implements RiceDispatchSchedulerMBean, Channe
                     throw new DispatcherException("The scheduler failed to register with the controller. Address:" + addressStr);
                 }
             } catch (InterruptedException | TimeoutException | RemotingConnectException |
-                RemotingSendRequestException | RemotingTimeoutException e) {
+                    RemotingSendRequestException | RemotingTimeoutException e) {
                 log.error("There was an error registering the controller and the channel will be closed，Address:{}", addressStr);
                 TransfUtil.closeChannel(channel);
             }

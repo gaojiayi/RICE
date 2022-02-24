@@ -8,6 +8,7 @@ import com.gaojy.rice.common.exception.RemotingConnectException;
 import com.gaojy.rice.common.exception.RemotingSendRequestException;
 import com.gaojy.rice.common.exception.RemotingTimeoutException;
 import com.gaojy.rice.common.exception.RemotingTooMuchRequestException;
+import com.gaojy.rice.common.protocol.body.scheduler.SchedulerHeartBeatBody;
 import com.gaojy.rice.common.protocol.body.scheduler.SchedulerPullTaskChangeResponseBody;
 import com.gaojy.rice.common.protocol.header.scheduler.SchedulerHeartBeatHeader;
 import com.gaojy.rice.common.protocol.header.scheduler.SchedulerPullTaskChangeRequestHeader;
@@ -110,12 +111,13 @@ public class DispatcherAPIWrapper {
     }
 
     //
-    public void heartBeatToController(String controller) throws InterruptedException, TimeoutException,
+    public void heartBeatToController(String controller, SchedulerHeartBeatBody body) throws InterruptedException, TimeoutException,
             RemotingConnectException, RemotingSendRequestException,
             RemotingTimeoutException, RemotingTooMuchRequestException {
         // String mainController = this.riceDispatchScheduler.getElectionClient().getMasterController();
         SchedulerHeartBeatHeader header = new SchedulerHeartBeatHeader(); //后续可以添加一些系统指标
         RiceRemoteContext command = RiceRemoteContext.createRequestCommand(RequestCode.SCHEDULER_HEART_BEAT, header);
+        command.setBody(body.encode());
         this.transportClient.invokeOneWay(controller, command, 1000 * 3);
     }
 

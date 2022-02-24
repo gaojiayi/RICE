@@ -15,11 +15,25 @@ import java.util.Set;
 public class SchedulerHeartBeatBody extends RemotingSerializable {
     List<ProcessorDetail> processorDetailList = new ArrayList<>();
 
-    public class ProcessorDetail {
+    public static class ProcessorDetail {
         private String address;
-        private int port;
-        private Set<String> taskCodes = new HashSet<>();
         private Long latestActiveTime;
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
+        }
+
+        public Long getLatestActiveTime() {
+            return latestActiveTime;
+        }
+
+        public void setLatestActiveTime(Long latestActiveTime) {
+            this.latestActiveTime = latestActiveTime;
+        }
     }
 
     public List<ProcessorDetail> getProcessorDetailList() {
@@ -29,5 +43,9 @@ public class SchedulerHeartBeatBody extends RemotingSerializable {
     public void setProcessorDetailList(
         List<ProcessorDetail> processorDetailList) {
         this.processorDetailList = processorDetailList;
+    }
+
+    public  void addProcessorDetail(ProcessorDetail pd){
+        processorDetailList.add(pd);
     }
 }

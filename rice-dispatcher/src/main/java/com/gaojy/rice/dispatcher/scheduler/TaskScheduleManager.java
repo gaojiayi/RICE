@@ -56,6 +56,8 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
 
     private AllocationType taskAllocationStrategy = AllocationType.CONSISTENTHASH;
 
+    private Map<String/* ip:port */, Long> processorHeartBeatRecord = new HashMap<>();
+
     public TaskScheduleManager(DispatcherAPIWrapper outApiWrapper) {
         this.outApiWrapper = outApiWrapper;
         this.pullTaskService = new PullTaskService(outApiWrapper, this);
@@ -180,13 +182,23 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
 
     @Override
     public void isolationProcessorForAllTasks(String address) {
-        clients.values().stream().filter(client ->{
-            return client.getProcesses().stream().anyMatch(processor->{
+        clients.values().stream().filter(client -> {
+            return client.getProcesses().stream().anyMatch(processor -> {
                 return processor.contains(address);
             });
-        }).forEach(client ->{
+        }).forEach(client -> {
             client.isolationProcessor(address);
         });
+    }
+
+    public Set<String> getValidProcessorAddress() {
+        Set<String> addresses = new HashSet<>();
+        if (!clients.isEmpty()) {
+            clients.values().forEach(client -> {
+                addresses.addAll(client.getProcesses());
+            });
+        }
+        return addresses;
     }
 
     // 全局心跳
@@ -200,6 +212,7 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
             addresses.forEach(address -> {
                 try {
                     outApiWrapper.heartBeatToProcessor(address);
+                    processorHeartBeatRecord.put(address, System.currentTimeMillis());
                 } catch (Exception e) {
                     log.error("Heartbeat sent to processor failed, address:{},error:{}", address, e);
                 }
@@ -239,5 +252,10 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
 
     public HashedWheelTimer getScheduleTimer() {
         return scheduleTimer;
+    }
+
+    public Long procesorLatestHeartBeat(String address) {
+        Long time = processorHeartBeatRecord.get(address);
+        return time == null ? 0L : time;
     }
 }

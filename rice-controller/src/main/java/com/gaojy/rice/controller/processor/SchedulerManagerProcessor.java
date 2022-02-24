@@ -13,6 +13,7 @@ import com.gaojy.rice.common.protocol.header.scheduler.SchedulerRegisterRequestH
 import com.gaojy.rice.controller.RiceController;
 import com.gaojy.rice.controller.longpolling.PullRequest;
 import com.gaojy.rice.controller.maintain.ChannelWrapper;
+import com.gaojy.rice.controller.maintain.ProcessorManager;
 import com.gaojy.rice.controller.maintain.SchedulerManager;
 import com.gaojy.rice.remote.common.RemoteHelper;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
@@ -42,6 +43,8 @@ public class SchedulerManagerProcessor implements RiceRequestProcessor {
 
     private SchedulerManager schedulerManager = SchedulerManager.getManager();
 
+    private ProcessorManager processorManager = ProcessorManager.getManager();
+
     public SchedulerManagerProcessor(RiceController riceController) {
         this.riceController = riceController;
     }
@@ -53,7 +56,7 @@ public class SchedulerManagerProcessor implements RiceRequestProcessor {
             case RequestCode.SCHEDULER_REGISTER: //  在所有的控制器节点上增加channel，并且主控制器触发任务分配
                 this.registerScheduler(ctx, request);
                 return null;
-            case RequestCode.SCHEDULER_HEART_BEAT: // 维护调度器与所有的控制器的心跳
+            case RequestCode.SCHEDULER_HEART_BEAT: // 维护调度器与所有的控制器的心跳 保存处理器状态
                 this.heartBeatHandler(ctx, request);
                 return null;
             case RequestCode.SCHEDULER_PULL_TASK: // 每一个task  都会带着一个时间搓
@@ -141,6 +144,10 @@ public class SchedulerManagerProcessor implements RiceRequestProcessor {
 
     public void heartBeatHandler(ChannelHandlerContext ctx, RiceRemoteContext request) {
         logger.info("Heartbeat probe received from scheduler {}", RemoteHelper.parseChannelRemoteAddr(ctx.channel()));
+        SchedulerHeartBeatBody body = SchedulerHeartBeatBody.decode(request.getBody(),SchedulerHeartBeatBody.class);
+        body.getProcessorDetailList().forEach(pd->{
+            processorManager.putProcessorStatus(pd.getAddress(),pd.getLatestActiveTime());
+        });
     }
 
     public RiceRemoteContext pullTasks(ChannelHandlerContext ctx,
