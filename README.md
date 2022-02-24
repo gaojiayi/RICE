@@ -40,34 +40,11 @@ RICE可以实现动态任务分配，当一个server调度器挂机之后，原�
 
 ### 开发进度
 #### 1.0版本计划
-**处理器**
-* [x] 任务暴露   
-* [x] 任务注册
-* [ ] 与spring的集成(类似dubbo)
+| **处理器**  | **控制器**  | **调度器**  | **控制台**  |**其他**   |
+| :------------ | :------------ | :------------ | :------------ | :------------ |
+| <input type="checkbox" checked disabled> 任务发布 </br><input type="checkbox" checked disabled> 任务上线通知 </br> | <input type="checkbox" checked disabled> Jraft选举 </br> <input type="checkbox" checked disabled> 任务发现通知 </br> <input type="checkbox" checked disabled> 调度器状态变更通知 </br> <input type="checkbox" checked disabled> 任务重分配通知</br><input type="checkbox" checked disabled> 处理器状态维护</br> |   |   |   |
+|  <input type="checkbox"  disabled> 与spring的集成(类似dubbo)  |   |   |   |   |  |
 
-**控制器**
-* [x] 控制器选举
-
-**调度器**
-* [x] CRON表达式支持
-
-**控制台**
-* [ ] UI
-
-#### 2.0版本计划
-**处理器**
-* [x] 任务暴露
-* [x] 任务注册
-* [ ] 与spring的集成(类似dubbo)
-
-**控制器**
-* [ ] 日志实时输出
-
-**调度器**
-* [ ] 工作流任务支持
-
-**控制台**
-* [ ] UI 
 ### 特性
 
 

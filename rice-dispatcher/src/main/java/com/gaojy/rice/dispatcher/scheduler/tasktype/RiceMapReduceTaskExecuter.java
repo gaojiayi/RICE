@@ -9,6 +9,9 @@ package com.gaojy.rice.dispatcher.scheduler.tasktype;
 public class RiceMapReduceTaskExecuter  implements RiceExecuter{
     @Override
     public void execute(Long taskInstanceId) {
+        // 先执行map
+        // 后执行process
+        // 再执行reduce
 
     }
 }
