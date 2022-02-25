@@ -60,7 +60,7 @@ public class RiceBasicTaskExecuter implements RiceExecuter {
             RiceRemoteContext requestCommand = RiceRemoteContext.createRequestCommand(RequestCode.INVOKE_PROCESSOR, buildRequest());
             while (retryCount++ <= RiceBasicTaskExecuter.this.client.getTaskRetryCount()) {
                 try {
-                    RiceBasicTaskExecuter.this.client.invoke(processor, requestCommand);
+                    RiceBasicTaskExecuter.this.client.invokeAsync(processor, requestCommand);
                     return;
                 } catch (RemotingConnectException | RemotingSendRequestException
                     | RemotingTimeoutException | InterruptedException

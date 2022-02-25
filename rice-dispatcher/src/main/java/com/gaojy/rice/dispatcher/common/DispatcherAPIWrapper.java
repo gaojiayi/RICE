@@ -135,10 +135,15 @@ public class DispatcherAPIWrapper {
     }
 
     //异步调用
-    public void invokeTask(String address, RiceRemoteContext request, long timeoutMillis, InvokeCallback callback) throws RemotingConnectException,
+    public RiceRemoteContext invokeTask(String address, RiceRemoteContext request, long timeoutMillis, InvokeCallback callback,boolean isSync) throws RemotingConnectException,
             RemotingSendRequestException, RemotingTimeoutException,
             InterruptedException, RemotingTooMuchRequestException {
-        this.transportClient.invokeAsync(address, request, timeoutMillis, callback);
+        if(isSync){
+            return  this.transportClient.invokeSync(address, request, timeoutMillis);
+        }else {
+            this.transportClient.invokeAsync(address, request, timeoutMillis, callback);
+            return null;
+        }
     }
 
     public void heartBeatToProcessor(String address) throws InterruptedException, TimeoutException,

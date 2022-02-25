@@ -1,7 +1,7 @@
 package com.gaojy.rice.common.constants;
 
 public enum TaskInstanceStatus {
-    WAIT(0),RUNNING(1),FINISHED(2),TIMEOUT(3),EXCEPTION(4);
+    WAIT(0),RUNNING(1),FINISHED(2),TIMEOUT(3),EXCEPTION(4),CANCEL(5);
 
     private int code;
 

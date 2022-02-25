@@ -26,6 +26,7 @@ import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.ResponseFuture;
 
 import com.sun.source.util.TaskListener;
+
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -80,7 +81,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     private Balance balance = new RandomBalance();
     private final RiceExecuter riceExecuter;
     private final Repository repository = ExtensionLoader.getExtensionLoader(Repository.class)
-        .getExtension("mysql");
+            .getExtension("mysql");
 
     private Long nextTaskInstanceId = -1L;
 
@@ -89,7 +90,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     private Long timeoutMillis = 5 * 1000 * 60L;
 
     public TaskScheduleClient(RiceTaskInfo taskInfo,
-        TaskScheduleManager taskScheduleManager) throws ParseException {
+                              TaskScheduleManager taskScheduleManager) throws ParseException {
         buildClient(taskInfo);
         this.scheduleTimer = taskScheduleManager.getScheduleTimer();
         this.outApiWrapper = taskScheduleManager.getOutApiWrapper();
@@ -179,6 +180,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
             // 固定延迟  则延迟调度
             delay = Long.parseLong(timeExpression);
         }
+        // TODO 如果发现有存在的等待状态或者运行状态的任务实例，则取消
         nextTaskInstanceId = repository.getTaskInstanceInfoDao().createTaskInstance(buildNewTaskInstance(delay));
         this.scheduleTimer.newTimeout(this, delay, TimeUnit.MILLISECONDS);
     }
@@ -225,9 +227,9 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
         return selectRet;
     }
 
-    public void invoke(String processorAddr, final RiceRemoteContext remoteContext)
-        throws RemotingConnectException, RemotingSendRequestException, RemotingTimeoutException,
-        InterruptedException, RemotingTooMuchRequestException {
+    public void invokeAsync(String processorAddr, final RiceRemoteContext remoteContext)
+            throws RemotingConnectException, RemotingSendRequestException, RemotingTimeoutException,
+            InterruptedException, RemotingTooMuchRequestException {
         InvokeCallback callback = new InvokeCallback() {
 
             @Override
@@ -240,9 +242,9 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
                 if (response != null) {
                     try {
                         TaskInvokerResponseHeader responseHeader = (TaskInvokerResponseHeader) response
-                            .decodeCommandCustomHeader(TaskInvokerResponseHeader.class);
+                                .decodeCommandCustomHeader(TaskInvokerResponseHeader.class);
                         TaskInvokerResponseBody body = TaskInvokerResponseBody.decode(response.getBody(),
-                            TaskInvokerResponseBody.class);
+                                TaskInvokerResponseBody.class);
                         // 更新实例状态
                         instanceInfo.setResult(body.toJson());
 
@@ -265,7 +267,13 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
                 repository.getTaskInstanceInfoDao().updateTaskInstance(instanceInfo);
             }
         };
-        outApiWrapper.invokeTask(processorAddr, remoteContext, timeoutMillis, callback);
+        outApiWrapper.invokeTask(processorAddr, remoteContext, timeoutMillis, callback, false);
+    }
+
+    public RiceRemoteContext invokeSync(String processorAddr, final RiceRemoteContext remoteContext)
+            throws RemotingConnectException, RemotingSendRequestException, RemotingTimeoutException,
+            InterruptedException, RemotingTooMuchRequestException {
+        return outApiWrapper.invokeTask(processorAddr, remoteContext, timeoutMillis, null, true);
     }
 
     public void initProcessores(List<ProcessorServerInfo> list) {
