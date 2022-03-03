@@ -21,7 +21,7 @@ import java.util.concurrent.ExecutorService;
 /**
  * @author gaojy
  * @ClassName RiceBasicTaskExecuter.java
- * @Description 基本任务类型执行器
+ * @Description 基本任务类型执行器  TODO 待优化
  * @createTime 2022/02/11 13:35:00
  */
 public class RiceBasicTaskExecuter implements RiceExecuter {

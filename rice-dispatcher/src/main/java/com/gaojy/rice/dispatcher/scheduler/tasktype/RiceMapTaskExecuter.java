@@ -1,8 +1,10 @@
 package com.gaojy.rice.dispatcher.scheduler.tasktype;
 
+import com.alibaba.fastjson.JSON;
 import com.gaojy.rice.common.constants.ExecuteType;
 import com.gaojy.rice.common.constants.ExecuterMethodName;
 import com.gaojy.rice.common.constants.RequestCode;
+import com.gaojy.rice.common.constants.TaskInstanceStatus;
 import com.gaojy.rice.common.entity.TaskInstanceInfo;
 import com.gaojy.rice.common.exception.RemotingConnectException;
 import com.gaojy.rice.common.exception.RemotingSendRequestException;
@@ -16,6 +18,9 @@ import com.gaojy.rice.common.utils.StringUtil;
 import com.gaojy.rice.dispatcher.scheduler.TaskScheduleClient;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.repository.api.Repository;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.Date;
@@ -25,78 +30,73 @@ import java.util.Map;
 /**
  * MAP任务执行器
  */
-public class RiceMapTaskExecuter implements RiceExecuter {
-
-    private TaskScheduleClient client;
-
-    private final Repository repository = ExtensionLoader.getExtensionLoader(Repository.class)
-            .getExtension("mysql");
+public class RiceMapTaskExecuter extends AbstractTaskExecuter implements RiceExecuter {
 
     public RiceMapTaskExecuter(TaskScheduleClient client) {
-        this.client = client;
-
+        super(client);
     }
 
     @Override
     public void execute(Long taskInstanceId) {
-        // 集群模式执行map
 
-        // 将结果写入数据库
-
-        // 并行模式执行 processor
-    }
-
-    private Map executeMap(Long taskInstanceId) {
-        int retryCount = 0;
-        String errorMsg = "";
-        TaskInstanceInfo instanceInfo = repository.getTaskInstanceInfoDao().getInstance(taskInstanceId);
-
-        while (retryCount++ <= RiceMapTaskExecuter.this.client.getTaskRetryCount()) {
-            List<String> processors = client.selectProcessores(this.client.getExecuteType());
-            if (CollectionUtils.isNotEmpty(processors)) {
-                RiceRemoteContext requestCommand = RiceRemoteContext.createRequestCommand(RequestCode.INVOKE_PROCESSOR, buildMapRequest(processors.get(0), taskInstanceId));
-                // 同步调用
-                try {
-                    RiceRemoteContext response = RiceMapTaskExecuter.this.client.invokeSync(processors.get(0),requestCommand);
-                    TaskInvokerResponseHeader responseHeader = (TaskInvokerResponseHeader)response.readCustomHeader();
-                    TaskInvokerResponseBody responseBody = TaskInvokerResponseBody.decode(response.getBody(),TaskInvokerResponseBody.class);
-                    // TODO
-                    break;
-                } catch (RemotingConnectException e) {
-                    e.printStackTrace();
-                } catch (RemotingSendRequestException e) {
-                    e.printStackTrace();
-                } catch (RemotingTimeoutException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (RemotingTooMuchRequestException e) {
-                    e.printStackTrace();
-                }
-
-
-            } else {
-
-            }
-
-
-            if (StringUtil.isNotEmpty(errorMsg)){
-                instanceInfo.set
-            }
+        TaskInstanceInfo mapTaskInstance = buildMapTaskInstance(taskInstanceId);
+        repository.getTaskInstanceInfoDao().createTaskInstance(mapTaskInstance);
+        Future<Map> future = client.getThreadPool().submit(new StandaloneTaskRunnable(mapTaskInstance));
+        Map retMap = null;
+        try {
+            retMap = future.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
         }
+        if (retMap != null && !retMap.isEmpty()) {
+            final CountDownLatch latch = new CountDownLatch(retMap.size());
+            // 并行模式执行 processor
 
+            retMap.forEach((k, v) -> {
+                TaskInstanceInfo info = buildProcessTaskInstance(taskInstanceId, String.valueOf(v));
+                client.getThreadPool().submit(new StandaloneTaskRunnable(info, latch));
+            });
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
+        // 更新数据库
+        TaskInstanceInfo rootInstance = repository.getTaskInstanceInfoDao().getInstance(taskInstanceId);
+        rootInstance.setFinishedTime(new Date());
+        rootInstance.setStatus(TaskInstanceStatus.FINISHED.getCode());
+        repository.getTaskInstanceInfoDao().updateTaskInstance(rootInstance);
 
     }
 
-    private TaskInvokeRequestHeader buildMapRequest(String processor, Long taskInstanceId) {
-        TaskInvokeRequestHeader requestHeader = new TaskInvokeRequestHeader();
-        requestHeader.setAppName(client.getAppName());
-        requestHeader.setTaskCode(client.getTaskCode());
-        requestHeader.setInstanceParameter(client.getParameters());
-        requestHeader.setMethodName(ExecuterMethodName.map.name());
-        requestHeader.setSchedulerServer(processor);
-        requestHeader.setMaxRetryTimes(client.getInstanceRetryCount());
-        requestHeader.setTaskInstanceId(taskInstanceId);
-        return requestHeader;
+    private TaskInstanceInfo buildProcessTaskInstance(Long parentInstanceId, String value) {
+        TaskInstanceInfo info = new TaskInstanceInfo();
+        info.setType(ExecuterMethodName.process.name());
+        info.setParentInstanceId(parentInstanceId);
+        info.setInstanceParams(value);
+        info.setTaskCode(client.getTaskCode());
+        info.setStatus(TaskInstanceStatus.WAIT.getCode());
+        info.setCreateTime(new Date());
+        info.setExpectedTriggerTime(new Date());
+        info.setActualTriggerTime(new Date());
+        return info;
     }
+
+    private TaskInstanceInfo buildMapTaskInstance(Long parentInstanceId) {
+        TaskInstanceInfo info = new TaskInstanceInfo();
+        info.setType(ExecuterMethodName.map.name());
+        info.setParentInstanceId(parentInstanceId);
+        info.setInstanceParams(client.getParameters());
+        info.setTaskCode(client.getTaskCode());
+        info.setStatus(TaskInstanceStatus.WAIT.getCode());
+        info.setCreateTime(new Date());
+        info.setExpectedTriggerTime(new Date());
+        info.setActualTriggerTime(new Date());
+        return info;
+    }
+
 }

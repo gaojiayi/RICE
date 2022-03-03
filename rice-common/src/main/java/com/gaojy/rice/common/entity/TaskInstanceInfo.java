@@ -9,7 +9,7 @@ public class TaskInstanceInfo{
 	private long id;
 	private String taskCode;
 	private String instanceParams;
-	private int parentInstanceId;
+	private long parentInstanceId;
 	private Date actualTriggerTime;
 	private Date expectedTriggerTime;
 	private int runningTimes;
@@ -44,11 +44,11 @@ public class TaskInstanceInfo{
 		return instanceParams;
 	}
 
-	public void setParentInstanceId(int parentInstanceId){
+	public void setParentInstanceId(long parentInstanceId){
 		this.parentInstanceId=parentInstanceId;
 	}
 
-	public int getParentInstanceId(){
+	public long getParentInstanceId(){
 		return parentInstanceId;
 	}
 

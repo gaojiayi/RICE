@@ -7,22 +7,31 @@ package com.gaojy.rice.common.constants;
  * @createTime 2022/01/04 19:16:00
  */
 public enum TaskType {
+
     /**
-     * 基本的RICE任务
+     * 广播执行
      */
-    RICE_BASIC(0),
+    BROADCAST(0),
+
+    /**
+     * 单机执行
+     */
+    STANDALONE(1),
+
     /**
      * MAP 任务
      */
-    RICE_MAP(1),
+    RICE_MAP(2),
     /**
      * MAP REDUCE 任务
      */
-    RICE_MAPREDUCE(2),
+    RICE_MAPREDUCE(3),
     /**
      * 工作流任务
      */
-    RICE_WORKFLOW(3);
+    RICE_WORKFLOW(4);
+
+
 
     private int code;
 

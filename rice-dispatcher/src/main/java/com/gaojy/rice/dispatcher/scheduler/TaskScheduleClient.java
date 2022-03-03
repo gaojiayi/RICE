@@ -227,6 +227,14 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
         return selectRet;
     }
 
+    public String selectOneProcessor() {
+        if (CollectionUtils.isNotEmpty(processes)) {
+            List<String> all = processes.stream().collect(Collectors.toList());
+            return balance.select(all);
+        }
+        return null;
+    }
+
     public void invokeAsync(String processorAddr, final RiceRemoteContext remoteContext)
             throws RemotingConnectException, RemotingSendRequestException, RemotingTimeoutException,
             InterruptedException, RemotingTooMuchRequestException {

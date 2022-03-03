@@ -16,4 +16,5 @@
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
+<!-- 执行   mvn -X clean package assembly:single-->
 </project>
