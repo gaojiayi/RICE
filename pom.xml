@@ -1,20 +1,5 @@
-<!--
-  Licensed to the Apache Software Foundation (ASF) under one or more
-  contributor license agreements.  See the NOTICE file distributed with
-  this work for additional information regarding copyright ownership.
-  The ASF licenses this file to You under the Apache License, Version 2.0
-  (the "License"); you may not use this file except in compliance with
-  the License.  You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-  -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -41,6 +26,38 @@
     <url>https://github.com/apache/incubator-dubbo</url>
     <inceptionYear>2021</inceptionYear>
 
+
+    <properties>
+        <!-- for maven compiler plugin -->
+        <java_source_version>1.8</java_source_version>
+        <java_target_version>1.8</java_target_version>
+        <file_encoding>UTF-8</file_encoding>
+
+        <skip_maven_deploy>false</skip_maven_deploy>
+
+        <!-- Maven plugins -->
+        <maven_jar_version>3.0.2</maven_jar_version>
+        <maven_surefire_version>2.22.1</maven_surefire_version>
+        <maven_deploy_version>2.8.2</maven_deploy_version>
+        <maven_compiler_version>3.6.0</maven_compiler_version>
+        <maven_source_version>3.0.1</maven_source_version>
+        <maven_javadoc_version>3.0.1</maven_javadoc_version>
+        <maven_jetty_version>9.4.11.v20180605</maven_jetty_version>
+        <maven_checkstyle_version>3.0.0</maven_checkstyle_version>
+        <maven_jacoco_version>0.8.2</maven_jacoco_version>
+        <apache-rat-plugin.version>0.12</apache-rat-plugin.version>
+
+        <arguments />
+        <checkstyle.skip>true</checkstyle.skip>
+        <rat.skip>true</rat.skip>
+    </properties>
+
+    <scm>
+        <url>https://github.com/gaojiayi/RICE</url>
+        <connection>scm:git:https://github.com/gaojiayi/RICE.git</connection>
+        <developerConnection>scm:git:https://github.com/gaojiayi/RICE.git</developerConnection>
+        <tag>rice-1.0.0</tag>
+    </scm>
     <dependencyManagement>
         <dependencies>
             <!--            定义依赖-->
@@ -54,4 +71,150 @@
         </dependencies>
     </dependencyManagement>
 
+    <build>
+        <!-- Used for packaging NOTICE & LICENSE to each sub-module jar-->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+            <!--            <resource>-->
+            <!--                <directory>${maven.multiModuleProjectDirectory}</directory>-->
+            <!--                <targetPath>META-INF/</targetPath>-->
+            <!--                <filtering>false</filtering>-->
+            <!--                                <includes>-->
+            <!--                                    <include>NOTICE</include>-->
+            <!--                                    <include>LICENSE</include>-->
+            <!--                                </includes>-->
+            <!--            </resource>-->
+        </resources>
+
+        <plugins>
+            <plugin>
+                <!--                source jar-->
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven_source_version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--打jar-->
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven_jar_version}</version>
+                <configuration>
+                    <archive>
+                        <addMavenDescriptor>true</addMavenDescriptor>
+                        <index>true</index>
+                        <manifest>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Specification-Version>${project.version}</Specification-Version>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven_deploy_version}</version>
+                <configuration>
+                    <skip>${skip_maven_deploy}</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven_compiler_version}</version>
+                <configuration>
+                    <compilerArgument>-proc:none</compilerArgument>
+                    <fork>true</fork>
+                    <source>${java_source_version}</source>
+                    <target>${java_target_version}</target>
+                    <encoding>${file_encoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>release</releaseProfiles>
+                    <goals>deploy</goals>
+                    <arguments>${arguments}</arguments>
+                </configuration>
+            </plugin>
+        </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <!-- keep surefire and failsafe in sync -->
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.22.1</version>
+                </plugin>
+                <!-- keep surefire and failsafe in sync -->
+                <plugin>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>2.22.1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.ops4j.pax.exam</groupId>
+                    <artifactId>maven-paxexam-plugin</artifactId>
+                    <version>1.2.4</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>2.10</version>
+                </plugin>
+                <plugin>
+                    <!-- Do NOT upgrade -->
+                    <artifactId>maven-jxr-plugin</artifactId>
+                    <version>2.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>1.10</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.fusesource.hawtjni</groupId>
+                    <artifactId>maven-hawtjni-plugin</artifactId>
+                    <version>1.14</version>
+                </plugin>
+                <plugin>
+                    <groupId>kr.motd.maven</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>1.0.0.Final</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>2.4.3</version>
+                    <configuration>
+                        <createDependencyReducedPom>false</createDependencyReducedPom>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-maven-plugin</artifactId>
+                    <version>${maven_jetty_version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

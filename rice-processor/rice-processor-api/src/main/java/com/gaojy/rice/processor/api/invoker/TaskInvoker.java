@@ -69,7 +69,7 @@ public abstract class TaskInvoker {
                                     TASK_CODE_INSTANCE_MAP.put(executer.taskCode(), clazz.newInstance());
                                     TaskInvoker invoker = getInvoker(clazz);
                                     // TODO 判断taskType
-                                    TaskType taskType = TaskType.RICE_BASIC;
+                                    TaskType taskType = TaskType.STANDALONE;
                                     if (clazz.getInterfaces()[0].getSimpleName().toLowerCase().indexOf("mapreduce") > 0) {
                                         taskType = TaskType.RICE_MAPREDUCE;
                                     }

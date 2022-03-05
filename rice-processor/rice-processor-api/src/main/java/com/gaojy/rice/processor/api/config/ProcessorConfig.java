@@ -82,7 +82,7 @@ public class ProcessorConfig extends ElectionConstants {
                             } else {
                                 taskName = taskCode = clazz.getSimpleName();
                             }
-                            TaskType taskType = TaskType.RICE_BASIC;
+                            TaskType taskType = TaskType.STANDALONE;
                             if (clazz.getSuperclass().getSimpleName().toLowerCase().indexOf("mapreduce") > 0) {
                                 taskType = TaskType.RICE_MAPREDUCE;
                             }

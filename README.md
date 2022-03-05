@@ -1,4 +1,4 @@
-# RICE 
+# RICE
 ### Distributed Cluster Scheduler
 [![Build Status](https://travis-ci.org/apache/incubator-dubbo.svg?branch=master)](https://travis-ci.org/apache/incubator-dubbo)
 [![codecov](https://codecov.io/gh/apache/incubator-dubbo/branch/master/graph/badge.svg)](https://codecov.io/gh/apache/incubator-dubbo)
@@ -25,27 +25,50 @@ RICE可以实现动态任务分配，当一个server调度器挂机之后，原�
 ### 控制器实现
 ![rice_deploy](https://github.com/gaojiayi/RICE/blob/master/doc/rice_controller.png)
 * 处理器连接主控制器，直到控制器连接成功并告知调度器。
-  
-* 所有的调度器都要与主控制器建立长轮询获取任务更新，并维护心跳。心跳上报处理器状态，主控制器处理状态数据。  
-  
-    当一个调度器宕机，主控制器负责任务重分配后，通知其他调度器更新任务  
-  
-    当新增一个调度器之后，主控制器负责任务重分配之后，通知其他调度器更新任务  
-  
-* 当添加任务的时候，会动态分配一个调度器，并告知调度器。调度器会添加任务  
-  
-* 当删除任务是，会通知响应的调度器，调度器会删除任务  
-  
-* 控制器的master与slave选举实现基于raft协议  
+
+* 所有的调度器都要与主控制器建立长轮询获取任务更新，并维护心跳。心跳上报处理器状态，主控制器处理状态数据。
+
+  当一个调度器宕机，主控制器负责任务重分配后，通知其他调度器更新任务
+
+  当新增一个调度器之后，主控制器负责任务重分配之后，通知其他调度器更新任务
+
+* 当添加任务的时候，会动态分配一个调度器，并告知调度器。调度器会添加任务
+
+* 当删除任务是，会通知响应的调度器，调度器会删除任务
+
+* 控制器的master与slave选举实现基于raft协议
 
 ### 开发进度
-#### 1.0版本计划
+#### 1.0.0版本计划
 | **处理器**  | **控制器**  | **调度器**  | **控制台**  |**其他**   |
 | :------------ | :------------ | :------------ | :------------ | :------------ |
-| <input type="checkbox" checked disabled> 任务发布 </br><input type="checkbox" checked disabled> 任务上线通知 </br> | <input type="checkbox" checked disabled> Jraft选举 </br> <input type="checkbox" checked disabled> 任务发现通知 </br> <input type="checkbox" checked disabled> 调度器状态变更通知 </br> <input type="checkbox" checked disabled> 任务重分配通知</br><input type="checkbox" checked disabled> 处理器状态维护</br> |   |   |   |
-|  <input type="checkbox"  disabled> 与spring的集成(类似dubbo)  |   |   |   |   |  |
+| √ 任务发布 </br>√ 任务上线通知 </br>┅ 与spring的集成(类似dubbo)                                                                                                                                                                                                                                                                                             |√ Jraft选举 </br> √ 任务发现通知 </br> √  调度器状态变更通知 </br> √  任务重分配通知</br>√处理器状态维护</br>                                                                                                                                                                                                                         | 单机任务</br>广播任务</br>Map任务</br>MapReduce任务</br>工作流任务</br>                                                                                                                                             | ┅UI</br>     |  √ 归档 </br>  √ 编译打包</br>  ┅ 执行shell脚本   |      |
+
+
+
 
 ### 特性
+
+
+### rice私有化协议
+|  数据组成 |  ori header length  | header Data   |   body Data |
+| ------------ | ------------ | ------------ | ------------ |
+| 占用字节  | 4  |  通过计算获得 |  总的length - 4 - header length | |
+
+整个数据报文有4字节的原始头长度，header数据以及业务数据组成，其中ori header length的整型值可以计算出真实的header数据长度。
+
+**header Data**
+header data的数据格式如下：
+
+|  占用字节数 |  2byte | 1byte |   2byte | 4byte  | 4byte | 4byte  | 未知 byte  | 4byte | 未知 byte |
+| ------------ | ------------ | ------------ | ------------ | ------------ | ------------ | ------------ | ------------ | ------------ | ------------ |
+| 数据作用  | code | LanguageCode |   version | opaque  | flag | remarkLength  | remarkContent  | extFieldsLength | ExtFields |
+
+
+
+
+
+
 
 
 
