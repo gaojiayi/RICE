@@ -18,6 +18,7 @@
         <module>rice-repository</module>
         <module>rice-protocol</module>
         <module>rice-http-agent</module>
+        <module>rice-all</module>
     </modules>
     <packaging>pom</packaging>
 

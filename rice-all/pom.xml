@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>rice-parent</artifactId>
+        <groupId>com.gaojy</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>rice</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>rice-all</name>
+    <description>The all in one project of rice</description>
+    <properties>
+        <skip_maven_deploy>false</skip_maven_deploy>
+    </properties>
+
+<!--    maven-jar-plugin，默认的打包插件，用来打普通的project JAR包；
+        maven-shade-plugin，用来打可执行JAR包，也就是所谓的fat JAR包；
+        maven-assembly-plugin，支持自定义的打包结构，也可以定制依赖项等。
+        这边主要是通过maven-shade-plugin来将整个rice打包到一起
+-->
+    <dependencies>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-common</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-remote</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-controller</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-dispatcher</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-processor-api</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-processor-spring</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <!--            <dependency>-->
+        <!--                <groupId>com.gaojy</groupId>-->
+        <!--                <artifactId>rice-distribution</artifactId>-->
+        <!--                <version>${project.version}</version>-->
+        <!--            </dependency>-->
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-repository-api</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-repository-mysql</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-protocol</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-http-agent</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <!--            <dependency>-->
+        <!--                <groupId>com.gaojy</groupId>-->
+        <!--                <artifactId>rice-parent</artifactId>-->
+        <!--                <version>${project.version}</version>-->
+        <!--            </dependency>-->
+        <!--            <dependency>-->
+        <!--                <groupId>com.gaojy</groupId>-->
+        <!--                <artifactId>rice-bom</artifactId>-->
+        <!--                <version>${project.version}</version>-->
+        <!--            </dependency>-->
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>rice-all-${project.version}</finalName>
+                            <!-- 是否创建源码到jar包中，方便ide直接查看到源码-->
+                            <createSourcesJar>true</createSourcesJar>
+                            <!--是否打包间接依赖-->
+                            <promoteTransitiveDependencies>false</promoteTransitiveDependencies>
+                            <artifactSet>
+                               <includes>
+                                   <include>com.gaojy:rice-common</include>
+                                   <include>com.gaojy:rice-controller</include>
+                                   <include>com.gaojy:rice-dispatcher</include>
+                                   <include>com.gaojy:rice-http-agent</include>
+                                   <include>com.gaojy:rice-processor-api</include>
+                                   <include>com.gaojy:rice-processor-spring</include>
+                                   <include>com.gaojy:rice-protocol</include>
+                                   <include>com.gaojy:rice-remote</include>
+                                   <include>com.gaojy:rice-repository-api</include>
+                                   <include>com.gaojy:rice-repository-mysql</include>
+                               </includes>
+                            </artifactSet>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/rice/internal/com.gaojy.rice.http.api.HttpBinder</resource>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/rice/internal/com.gaojy.rice.repository.api.Repository</resource>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>rice.banner</resource>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>
