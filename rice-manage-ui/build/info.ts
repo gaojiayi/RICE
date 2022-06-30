@@ -1,4 +1,3 @@
-// 这个描述了vite build的插件  打印build时候的输出
 import { readdir, stat } from "fs";
 import type { Plugin } from "vite";
 import dayjs, { Dayjs } from "dayjs";
@@ -51,21 +50,21 @@ export function viteBuildInfo(): Plugin {
       config = resolvedConfig;
     },
     buildStart() {
-      console.log(
-        bold(
-          green(
-            `👏欢迎使用${blue(
-              "[rice-manage-ui]"
-            )}，如果您感觉不错，记得点击后面链接给个star哦💖 https://github.com/gaojiayi/RICE`
-          )
-        )
-      );
       if (config.command === "build") {
         startTime = dayjs(new Date());
       }
     },
     closeBundle() {
       if (config.command === "build") {
+        console.log(
+          bold(
+            green(
+              `👏欢迎使用${blue(
+                "[vue-pure-admin]"
+              )}，如果您感觉不错，记得点击后面链接给个star哦💖 https://github.com/xiaoxian521/vue-pure-admin`
+            )
+          )
+        );
         endTime = dayjs(new Date());
         recursiveDirectory(staticPath, () => {
           console.log(

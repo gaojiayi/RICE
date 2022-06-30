@@ -1,14 +1,9 @@
-// import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
 import dayjs from "dayjs";
 import { resolve } from "path";
 import pkg from "./package.json";
 import { warpperEnv, regExps } from "./build";
-import { UserConfigExport, ConfigEnv, loadEnv } from "vite";
 import { getPluginsList } from "./build/plugins";
-
-
-// https://vitejs.dev/config/  定义了读取vite的环境变量 初始化服务器选项
+import { UserConfigExport, ConfigEnv, loadEnv } from "vite";
 
 // 当前执行node命令时文件夹的地址（工作目录）
 const root: string = process.cwd();
@@ -29,7 +24,6 @@ const __APP_INFO__ = {
   pkg: { dependencies, devDependencies, name, version },
   lastBuildTime: dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss")
 };
-
 
 export default ({ command, mode }: ConfigEnv): UserConfigExport => {
   const {
@@ -65,11 +59,11 @@ export default ({ command, mode }: ConfigEnv): UserConfigExport => {
             }
           : null
     },
-    plugins: getPluginsList(command, VITE_LEGACY), // 这边会加载plugins
-    // optimizeDeps: {
-    //   include: ["pinia", "vue-i18n", "lodash-es", "@vueuse/core"],
-    //   exclude: ["@pureadmin/theme/dist/browser-utils"]
-    // },
+    plugins: getPluginsList(command, VITE_LEGACY),
+    optimizeDeps: {
+      include: ["pinia", "vue-i18n", "lodash-es", "@vueuse/core"],
+      exclude: ["@pureadmin/theme/dist/browser-utils"]
+    },
     build: {
       sourcemap: false,
       brotliSize: false,
@@ -82,8 +76,3 @@ export default ({ command, mode }: ConfigEnv): UserConfigExport => {
     }
   };
 };
-
-
-// export default defineConfig({
-//   plugins: [vue()]
-// })

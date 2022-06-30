@@ -49,29 +49,6 @@ module.exports = {
       jsx: true
     }
   },
-  overrides: [
-    {
-      files: ["*.ts", "*.vue"],
-      rules: {
-        "no-undef": "off"
-      }
-    },
-    {
-      files: ["*.vue"],
-      parser: "vue-eslint-parser",
-      parserOptions: {
-        parser: "@typescript-eslint/parser",
-        extraFileExtensions: [".vue"],
-        ecmaVersion: "latest",
-        ecmaFeatures: {
-          jsx: true
-        }
-      },
-      rules: {
-        "no-undef": "off"
-      }
-    }
-  ],
   rules: {
     "vue/no-v-html": "off",
     "vue/require-default-prop": "off",
@@ -117,4 +94,4 @@ module.exports = {
       }
     ]
   }
-}
+};

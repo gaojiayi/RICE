@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "moduleResolution": "Node",
+    "moduleResolution": "node",
     "strict": false,
     "jsx": "preserve",
     "importHelpers": true,
@@ -24,7 +24,7 @@
       "@build/*": ["build/*"],
       "/#/*": ["types/*"]
     },
-    // ts编译的相关引入
+    "types": ["node", "vite/client", "element-plus/global"],
     "typeRoots": ["./node_modules/@types/", "./types"]
   },
   "include": [

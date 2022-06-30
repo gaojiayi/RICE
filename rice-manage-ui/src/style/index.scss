@@ -1,0 +1,49 @@
+@import "./mixin.scss";
+@import "./transition.scss";
+@import "./element-plus.scss";
+@import "./sidebar.scss";
+@import "./dark.scss";
+
+body {
+  width: 100%;
+  height: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizelegibility;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+}
+
+html {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+}
+
+/* 头部用户信息样式重置 */
+.hidden {
+  display: none !important;
+}
+
+/* 灰色模式 */
+.html-grey {
+  filter: grayscale(100%);
+}
+
+/* 色弱模式 */
+.html-weakness {
+  filter: invert(80%);
+}
+
+.pc-spacing {
+  margin: 10px;
+}
+
+.mobile-spacing {
+  margin: 0;
+}
