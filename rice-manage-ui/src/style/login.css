@@ -26,9 +26,14 @@
   width: 500px;
 }
 .login-app-desc{
-  align-items: center;
-  text-align: center;
-  float: left;
+font-family: courier, "courier new", monospace;
+color: #D6BE20;
+font-size: 20px;
+font-weight: bold;
+letter-spacing: -0.2pt;
+word-spacing: 0.8pt;
+line-height: 1.9;
+
 
 }
 .login-box {
@@ -50,7 +55,7 @@
 .login-form h2 {
   text-transform: uppercase;
   margin: 15px 0;
-  color: #999;
+  color:  #D6BE20;
   font: bold 200% Consolas, Monaco, monospace;
 }
 

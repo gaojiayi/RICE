@@ -31,12 +31,11 @@ import {
 import homeRouter from "./modules/home";
 import errorRouter from "./modules/error";
 import remainingRouter from "./modules/remaining";
-// import taskManagerRouter from "./modules/taskmanager";
-// import taskInstanceRouter from "./modules/taskinstance";
+import taskManagerRouter from "./modules/taskmanager";
+import taskInstanceRouter from "./modules/taskinstance";
 
 // //原始静态路由（未做任何处理）
-// const routes = [homeRouter, errorRouter, taskManagerRouter, taskInstanceRouter];
-const routes = [homeRouter, errorRouter]
+const routes = [homeRouter, errorRouter, taskManagerRouter, taskInstanceRouter];
 
 // 导出处理后的静态路由（三级及以上的路由全部拍成二级）
 export const constantRoutes: Array<RouteRecordRaw> = formatTwoStageRoutes(

@@ -17,15 +17,31 @@
     "baseUrl": ".",
     "allowJs": false,
     "resolveJsonModule": true,
-    "lib": ["dom", "esnext"],
+    "lib": [
+      "dom",
+      "esnext"
+    ],
     "incremental": true,
     "paths": {
-      "/@/*": ["src/*"],
-      "@build/*": ["build/*"],
-      "/#/*": ["types/*"]
+      "/@/*": [
+        "src/*"
+      ],
+      "@build/*": [
+        "build/*"
+      ],
+      "/#/*": [
+        "types/*"
+      ]
     },
-    "types": ["node", "vite/client", "element-plus/global"],
-    "typeRoots": ["./node_modules/@types/", "./types"]
+    "types": [
+      "node",
+      "vite/client",
+      "element-plus/global"
+    ],
+    "typeRoots": [
+      "./node_modules/@types/",
+      "./types"
+    ]
   },
   "include": [
     "src/**/*.ts",
@@ -35,5 +51,9 @@
     "mock/*.ts",
     "vite.config.ts"
   ],
-  "exclude": ["node_modules", "dist", "**/*.js"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.js"
+  ]
 }

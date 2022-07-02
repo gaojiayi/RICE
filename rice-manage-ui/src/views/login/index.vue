@@ -76,11 +76,11 @@ watch(imgCode, (value) => {
     </div>
     <div class="login-box">
       <div class="login-form">
-      <h3>下一代高性能分布式调度平台</h3>
 
         <avatar class="avatar" />
         <Motion>
           <h2>Rice Scheduler</h2>
+           <h class="login-app-desc">新一代高性能分布式调度平台</h>
         </Motion>
 
         <el-form

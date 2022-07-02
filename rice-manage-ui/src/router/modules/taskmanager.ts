@@ -3,17 +3,17 @@ const Layout = () => import("/@/layout/index.vue");
 
 const taskManagerRouter = {
   path: "/task",
-  name: "task",
+  // name: "task",
   component: Layout,
-  redirect: "/taskmanager",
+  redirect: "/task/index",
   meta: {
     icon: "home-filled",
     title: $t("menus.hstaskmanager"),
-    rank: 1,
+    rank: 10,
   },
   children: [
     {
-      path: "/taskmanager",
+      path: "/task/index",
       name: "taskmanager",
       component: () => import("/@/views/taskmanager/index.vue"),
       meta: {
