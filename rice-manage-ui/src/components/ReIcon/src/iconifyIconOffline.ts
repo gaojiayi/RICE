@@ -1,5 +1,7 @@
+import { iconType } from './types';
 import { h, defineComponent } from "vue";
 import { Icon as IconifyIcon, addIcon } from "@iconify/vue/dist/offline";
+// https://icon-sets.iconify.design/  icon大全
 
 // element-plus icon
 import Check from "@iconify-icons/ep/check";
@@ -31,6 +33,10 @@ import ArrowDownLine from "@iconify-icons/ri/arrow-down-line";
 import Bookmark from "@iconify-icons/ri/bookmark-2-line";
 import User from "@iconify-icons/ri/user-3-fill";
 import Lock from "@iconify-icons/ri/lock-fill";
+import ListCheck from "@iconify-icons/ri/list-check";
+import ComputerLine from "@iconify-icons/ri/computer-line";
+import HourLine24 from "@iconify-icons/ri/24-hours-line";
+
 addIcon("arrow-right-s-line", ArrowRightSLine);
 addIcon("arrow-left-s-line", ArrowLeftSLine);
 addIcon("logout-circle-r-line", LogoutCircleRLine);
@@ -40,6 +46,9 @@ addIcon("arrow-down-line", ArrowDownLine);
 addIcon("bookmark", Bookmark);
 addIcon("user", User);
 addIcon("lock", Lock);
+addIcon("list-check", ListCheck);
+addIcon("computer-line", ComputerLine);
+addIcon("24-hour-line", HourLine24);
 
 // Iconify Icon在Vue里离线使用（用于内网环境）https://docs.iconify.design/icon-components/vue/offline.html
 export default defineComponent({

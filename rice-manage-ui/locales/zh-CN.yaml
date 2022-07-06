@@ -1,34 +1,37 @@
 buttons:
   hsLoginOut: 退出系统
-  hsfullscreen: 全屏
-  hsexitfullscreen: 退出全屏
-  hsrefreshRoute: 刷新路由
-  hslogin: 登陆
   hsadd: 新增
-  hsmark: 标记/取消
-  hssave: 保存
-  hssearch: 搜索
-  hsexpendAll: 全部展开
-  hscollapseAll: 全部折叠
-  hssystemSet: 打开项目配置
-  hsdelete: 删除
-  hsreload: 重新加载
+  hscloseAllTabs: 关闭全部标签页
   hscloseCurrentTab: 关闭当前标签页
   hscloseLeftTabs: 关闭左侧标签页
-  hscloseRightTabs: 关闭右侧标签页
   hscloseOtherTabs: 关闭其他标签页
-  hscloseAllTabs: 关闭全部标签页
+  hscloseRightTabs: 关闭右侧标签页
+  hscollapseAll: 全部折叠
+  hsdelete: 删除
+  hsexitfullscreen: 退出全屏
+  hsexpendAll: 全部展开
+  hsfullscreen: 全屏
+  hslogin: 登陆
+  hsmark: 标记/取消
+  hsrefreshRoute: 刷新路由
+  hsreload: 重新加载
+  hssave: 保存
+  hssearch: 搜索
+  hssystemSet: 打开项目配置
 menus:
+  hsFive: '500'
+  hserror: 错误页面
+  hsfourZeroFour: '404'
+  hsfourZeroOne: '403'
   hshome: 首页
   hslogin: 登陆
-  hserror: 错误页面
-  hsfourZeroFour: "404"
-  hsfourZeroOne: "403"
-  hsFive: "500"
-  permission: 权限管理
-  permissionPage: 页面权限
-  permissionButton: 按钮权限
-  hstaskmanager: 任务管理
   hstaskinstance: 任务实例
+  hstaskmanager: 任务管理
+  permission: 权限管理
+  permissionButton: 按钮权限
+  permissionPage: 页面权限
+  hsapplication: 应用管理
+  hsappDetail: 应用详情
+  hsappProcessor: 应用处理器
 status:
   hsLoad: 加载中...

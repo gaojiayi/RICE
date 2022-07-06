@@ -5,22 +5,22 @@ const taskInstanceRouter = {
   path: "/taskinstance",
   // name: "taskinstance",
   component: Layout,
-  redirect: "/taskinstance/manager",
+  redirect: "/taskinstance/info",
   meta: {
     icon: "home-filled",
     title: $t("menus.hstaskinstance"),
-    rank: 20,
+    rank: 20
   },
   children: [
     {
-      path: "/taskinstance/manager",
-      name: "taskinstancemanager",
+      path: "/taskinstance/info",
+      name: "taskinstanceinfo",
       component: () => import("/@/views/taskinstance/index.vue"),
       meta: {
-        title: $t("menus.hstaskinstance"),
-      },
-    },
-  ],
+        title: $t("menus.hstaskinstance")
+      }
+    }
+  ]
 };
 
 export default taskInstanceRouter;
