@@ -1,6 +1,16 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { useRenderIcon } from "/@/components/ReIcon/src/hooks";
+import { ElMessage, ElMessageBox } from "element-plus";
+import CreateAppDialog from "./components/CreateAppDialog.vue";
+
+const INITIAL_DATA = {
+  name: "",
+  status: "",
+  description: "",
+  type: "",
+  mark: ""
+};
 
 defineOptions({
   name: "appDetail"
@@ -9,16 +19,36 @@ const currentDate = ref(new Date());
 
 const formDialogVisible = ref(false);
 const searchValue = ref("");
+const formData = ref({ ...INITIAL_DATA });
+
+const handleDeleteItem = product => {
+  ElMessageBox.confirm(
+    product
+      ? `确认删除后${product.name}的所有产品信息将被清空, 且无法恢复`
+      : "",
+    "提示",
+    {
+      type: "warning"
+    }
+  )
+    .then(() => {
+      ElMessage({
+        type: "success",
+        message: "删除成功"
+      });
+    })
+    .catch(() => {});
+};
 </script>
 
 <template>
   <div class="main">
     <div class="w-full flex justify-between mb-4">
-      <el-button :icon="useRenderIcon('add')" @click="formDialogVisible = true">
-        新建应用
+      <el-button @click="formDialogVisible = true" class="button-create-app">
+        <iconify-icon-offline icon="add-circle-line" />新建应用
       </el-button>
       <el-input
-        style="width: 300px"
+        style="width: 300px; margin-right: 100px"
         v-model="searchValue"
         placeholder="请输入应用名称"
         clearable
@@ -35,53 +65,110 @@ const searchValue = ref("");
     </div>
 
     <div>
-      <el-row>
+      <el-row class="row-app-card-data">
         <el-col
-          v-for="(o, index) in 2"
+          v-for="(o, index) in 6"
           :key="o"
-          :span="8"
-          :offset="index > 0 ? 2 : 0"
+          :span="4"
+          style="margin: 20px"
+          class="card-app-info"
         >
-          <el-card :body-style="{ padding: '0px' }">
-            <img
-              src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-              class="image"
-            />
-            <div style="padding: 14px">
-              <span>订单系统</span>
-              <div class="bottom">
-                <span class="time">{{ currentDate }}</span>
-                <el-button text class="button">编辑</el-button>
+          <el-card :body-style="{ padding: '5px', height: '250px' }">
+            <div class="app-header">
+              <img
+                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+                class="image"
+              />
+              <div class="app-title">
+                <iconify-icon-offline
+                  icon="close-circle-fill"
+                  @click="handleDeleteItem"
+                  class="icon-remove-app"
+                />
+                <div class="app-title-name">订单系统</div>
+                <div class="app-title-id">ID:34455</div>
+              </div>
+            </div>
+
+            <div style="">
+              <div class="bottom-app-info">
+                <span class=""
+                  >一旦为页面设置了恰当的
+                  DTD，大多数浏览器都会按照上面的图示来呈现内容。然而 IE 5 和 6
+                  的呈现却是不正确的。根据 W3C 的规范，。</span
+                >
               </div>
             </div>
           </el-card>
         </el-col>
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="1000"
+          class="app-page"
+        />
       </el-row>
     </div>
+
+    <CreateAppDialog v-model:visible="formDialogVisible" :data="formData" />
   </div>
 </template>
 
-<style>
-.time {
+<style lang="scss" scoped>
+.row-app-card-data {
+  position: relative;
+  .app-page {
+    position: absolute;
+    bottom: -40px;
+    right: 40px;
+  }
+}
+
+.bottom-app-info {
+  margin-top: 30px;
+  line-height: 22px;
   font-size: 12px;
   color: #999;
 }
 
-.bottom {
-  margin-top: 13px;
-  line-height: 12px;
+.image,
+.app-title {
+  width: 50%;
+  /* display: inline; */
+}
+.app-title {
+  font-size: 16px;
+  .app-title-name {
+    font-weight: bolder;
+    line-height: 50px;
+    font-size: 20px;
+  }
+  .app-title-id {
+    color: #999;
+  }
+}
+.app-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  text-align: center;
 }
-
-.button {
-  padding: 0;
-  min-height: auto;
+.button-create-app {
+  margin-left: 20px;
 }
-
-.image {
-  width: 100%;
-  display: block;
+.card-app-info {
+  position: relative;
+  .icon-remove-app {
+    position: absolute;
+    right: -12.5px;
+    // 举例相对定位元素的上边距-12.5px
+    top: -12.5px;
+    width: 25px;
+    height: 25px;
+    color: rgb(85, 78, 85);
+  }
+  .icon-remove-app:hover {
+    width: 30px;
+    height: 30px;
+  }
 }
 </style>

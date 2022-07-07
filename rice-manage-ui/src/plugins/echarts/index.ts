@@ -1,6 +1,6 @@
 import * as echarts from "echarts/core";
 
-import { PieChart, BarChart, LineChart, GaugeChart } from "echarts/charts";
+import { PieChart, BarChart, LineChart } from "echarts/charts";
 import { SVGRenderer } from "echarts/renderers";
 const { use, registerTheme } = echarts;
 
@@ -18,7 +18,7 @@ use([
   PieChart,
   BarChart,
   LineChart,
-  GaugeChart,
+  //GaugeChart,
   SVGRenderer,
   GridComponent,
   TitleComponent,

@@ -13,6 +13,8 @@ import ArrowDown from "@iconify-icons/ep/arrow-down";
 import CloseBold from "@iconify-icons/ep/close-bold";
 import Bell from "@iconify-icons/ep/bell";
 import Search from "@iconify-icons/ep/search";
+import Plus from "@iconify-icons/ep/plus";
+
 addIcon("check", Check);
 addIcon("home-filled", HomeFilled);
 addIcon("setting", Setting);
@@ -22,6 +24,7 @@ addIcon("arrow-down", ArrowDown);
 addIcon("close-bold", CloseBold);
 addIcon("bell", Bell);
 addIcon("search", Search);
+addIcon("plus", Plus);
 
 // remixicon
 import ArrowRightSLine from "@iconify-icons/ri/arrow-right-s-line";
@@ -36,6 +39,9 @@ import Lock from "@iconify-icons/ri/lock-fill";
 import ListCheck from "@iconify-icons/ri/list-check";
 import ComputerLine from "@iconify-icons/ri/computer-line";
 import HourLine24 from "@iconify-icons/ri/24-hours-line";
+import CloseCircleFill from "@iconify-icons/ri/close-circle-fill";
+import AddCircleLine from "@iconify-icons/ri/add-circle-line";
+import More2Fill from "@iconify-icons/ri/more-2-fill";
 
 addIcon("arrow-right-s-line", ArrowRightSLine);
 addIcon("arrow-left-s-line", ArrowLeftSLine);
@@ -49,6 +55,9 @@ addIcon("lock", Lock);
 addIcon("list-check", ListCheck);
 addIcon("computer-line", ComputerLine);
 addIcon("24-hour-line", HourLine24);
+addIcon("close-circle-fill", CloseCircleFill);
+addIcon("add-circle-line", AddCircleLine);
+addIcon("more-vertical", More2Fill);
 
 // Iconify Icon在Vue里离线使用（用于内网环境）https://docs.iconify.design/icon-components/vue/offline.html
 export default defineComponent({

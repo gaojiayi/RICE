@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { ReInfinite, RePie, ReLine, ReClock } from "./components";
+import { ReInfinite, RePie, ReLine,ReBar } from "./components";
 
 const size = ref("");
 const current_time = ref("");
@@ -105,7 +105,7 @@ const blockMargin = computed(() => {
           </el-col>
 
           <el-col :span="8" style="padding-left: 5px">
-            <el-card shadow="hover" :body-style="{ padding: '0px' }">
+            <el-card shadow="always" :body-style="{ padding: '0px' }">
               <div class="grid-content grid-con-3">
                 <div class="grid-con-icon">
                   <IconifyIconOffline
@@ -123,11 +123,11 @@ const blockMargin = computed(() => {
           <el-col :span="24">
             <el-card shadow="hover" class="card-controller-info">
               <el-descriptions class="" title="" :column="1">
-                <el-descriptions-item label="当前控制器地址:"
+                <el-descriptions-item label="当前控制器地址:" class-name="descriptions-item-label"
                   >178.134.21.25:8080</el-descriptions-item
                 >
-                <el-descriptions-item label="S/M:">
-                  MASTER</el-descriptions-item
+                <el-descriptions-item label="主/从:">
+                   <el-tag type="danger" size="small" >主控制器</el-tag></el-descriptions-item
                 >
                 <el-descriptions-item label="启动时间:"
                   >2022-1-3 12:23:10</el-descriptions-item
@@ -168,7 +168,7 @@ const blockMargin = computed(() => {
         <el-card style="height: 360px">
           <template #header>
             <span style="font-size: 16px; font-weight: 500">
-              实时动态调度
+              调度实时动态
             </span>
           </template>
           <el-skeleton animated :rows="7" :loading="loading">
@@ -182,9 +182,9 @@ const blockMargin = computed(() => {
       <el-col
         :xs="24"
         :sm="24"
-        :md="12"
-        :lg="12"
-        :xl="12"
+        :md="24"
+        :lg="8"
+        :xl="8"
         style="margin-bottom: 20px"
         v-motion
         :initial="{
@@ -211,7 +211,7 @@ const blockMargin = computed(() => {
         </el-card>
       </el-col>
 
-      <!-- <el-col
+      <el-col
         :xs="24"
         :sm="24"
         :md="24"
@@ -234,23 +234,23 @@ const blockMargin = computed(() => {
         <el-card>
           <template #header>
             <span style="font-size: 16px; font-weight: 500">
-              {{current_time}}
+               应用执行器数
             </span>
           </template>
           <el-skeleton animated :rows="7" :loading="loading">
             <template #default>
-              <ReClock @update-clock="change_clock"/>
+              <ReBar />
             </template>
           </el-skeleton>
         </el-card>
-      </el-col> -->
+      </el-col>
 
       <el-col
         :xs="24"
         :sm="24"
         :md="12"
-        :lg="12"
-        :xl="12"
+        :lg="8"
+        :xl="8"
         style="margin-bottom: 20px"
         v-motion
         :initial="{
@@ -354,4 +354,5 @@ $grid3-color: rgb(126, 19, 227);
     color: $grid3-color;
   }
 }
+
 </style>

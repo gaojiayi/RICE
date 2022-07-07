@@ -1,7 +1,7 @@
 import reInfinite from "./Infinite.vue";
 import rePie from "./Pie.vue";
 import reLine from "./Line.vue"
-import reClock from "./Clock.vue"
+import reBar from "./Bar.vue"
 import { App } from "vue";
 
 const ReInfinite = Object.assign(reInfinite, {
@@ -22,10 +22,10 @@ const ReLine = Object.assign(reLine, {
   }
 });
 
-const ReClock = Object.assign(reClock, {
+const ReBar = Object.assign(reBar, {
   install(app: App) {
-    app.component(reClock.name, reClock);
+    app.component(reBar.name, reBar);
   }
 });
 
-export { ReInfinite, RePie, ReLine, ReClock };
+export { ReInfinite, RePie, ReLine, ReBar };
