@@ -42,6 +42,8 @@ import HourLine24 from "@iconify-icons/ri/24-hours-line";
 import CloseCircleFill from "@iconify-icons/ri/close-circle-fill";
 import AddCircleLine from "@iconify-icons/ri/add-circle-line";
 import More2Fill from "@iconify-icons/ri/more-2-fill";
+import CheckboxBlankCircleFill from "@iconify-icons/ri/checkbox-blank-circle-fill";
+import FileListLine from "@iconify-icons/ri/file-list-line";
 
 addIcon("arrow-right-s-line", ArrowRightSLine);
 addIcon("arrow-left-s-line", ArrowLeftSLine);
@@ -58,6 +60,9 @@ addIcon("24-hour-line", HourLine24);
 addIcon("close-circle-fill", CloseCircleFill);
 addIcon("add-circle-line", AddCircleLine);
 addIcon("more-vertical", More2Fill);
+addIcon("checkbox-blank-circle-fill", CheckboxBlankCircleFill);
+addIcon("log-consule", FileListLine);
+
 
 // Iconify Icon在Vue里离线使用（用于内网环境）https://docs.iconify.design/icon-components/vue/offline.html
 export default defineComponent({

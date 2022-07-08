@@ -1,7 +1,7 @@
 import { $t } from "/@/plugins/i18n";
 const Layout = () => import("/@/layout/index.vue");
 
-const taskManagerRouter = {
+const wfTaskManagerRouter = {
   path: "/task",
   // name: "task",
   component: Layout,
@@ -9,7 +9,7 @@ const taskManagerRouter = {
   meta: {
     icon: "home-filled",
     title: $t("menus.hstaskmanager"),
-    rank: 10,
+    rank: 10
   },
   children: [
     {
@@ -17,10 +17,18 @@ const taskManagerRouter = {
       name: "taskmanager",
       component: () => import("/@/views/taskmanager/index.vue"),
       meta: {
-        title: $t("menus.hstaskmanager"),
-      },
+        title: $t("menus.hstasklist")
+      }
     },
-  ],
+    {
+      path: "/task/create",
+      name: "taskcreate",
+      component: () => import("/@/views/taskmanager/create/index.vue"),
+      meta: {
+        title: $t("menus.hstaskcreate")
+      }
+    }
+  ]
 };
 
-export default taskManagerRouter;
+export default wfTaskManagerRouter;

@@ -15,7 +15,8 @@ export default [
               port: 2345,
               task: [
                 { task_code: "order_timeout_delete", task_status: 0 },
-                { task_code: "order_timeout_notify", task_status: 0 }
+                { task_code: "order_timeout_notify", task_status: 0 },
+                { task_code: "order_timeout_cancel", task_status: 1 }
               ]
             },
             {

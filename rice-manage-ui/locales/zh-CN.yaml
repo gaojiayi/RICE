@@ -27,11 +27,18 @@ menus:
   hslogin: 登陆
   hstaskinstance: 任务实例
   hstaskmanager: 任务管理
+  hstasklist: 任务列表
+  hstaskcreate: 新建任务
   permission: 权限管理
   permissionButton: 按钮权限
   permissionPage: 页面权限
   hsapplication: 应用管理
   hsappDetail: 应用详情
   hsappProcessor: 应用处理器
+  hswftasklist: 工作流任务列表
+  hswftaskcreate: 工作流任务创建
+  hswftaskrecord: 工作流任务执行记录
+  hswfmanager: 工作流管理
+  hsabout: 关于
 status:
   hsLoad: 加载中...

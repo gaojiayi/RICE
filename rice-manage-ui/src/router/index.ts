@@ -34,6 +34,8 @@ import remainingRouter from "./modules/remaining";
 import taskManagerRouter from "./modules/taskmanager";
 import taskInstanceRouter from "./modules/taskinstance";
 import applicationRouter from "./modules/application";
+import wfTaskManagerRouter from "./modules/wfmanager";
+import aboutRouter from "./modules/about";
 
 // //原始静态路由（未做任何处理）
 const routes = [
@@ -41,7 +43,9 @@ const routes = [
   errorRouter,
   taskManagerRouter,
   taskInstanceRouter,
-  applicationRouter
+  applicationRouter,
+  wfTaskManagerRouter,
+  aboutRouter
 ];
 
 // 导出处理后的静态路由（三级及以上的路由全部拍成二级）

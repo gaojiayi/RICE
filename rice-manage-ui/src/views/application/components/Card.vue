@@ -31,7 +31,7 @@ const handleClickShield = (processor: CardPrcessorType) => {
 
 const cardClass = computed(() => [
   "list-card-item",
-  { "list-card-item__disabled": props.processor.server_status == 0 }
+  { "list-card-item__disabled": props.processor.server_status == 1 }
 ]);
 
 const cardLogoClass = computed(() => [
@@ -50,50 +50,62 @@ const cardLogoClass = computed(() => [
           <serviceIcon />
         </div>
         <div class="list-card-item_detail--operation">
-
-            <el-tag
-              :color="processor.server_status == 0 ? '#00a870' : '#eee'"
-              effect="dark"
-              class="mx-1 list-card-item_detail--operation--tag"
-            >
-              {{ processor.server_status == 0 ? "运行中" : "已下线" }}
-            </el-tag>
-            <el-dropdown
-              trigger="click"
-              :disabled="processor.server_status != 0"
-              max-height="2"
-            >
-              <IconifyIconOffline icon="more-vertical" class="icon-more" />
-              <template #dropdown>
-                <el-dropdown-menu :disabled="processor.server_status == 1">
-                  <el-dropdown-item @click="handleClickShield(processor)">
-                    隔离
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-
+          <el-tag
+            :color="processor.server_status == 0 ? '#00a870' : '#eee'"
+            effect="dark"
+            class="mx-1 list-card-item_detail--operation--tag"
+          >
+            {{ processor.server_status == 0 ? "运行中" : "已下线" }}
+          </el-tag>
+          <el-dropdown
+            trigger="click"
+            :disabled="processor.server_status != 0"
+            max-height="2"
+          >
+            <IconifyIconOffline icon="more-vertical" class="icon-more" />
+            <template #dropdown>
+              <el-dropdown-menu :disabled="processor.server_status == 1">
+                <el-dropdown-item @click="handleClickShield(processor)">
+                  隔离
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
 
           <div class="server-address-text">{{ processor.address }}</div>
           <!-- <div>port: {{ processor.port }}</div> -->
         </div>
       </el-row>
-      <p class="list-card-item_detail--name">{{ processor.app_name }}</p>
-      <!-- <template v-for="t in processor.task" :key="t.task_code" >
-        <li class="list-card-item_detail--desc" v-if="t.task_status === 0">
-        <el-icon><CircleCheck /></el-icon>  {{ t.task_code }}
-        </li>
-        <li class="list-card-item_detail--desc" v-if="t.task_status === 0">
-        <el-icon><CircleClose /></el-icon>  {{ t.task_code }}
-        </li>
-      </template> -->
+      <h2>{{ processor.app_name }}</h2>
+      <div class="list-card-item_detail--list">
+        <template v-for="t in processor.task" :key="t.task_code">
+          <p class="list-card-item_detail--task">
+            <iconify-icon-offline
+              icon="checkbox-blank-circle-fill"
+              :class="
+                t.task_status === 0
+                  ? 'icon-task-status'
+                  : 'icon-task-status' + ' icon-task-offline'
+              "
+            />
+            {{ t.task_code }}
+          </p>
+        </template>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
 $text-color-disabled: rgba(0, 0, 0, 0.26);
-
+@keyframes tast-status-animation {
+  from {
+    color: $text-color-disabled;
+  }
+  to {
+    color: rgb(0, 168, 112);
+  }
+}
 .list-card-item {
   display: flex;
   height: 250px;
@@ -127,27 +139,51 @@ $text-color-disabled: rgba(0, 0, 0, 0.26);
         color: #a1c4ff;
       }
     }
+    .list-card-item_detail--list {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      .list-card-item_detail--task {
+        font-size: 16px;
+        line-height: 30px;
+        .icon-task-status {
+          display: inline-block;
+          font-size: 12px;
+          color: rgb(0, 168, 112);
+          animation: tast-status-animation 0.9s infinite;
+        }
+        .icon-task-offline {
+          color: $text-color-disabled;
+          animation-play-state: paused;
+        }
+      }
+    }
 
+    h2 {
+      margin-top: 20px;
+    }
     &--operation {
       // display: flex;
       // height: 100%;
       position: relative;
       &--tag {
-        position:absolute;
+        position: absolute;
         border: 0;
         // top: 0px;
         // margin-right: 10px;
-
       }
-      .el-dropdown{
+      .el-dropdown {
         position: absolute;
         top: 0px;
         right: 0px;
       }
-      .server-address-text{
+      .server-address-text {
         margin-top: 30px;
         text-align: center;
-        color: #5700d9;
+        // color: #2d69b7;
       }
     }
 
@@ -163,17 +199,17 @@ $text-color-disabled: rgba(0, 0, 0, 0.26);
       color: rgba(0, 0, 0, 0.9);
     }
 
-    &--desc {
-      font-size: 12px;
-      line-height: 20px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      margin-bottom: 24px;
-      height: 40px;
-    }
+    // &--desc {
+    //   font-size: 12px;
+    //   line-height: 20px;
+    //   overflow: hidden;
+    //   text-overflow: ellipsis;
+    //   display: -webkit-box;
+    //   -webkit-line-clamp: 2;
+    //   -webkit-box-orient: vertical;
+    //   margin-bottom: 24px;
+    //   height: 40px;
+    // }
   }
 
   &__disabled {

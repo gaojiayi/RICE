@@ -78,13 +78,21 @@ const saveEdit = () => {
   <div>
     <div class="container">
       <div class="handle-box">
+       <!-- <span >任务编码:</span -->
+      <!-- > -->
         <el-input
           v-model="query.name"
           placeholder="任务编码"
+          class="handle-input mr3"
+        ></el-input>
+        <!-- <span >应用ID:</span> -->
+        <el-input
+          v-model="query.name"
+          placeholder="应用ID"
           class="handle-input mr10"
         ></el-input>
-        <el-button type="primary" icon="el-icon-search" @click="searchTaskInfo"
-          >搜索</el-button
+        <el-button type="primary"  @click="searchTaskInfo"
+          ><iconify-icon-offline icon="search"/>搜索</el-button
         >
       </div>
       <el-table
@@ -144,7 +152,7 @@ const saveEdit = () => {
         ></el-table-column>
         <el-table-column
           prop="task_retry_count"
-          label="任务重试次数"
+          label="允许重试次数"
 
           align="left"
         ></el-table-column>
@@ -199,6 +207,14 @@ const saveEdit = () => {
               v-if="scope.row.status === 1"
               >启动</el-button
             >
+             <el-button
+              type="text"
+              icon="el-icon-delete"
+              class="red"
+              @click="handleDelete(scope.$index)"
+              v-if="scope.row.status === 0"
+              >立即运行</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -234,4 +250,11 @@ const saveEdit = () => {
   </div>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.handle-box{
+  margin-bottom: 20px;
+  .handle-input{
+    width: 10%;
+  }
+}
+</style>

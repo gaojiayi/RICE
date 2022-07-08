@@ -14,6 +14,7 @@ const taskInfos = {
       task_retry_count: 2,
       next_trigger_time: "2022-7-1 13:23:50",
       create_time: "2022-1-1 11:33:40",
+      log_visible: false,
       status: 0
     },
     {
@@ -28,6 +29,7 @@ const taskInfos = {
       task_retry_count: 2,
       next_trigger_time: "2022-7-1 13:23:50",
       create_time: "2022-1-1 11:33:40",
+      log_visible: false,
       status: 1
     }
   ],

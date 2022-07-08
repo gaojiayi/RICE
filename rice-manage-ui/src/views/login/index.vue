@@ -67,11 +67,11 @@ watch(imgCode, (value) => {
 <template>
   <img :src="bgDown" class="wave" />
   <img :src="bgUp" class="wave" />
-  <!-- <div class="login-app-desc"><span>下一代高性能分布式调度</span></div> -->
 
   <div class="login-container">
 
     <div class="img">
+    <!--插画地址   https://undraw.co/ -->
       <component :is="currentWeek" />
     </div>
     <div class="login-box">

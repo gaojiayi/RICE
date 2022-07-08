@@ -95,14 +95,11 @@ const handleManageProduct = product => {
 
 <template>
   <div class="main">
-    <div class="w-full flex justify-between mb-4">
-      <el-button :icon="useRenderIcon('add')" @click="formDialogVisible = true">
-        新建产品
-      </el-button>
+    <div class="w-full flex justify-end mb-4">
       <el-input
         style="width: 300px"
         v-model="searchValue"
-        placeholder="请输入产品名称"
+        placeholder="请输入应用名称"
         clearable
       >
         <template #suffix>

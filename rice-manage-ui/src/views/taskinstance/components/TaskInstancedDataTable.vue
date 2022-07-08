@@ -1,13 +1,19 @@
 <script setup lang="ts">
-import { ref, reactive } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ref, reactive ,watch} from "vue";
 import { fetchTaskInfo } from "/@/api/task";
-import { LogDialog, TaskInstanceDataTable } from "./components";
+import { LogDialog } from ".";
 
 defineOptions({
-  name: "taskinstanceinfo"
+  name: "childtaskinstanceinfo"
 });
 
+const props = defineProps({
+  parentTaskInstanceId: { type: String, default: "" },
+  childTaskTableVisible: {
+    type: Boolean,
+    default: false
+  }
+});
 const query = reactive({
   address: "",
   name: "",
@@ -15,14 +21,11 @@ const query = reactive({
   pageSize: 10
 });
 
-const loading = ref(false);
+const childTaskTableVisible = ref(props.childTaskTableVisible);
 
+const loading = ref(false);
 const logDialogVisible = ref(false);
 const logDialogTaskInstanceId = ref("");
-
-const childTaskTableVisible = ref(false);
-const parentTaskInastanceId = ref("");
-
 const taskInfoData = ref([]);
 const pageTotal = ref(0);
 
@@ -35,69 +38,48 @@ const getData = () => {
 };
 getData();
 
-// 查询操作
-const searchTaskInfo = () => {
-  query.pageIndex = 1;
-  getData();
-};
-
 // 分页导航
 const handlePageChange = val => {
   query.pageIndex = val;
   getData();
 };
 
-// 删除操作
-const handleDelete = index => {
-  // 二次确认删除
-  ElMessageBox.confirm("确定要删除吗？", "提示", {
-    type: "warning"
-  })
-    .then(() => {
-      ElMessage.success("删除成功");
-      taskInfoData.value.splice(index, 1);
-    })
-    .catch(() => {});
-};
 
-// 表格编辑时弹窗和保存
-const editVisible = ref(false);
-let form = reactive({
-  name: "",
-  address: ""
-});
-let idx = -1;
-const handleEdit = (index, row) => {
-  idx = index;
-  Object.keys(form).forEach(item => {
-    form[item] = row[item];
-  });
-  editVisible.value = true;
+
+watch(
+  () => props.childTaskTableVisible,
+  val => {
+    childTaskTableVisible.value = val;
+  }
+);
+
+const handleClose = (done: () => void) => {
+  childTaskTableVisible.value = !childTaskTableVisible.value;
+  done();
 };
-const saveEdit = () => {
-  editVisible.value = false;
-  ElMessage.success(`修改第 ${idx + 1} 行成功`);
-  Object.keys(form).forEach(item => {
-    taskInfoData.value[idx][item] = form[item];
-  });
-};
+const emit = defineEmits(["update:child-task-table-visible"]);
+
+
+watch(
+  () => childTaskTableVisible.value,
+  val => {
+    emit("update:child-task-table-visible", val);
+  }
+);
+
+
+
 </script>
 
 <template>
-  <div>
+  <el-dialog
+    v-model="childTaskTableVisible"
+    title="子任务"
+    width="80%"
+    :before-close="handleClose"
+  >
     <div class="container">
-      <div class="handle-box">
-        <!-- <span >任务编码:</span -->
-        <!-- > -->
-        <el-input
-          v-model="query.name"
-          placeholder="任务编码"
-          class="handle-input mr3"
-        ></el-input>
-        <el-button type="primary" @click="searchTaskInfo"
-          ><iconify-icon-offline icon="search" />搜索</el-button
-        >
-      </div>
+
       <el-empty v-if="pageTotal === 0 && !loading" description="暂无搜索结果" />
       <el-table
         :data="taskInfoData"
@@ -153,17 +135,6 @@ const saveEdit = () => {
           align="center"
         ></el-table-column>
 
-        <el-table-column prop="task_type" label="子任务详情" align="center"
-          ><template #default="scope">
-          <!-- v-if="scope.row.parent_instance_id" -->
-            <el-button
-              type="text"
-              @click="childTaskTableVisible = true"
-              >子任务
-            </el-button>
-          </template>
-        </el-table-column>
-
         <el-table-column prop="create_time" label="创建时间" align="center">
         </el-table-column>
         <el-table-column prop="status" label="实例运行状态" align="center">
@@ -206,18 +177,6 @@ const saveEdit = () => {
         ></el-pagination>
       </div>
     </div>
-
-    <!-- 子任务弹出框 -->
-    <TaskInstanceDataTable
-      :parent-task-instance-id="parentTaskInastanceId"
-      :child-task-table-visible="childTaskTableVisible"
-      @update:child-task-table-visible="
-        val => {
-          childTaskTableVisible = val;
-        }
-      "
-    />
-
     <!-- 日志弹出框 -->
     <LogDialog
       :task-instance-id="logDialogTaskInstanceId"
@@ -228,7 +187,7 @@ const saveEdit = () => {
         }
       "
     />
-  </div>
+ </el-dialog>
 </template>
 
 <style lang="scss" scoped>
