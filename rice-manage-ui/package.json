@@ -48,7 +48,9 @@
     "vue": "^3.2.33",
     "vue-i18n": "^9.2.0-beta.35",
     "vue-router": "^4.0.15",
-    "vue-types": "^4.1.1"
+    "vue-types": "^4.1.1",
+    "@logicflow/core": "^1.1.16",
+    "@logicflow/extension": "^1.1.16"
   },
   "devDependencies": {
     "@commitlint/cli": "13.1.0",

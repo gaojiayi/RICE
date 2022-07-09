@@ -3,6 +3,12 @@ import { ref } from "vue";
 import { useRenderIcon } from "/@/components/ReIcon/src/hooks";
 import { ElMessage, ElMessageBox } from "element-plus";
 import CreateAppDialog from "./components/CreateAppDialog.vue";
+import { useRouter, RouteParamsRaw } from "vue-router";
+const router = useRouter();
+
+const skipToTaskCreate = (val: RouteParamsRaw) => {
+  router.push({ name: "taskcreate", params: val });
+};
 
 const INITIAL_DATA = {
   name: "",
@@ -87,6 +93,11 @@ const handleDeleteItem = product => {
                 />
                 <div class="app-title-name">订单系统</div>
                 <div class="app-title-id">ID:34455</div>
+                <el-button
+                  @click="skipToTaskCreate({ appid: 111, appName: '订单系统' })"
+                >
+                  新增任务
+                </el-button>
               </div>
             </div>
 
