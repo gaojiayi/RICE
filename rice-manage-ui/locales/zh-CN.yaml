@@ -36,9 +36,12 @@ menus:
   hsappDetail: 应用详情
   hsappProcessor: 应用处理器
   hswftasklist: 工作流任务列表
-  hswftaskcreate: 工作流任务创建
+  hswftaskoperation: 工作流任务编排
   hswftaskrecord: 工作流任务执行记录
   hswfmanager: 工作流管理
   hsabout: 关于
+  hsintroduce: 介绍
+  hsdoc: 平台文档
+  hsofficial: 官网
 status:
   hsLoad: 加载中...

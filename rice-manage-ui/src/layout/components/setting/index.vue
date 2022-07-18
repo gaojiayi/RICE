@@ -17,11 +17,9 @@ import { emitter } from "/@/utils/mitt";
 import { templateRef } from "@vueuse/core";
 import { debounce } from "/@/utils/debounce";
 import { themeColorsType } from "../../types";
-import { useAppStoreHook } from "/@/store/modules/app";
+import { useAppStoreHook,useEpThemeStoreHook ,useMultiTagsStoreHook} from "/@/store";
 import { shadeBgColor } from "../../theme/element-plus";
-import { useEpThemeStoreHook } from "/@/store/modules/epTheme";
 import { storageLocal, storageSession } from "/@/utils/storage";
-import { useMultiTagsStoreHook } from "/@/store/modules/multiTags";
 import { createNewStyle, writeNewStyle } from "../../theme/element-plus";
 import { toggleTheme } from "@pureadmin/theme/dist/browser-utils";
 

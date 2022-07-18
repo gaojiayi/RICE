@@ -7,7 +7,7 @@ import { storageLocal } from "/@/utils/storage";
 import { useRoute, useRouter } from "vue-router";
 import { ref, computed, watch, onBeforeMount } from "vue";
 import { findRouteByPath, getParentPaths } from "/@/router/utils";
-import { usePermissionStoreHook } from "/@/store/modules/permission";
+import { usePermissionStoreHook } from "/@/store";
 
 const route = useRoute();
 const routers = useRouter().options.routes;

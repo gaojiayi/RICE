@@ -10,9 +10,8 @@ import screenfull from "../screenfull/index.vue";
 import { useRoute, useRouter } from "vue-router";
 import { deviceDetection } from "/@/utils/deviceDetection";
 import { useRenderIcon } from "/@/components/ReIcon/src/hooks";
-import { useEpThemeStoreHook } from "/@/store/modules/epTheme";
+import { useEpThemeStoreHook,usePermissionStoreHook } from "/@/store";
 import { getParentPaths, findRouteByPath } from "/@/router/utils";
-import { usePermissionStoreHook } from "/@/store/modules/permission";
 import globalization from "/@/assets/svg/globalization.svg?component";
 import { ref, watch, nextTick, onMounted, getCurrentInstance } from "vue";
 

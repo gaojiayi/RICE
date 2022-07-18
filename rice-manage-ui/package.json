@@ -50,7 +50,8 @@
     "vue-router": "^4.0.15",
     "vue-types": "^4.1.1",
     "@logicflow/core": "^1.1.16",
-    "@logicflow/extension": "^1.1.16"
+    "@logicflow/extension": "^1.1.16",
+    "vue-json-pretty": "^2.0.2"
   },
   "devDependencies": {
     "@commitlint/cli": "13.1.0",

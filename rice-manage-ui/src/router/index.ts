@@ -7,8 +7,7 @@ import { findIndex } from "lodash-unified";
 import { transformI18n } from "/@/plugins/i18n";
 import { storageSession } from "/@/utils/storage";
 import { buildHierarchyTree } from "/@/utils/tree";
-import { useMultiTagsStoreHook } from "/@/store/modules/multiTags";
-import { usePermissionStoreHook } from "/@/store/modules/permission";
+import { useMultiTagsStoreHook, usePermissionStoreHook } from "/@/store";
 import {
   Router,
   RouteMeta,
@@ -32,7 +31,6 @@ import homeRouter from "./modules/home";
 import errorRouter from "./modules/error";
 import remainingRouter from "./modules/remaining";
 import taskManagerRouter from "./modules/taskmanager";
-import taskInstanceRouter from "./modules/taskinstance";
 import applicationRouter from "./modules/application";
 import wfTaskManagerRouter from "./modules/wfmanager";
 import aboutRouter from "./modules/about";
@@ -42,7 +40,7 @@ const routes = [
   homeRouter,
   errorRouter,
   taskManagerRouter,
-  taskInstanceRouter,
+  // taskInstanceRouter,
   applicationRouter,
   wfTaskManagerRouter,
   aboutRouter
@@ -71,6 +69,7 @@ export const router: Router = createRouter({
   scrollBehavior(to, from, savedPosition) {
     return new Promise(resolve => {
       if (savedPosition) {
+        //savePosition 记录滚动条的坐标，点击前进后退的时候记录。
         return savedPosition;
       } else {
         if (from.meta.saveSrollTop) {

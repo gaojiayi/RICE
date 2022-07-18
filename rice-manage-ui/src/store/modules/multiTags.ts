@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import { store } from "/@/store";
 import { isUrl } from "/@/utils/is";
 import { isEqual } from "lodash-unified";
 import { storageLocal } from "/@/utils/storage";
@@ -104,6 +103,6 @@ export const useMultiTagsStore = defineStore({
   }
 });
 
-export function useMultiTagsStoreHook() {
-  return useMultiTagsStore(store);
-}
+// export function useMultiTagsStoreHook() {
+//   return useMultiTagsStore(store);
+// }

@@ -22,7 +22,7 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { useEpThemeStoreHook } from "/@/store/modules/epTheme";
+import { useEpThemeStoreHook } from "/@/store";
 import { useRenderIcon } from "/@/components/ReIcon/src/hooks";
 import enterOutlined from "/@/assets/svg/enter_outlined.svg?component";
 

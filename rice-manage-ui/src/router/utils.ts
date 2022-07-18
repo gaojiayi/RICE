@@ -11,7 +11,7 @@ import { loadEnv } from "../../build";
 import { useTimeoutFn } from "@vueuse/core";
 import { RouteConfigs } from "/@/layout/types";
 import { buildHierarchyTree } from "/@/utils/tree";
-import { usePermissionStoreHook } from "/@/store/modules/permission";
+import { usePermissionStoreHook } from "/@/store";
 const Layout = () => import("/@/layout/index.vue");
 const IFrame = () => import("/@/layout/frameView.vue");
 // https://cn.vitejs.dev/guide/features.html#glob-import
@@ -125,7 +125,7 @@ function initRouter(name: string) {
             // 防止重复添加路由
             if (
               router.options.routes[0].children.findIndex(
-                value => value.path === v.path
+                value => value.path === v.path  // 返回值为true的索引
               ) !== -1
             ) {
               return;

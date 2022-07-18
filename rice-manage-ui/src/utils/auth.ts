@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { useUserStoreHook } from "/@/store/modules/user";
+import { useUserStoreHook } from "/@/store";
 
 const TokenKey = "authorized-token";
 

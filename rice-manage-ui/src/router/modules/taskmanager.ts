@@ -27,6 +27,14 @@ const wfTaskManagerRouter = {
       meta: {
         title: $t("menus.hstaskcreate")
       }
+    },
+    {
+      path: "/task/instance/info",
+      name: "taskinstanceinfo",
+      component: () => import("/@/views/taskmanager/instance/index.vue"),
+      meta: {
+        title: $t("menus.hstaskinstance")
+      }
     }
   ]
 };

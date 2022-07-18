@@ -27,10 +27,8 @@ import { useRoute, useRouter } from "vue-router";
 import { isEqual, isEmpty } from "lodash-unified";
 import { transformI18n, $t } from "/@/plugins/i18n";
 import { RouteConfigs, tagsViewsType } from "../../types";
-import { useSettingStoreHook } from "/@/store/modules/settings";
+import { useSettingStoreHook,useMultiTagsStoreHook ,usePermissionStoreHook} from "/@/store";
 import { handleAliveRoute, delAliveRoutes } from "/@/router/utils";
-import { useMultiTagsStoreHook } from "/@/store/modules/multiTags";
-import { usePermissionStoreHook } from "/@/store/modules/permission";
 import { toggleClass, removeClass, hasClass } from "/@/utils/operate";
 import { templateRef, useResizeObserver, useDebounceFn } from "@vueuse/core";
 

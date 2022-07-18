@@ -5,7 +5,7 @@ import { updateRules } from "../utils/rule";
 import { message } from "@pureadmin/components";
 import type { FormInstance } from "element-plus";
 import { useVerifyCode } from "../utils/verifyCode";
-import { useUserStoreHook } from "/@/store/modules/user";
+import { useUserStoreHook } from "/@/store";
 import { useRenderIcon } from "/@/components/ReIcon/src/hooks";
 
 const loading = ref(false);

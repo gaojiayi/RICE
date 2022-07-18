@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Motion from "../utils/motion";
 import ReQrcode from "/@/components/ReQrcode";
-import { useUserStoreHook } from "/@/store/modules/user";
+import { useUserStoreHook } from "/@/store";
 </script>
 
 <template>

@@ -12,7 +12,7 @@ import type { FormInstance } from "element-plus";
 import { storageSession } from "/@/utils/storage";
 import { ref, reactive, watch, computed } from "vue";
 import { operates, thirdParty } from "./utils/enums";
-import { useUserStoreHook } from "/@/store/modules/user";
+import { useUserStoreHook } from "/@/store";
 import { bgDown, bgUp,avatar, currentWeek } from "./utils/static";
 import { ReImageVerify } from "/@/components/ReImageVerify";
 import { useRenderIcon } from "/@/components/ReIcon/src/hooks";
@@ -182,10 +182,11 @@ watch(imgCode, (value) => {
                 :key="index"
                 :title="`${item.title}登陆`"
               >
+              <!-- unocss 写法 -->
                 <IconifyIconOnline
                   :icon="`ri:${item.icon}-fill`"
                   width="20"
-                  class="cursor-pointer text-gray-500 hover:text-blue-400"
+                  class="cursor-pointer text-gray-500 hover:text-blue-700"
                 />
               </span>
             </div>

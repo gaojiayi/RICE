@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import { store } from "/@/store";
 import { cacheType } from "./types";
 import { constantMenus } from "/@/router";
 import { cloneDeep } from "lodash-unified";
@@ -68,6 +67,6 @@ export const usePermissionStore = defineStore({
   }
 });
 
-export function usePermissionStoreHook() {
-  return usePermissionStore(store);
-}
+// export function usePermissionStoreHook() {
+//   return usePermissionStore(store);
+// }

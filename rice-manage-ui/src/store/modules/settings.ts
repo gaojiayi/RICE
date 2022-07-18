@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import { store } from "/@/store";
 import { setType } from "./types";
 import { getConfig } from "/@/config";
 
@@ -34,6 +33,6 @@ export const useSettingStore = defineStore({
   }
 });
 
-export function useSettingStoreHook() {
-  return useSettingStore(store);
-}
+// export function useSettingStoreHook() {
+//   return useSettingStore(store);
+// }

@@ -1,4 +1,3 @@
-import { store } from "/@/store";
 import { defineStore } from "pinia";
 import { getConfig } from "/@/config";
 import { storageLocal } from "/@/utils/storage";
@@ -38,6 +37,6 @@ export const useEpThemeStore = defineStore({
   }
 });
 
-export function useEpThemeStoreHook() {
-  return useEpThemeStore(store);
-}
+// export function useEpThemeStoreHook() {
+//   return useEpThemeStore(store);
+// }

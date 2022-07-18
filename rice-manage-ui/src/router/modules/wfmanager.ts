@@ -22,11 +22,11 @@ const taskManagerRouter = {
       }
     },
     {
-      path: "/wf/task/create",
-      name: "wftaskcreat",
+      path: "/wf/task/operation",
+      name: "wftaskoperation",
       component: () => import("/@/views/wf/create/index.vue"),
       meta: {
-        title: $t("menus.hswftaskcreate")
+        title: $t("menus.hswftaskoperation")
       }
     },
     {

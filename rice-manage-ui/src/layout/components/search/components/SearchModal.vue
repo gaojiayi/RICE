@@ -6,7 +6,7 @@ import { deleteChildren } from "/@/utils/tree";
 import { transformI18n } from "/@/plugins/i18n";
 import { useDebounceFn, onKeyStroke } from "@vueuse/core";
 import { ref, watch, computed, nextTick, shallowRef } from "vue";
-import { usePermissionStoreHook } from "/@/store/modules/permission";
+import { usePermissionStoreHook } from "/@/store";
 
 interface Props {
   /** 弹窗显隐 */

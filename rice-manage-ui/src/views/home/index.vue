@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { ReInfinite, RePie, ReLine,ReBar } from "./components";
+import { computed, ref, onMounted } from "vue";
+import { ReInfinite, RePie, ReLine, ReBar } from "./components";
+import { useHomeStoreHook } from "/@/store";
+
+const homeStore = useHomeStoreHook();
 
 const size = ref("");
 const current_time = ref("");
@@ -34,6 +37,11 @@ const blockMargin = computed(() => {
   return {
     marginTop: marginMap[size.value] || marginMap.default
   };
+});
+
+onMounted(() => {
+  homeStore.getStatistic();
+  homeStore.getCollectors();
 });
 </script>
 
@@ -76,7 +84,7 @@ const blockMargin = computed(() => {
                 </div>
 
                 <div class="grid-cont-right">
-                  <div class="grid-num">1234</div>
+                  <div class="grid-num">{{ homeStore.statistic.task_num }}</div>
                   <div>任务总数</div>
                 </div>
               </div>
@@ -97,7 +105,9 @@ const blockMargin = computed(() => {
                 </div>
 
                 <div class="grid-cont-right">
-                  <div class="grid-num">5000</div>
+                  <div class="grid-num">
+                    {{ homeStore.statistic.total_schedule_times }}
+                  </div>
                   <div>总调度次数</div>
                 </div>
               </div>
@@ -114,30 +124,57 @@ const blockMargin = computed(() => {
                   />
                 </div>
                 <div class="grid-cont-right">
-                  <div class="grid-num">321</div>
+                  <div class="grid-num">
+                    {{ homeStore.statistic.scheduler_num }}
+                  </div>
                   <div>调度服务器数</div>
                 </div>
               </div>
             </el-card>
           </el-col>
           <el-col :span="24">
-            <el-card shadow="hover" class="card-controller-info">
+            <el-card shadow="always" class="card-controller-info">
               <el-descriptions class="" title="" :column="1">
-                <el-descriptions-item label="当前控制器地址:" class-name="descriptions-item-label"
-                  >178.134.21.25:8080</el-descriptions-item
+                <el-descriptions-item
+                  label="当前控制器地址:"
+                  class-name="descriptions-item-label"
+                  >{{
+                    homeStore.current_controller_info.current_address
+                  }}</el-descriptions-item
                 >
                 <el-descriptions-item label="主/从:">
-                   <el-tag type="danger" size="small" >主控制器</el-tag></el-descriptions-item
-                >
-                <el-descriptions-item label="启动时间:"
-                  >2022-1-3 12:23:10</el-descriptions-item
-                >
+                  <el-tag
+                    v-if="homeStore.current_controller_info.isMaster"
+                    type="danger"
+                    size="small"
+                    >主控制器</el-tag
+                  >
+                  <el-tag v-else type="success" size="small">从控制器</el-tag>
+                </el-descriptions-item>
+                <el-descriptions-item label="启动时间:">{{
+                  homeStore.current_controller_info.start_time
+                }}</el-descriptions-item>
 
                 <el-descriptions-item label="状态:">
-                  <el-tag size="small">运行中</el-tag>
+                  <el-tag
+                    v-if="homeStore.current_controller_info.status === 0"
+                    size="small"
+                    >运行中</el-tag
+                  >
+                  <el-tag v-else type="info" size="small">已停机</el-tag>
                 </el-descriptions-item>
-                <el-descriptions-item label="其他控制器:"
-                  >178.134.21.26:8080, 178.134.21.27:8080, 178.134.21.28:8080
+                <el-descriptions-item label="其他控制器:">
+                  <el-tag
+                    v-for="item in homeStore.current_controller_info
+                      .other_collectors"
+                    :key="item.address"
+                    :type="item.isMaster ? 'danger' : 'info'"
+                    class="mx-1"
+                    effect="dark"
+                    round
+                  >
+                    {{ item.address }}
+                  </el-tag>
                 </el-descriptions-item>
               </el-descriptions>
             </el-card>
@@ -234,7 +271,7 @@ const blockMargin = computed(() => {
         <el-card>
           <template #header>
             <span style="font-size: 16px; font-weight: 500">
-               应用执行器数
+              应用执行器数
             </span>
           </template>
           <el-skeleton animated :rows="7" :loading="loading">
@@ -290,6 +327,7 @@ const blockMargin = computed(() => {
 
 .card-controller-info {
   margin-top: 38px;
+  height: 220px;
 }
 
 .grid-content {
@@ -354,5 +392,4 @@ $grid3-color: rgb(126, 19, 227);
     color: $grid3-color;
   }
 }
-
 </style>

@@ -8,7 +8,7 @@ import {
   getCurrentInstance
 } from "vue";
 import backTop from "/@/assets/svg/back_top.svg?component";
-import { usePermissionStoreHook } from "/@/store/modules/permission";
+import { usePermissionStoreHook } from "/@/store";
 
 const props = defineProps({
   fixedHeader: Boolean

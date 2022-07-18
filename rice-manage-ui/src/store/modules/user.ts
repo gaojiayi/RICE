@@ -1,11 +1,10 @@
 import { defineStore } from "pinia";
-import { store } from "/@/store";
 import { userType } from "./types";
 import { router } from "/@/router";
 import { storageSession } from "/@/utils/storage";
 import { getLogin, refreshToken } from "/@/api/user";
 import { getToken, setToken, removeToken } from "/@/utils/auth";
-import { useMultiTagsStoreHook } from "/@/store/modules/multiTags";
+import { useMultiTagsStoreHook } from "/@/store";
 
 const data = getToken();
 let token = "";
@@ -19,7 +18,7 @@ if (data) {
 }
 
 export const useUserStore = defineStore({
-  id: "pure-user",
+  id: "rice-user",
   state: (): userType => ({
     token,
     name,
@@ -86,6 +85,6 @@ export const useUserStore = defineStore({
   }
 });
 
-export function useUserStoreHook() {
-  return useUserStore(store);
-}
+// export function useUserStoreHook() {
+//   return useUserStore(store);
+// }

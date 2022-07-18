@@ -1,4 +1,4 @@
-import { usePermissionStoreHook } from "/@/store/modules/permission";
+import { usePermissionStoreHook } from "/@/store";
 import { Directive } from "vue";
 import type { DirectiveBinding } from "vue";
 

@@ -2,10 +2,10 @@ import { $t } from "/@/plugins/i18n";
 const Layout = () => import("/@/layout/index.vue");
 
 const aboutRouter = {
-  path: "/",
+  path: "/about",
   name: "about",
   component: Layout,
-  redirect: "/about/index",
+  redirect: "/about/introduce",
   meta: {
     icon: "home-filled",
     title: $t("menus.hsabout"),
@@ -13,11 +13,27 @@ const aboutRouter = {
   },
   children: [
     {
-      path: "/about/index",
-      name: "aboutindex",
+      path: "/about/introduce",
+      name: "aboutintroduce",
       component: () => import("/@/views/about/index.vue"),
       meta: {
-        title: $t("menus.hsabout")
+        title: $t("menus.hsintroduce")
+      }
+    },
+    {
+      path: "/about/official",
+      name: "aboutofficial",
+      component: () => import("/@/views/about/index.vue"),
+      meta: {
+        title: $t("menus.hsofficial")
+      }
+    },
+    {
+      path: "/about/doc",
+      name: "aboutdoc",
+      component: () => import("/@/views/about/index.vue"),
+      meta: {
+        title: $t("menus.hsdoc")
       }
     }
   ]

@@ -3,7 +3,7 @@ const Layout = () => import("/@/layout/index.vue");
 
 const homeRouter = {
   path: "/",
-  name: "home",
+  name: "welcome",
   component: Layout,
   redirect: "/welcome",
   meta: {

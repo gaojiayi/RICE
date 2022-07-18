@@ -10,7 +10,7 @@ import screenfull from "../screenfull/index.vue";
 import { useRoute, useRouter } from "vue-router";
 import { deviceDetection } from "/@/utils/deviceDetection";
 import { watch, nextTick, onMounted, getCurrentInstance } from "vue";
-import { usePermissionStoreHook } from "/@/store/modules/permission";
+import { usePermissionStoreHook } from "/@/store";
 import globalization from "/@/assets/svg/globalization.svg?component";
 
 const route = useRoute();

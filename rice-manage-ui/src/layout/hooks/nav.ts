@@ -6,8 +6,8 @@ import { routeMetaType } from "../types";
 import { remainingPaths } from "/@/router";
 import { transformI18n } from "/@/plugins/i18n";
 import { storageSession } from "/@/utils/storage";
-import { useAppStoreHook } from "/@/store/modules/app";
-import { useEpThemeStoreHook } from "/@/store/modules/epTheme";
+import { useAppStoreHook } from "/@/store";
+import { useEpThemeStoreHook } from "/@/store";
 
 const errorInfo = "当前路由配置不正确，请检查配置";
 

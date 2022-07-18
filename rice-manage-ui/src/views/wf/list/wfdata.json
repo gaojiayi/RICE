@@ -1,0 +1,213 @@
+{
+  "nodes": [
+    {
+      "id": "Event_2lqu9sq",
+      "type": "bpmn:startEvent",
+      "x": 340,
+      "y": 140,
+      "properties": {
+        "a": "efrwe",
+        "b": "wewe"
+      },
+      "text": {
+        "x": 340,
+        "y": 180,
+        "value": "开始"
+      }
+    },
+    {
+      "id": "a1921fce-50d4-430a-8f78-d7d8cc6452de",
+      "type": "rect",
+      "x": 510,
+      "y": 140,
+      "properties": {
+        "a": "efrwe",
+        "b": "wewe"
+      },
+      "text": {
+        "x": 510,
+        "y": 140,
+        "value": "rice任务"
+      }
+    },
+    {
+      "id": "1a8139f5-470c-4425-93bb-292f0516b03f",
+      "type": "rect",
+      "x": 800,
+      "y": 140,
+      "properties": {
+        "a": "efrwe",
+        "b": "wewe"
+      },
+      "text": {
+        "x": 800,
+        "y": 140,
+        "value": "rice任务"
+      }
+    },
+    {
+      "id": "efed3536-7bf8-45e2-b972-11a5073c2418",
+      "type": "polygon",
+      "x": 660,
+      "y": 140,
+      "properties": {
+        "a": "efrwe",
+        "b": "wewe"
+      },
+      "text": {
+        "x": 660,
+        "y": 140,
+        "value": "条件"
+      }
+    },
+    {
+      "id": "Event_2r39l6a",
+      "type": "bpmn:endEvent",
+      "x": 940,
+      "y": 140,
+      "properties": {
+        "a": "efrwe",
+        "b": "wewe"
+      },
+      "text": {
+        "x": 940,
+        "y": 180,
+        "value": "结束"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "Flow_0p507jp",
+      "type": "bpmn:sequenceFlow",
+      "sourceNodeId": "a1921fce-50d4-430a-8f78-d7d8cc6452de",
+      "targetNodeId": "efed3536-7bf8-45e2-b972-11a5073c2418",
+      "startPoint": {
+        "x": 560,
+        "y": 140
+      },
+      "endPoint": {
+        "x": 610,
+        "y": 140
+      },
+      "properties": {},
+      "pointsList": [
+        {
+          "x": 560,
+          "y": 140
+        },
+        {
+          "x": 590,
+          "y": 140
+        },
+        {
+          "x": 590,
+          "y": 140
+        },
+        {
+          "x": 580,
+          "y": 140
+        },
+        {
+          "x": 580,
+          "y": 140
+        },
+        {
+          "x": 610,
+          "y": 140
+        }
+      ]
+    },
+    {
+      "id": "Flow_35ir65o",
+      "type": "bpmn:sequenceFlow",
+      "sourceNodeId": "Event_2lqu9sq",
+      "targetNodeId": "a1921fce-50d4-430a-8f78-d7d8cc6452de",
+      "startPoint": {
+        "x": 358,
+        "y": 140
+      },
+      "endPoint": {
+        "x": 460,
+        "y": 140
+      },
+      "properties": {},
+      "pointsList": [
+        {
+          "x": 358,
+          "y": 140
+        },
+        {
+          "x": 460,
+          "y": 140
+        }
+      ]
+    },
+    {
+      "id": "Flow_2shhans",
+      "type": "bpmn:sequenceFlow",
+      "sourceNodeId": "efed3536-7bf8-45e2-b972-11a5073c2418",
+      "targetNodeId": "1a8139f5-470c-4425-93bb-292f0516b03f",
+      "startPoint": {
+        "x": 710,
+        "y": 140
+      },
+      "endPoint": {
+        "x": 750,
+        "y": 140
+      },
+      "properties": {},
+      "pointsList": [
+        {
+          "x": 710,
+          "y": 140
+        },
+        {
+          "x": 740,
+          "y": 140
+        },
+        {
+          "x": 740,
+          "y": 140
+        },
+        {
+          "x": 720,
+          "y": 140
+        },
+        {
+          "x": 720,
+          "y": 140
+        },
+        {
+          "x": 750,
+          "y": 140
+        }
+      ]
+    },
+    {
+      "id": "Flow_1c6lc30",
+      "type": "bpmn:sequenceFlow",
+      "sourceNodeId": "1a8139f5-470c-4425-93bb-292f0516b03f",
+      "targetNodeId": "Event_2r39l6a",
+      "startPoint": {
+        "x": 850,
+        "y": 140
+      },
+      "endPoint": {
+        "x": 922,
+        "y": 140
+      },
+      "properties": {},
+      "pointsList": [
+        {
+          "x": 850,
+          "y": 140
+        },
+        {
+          "x": 922,
+          "y": 140
+        }
+      ]
+    }
+  ]
+}

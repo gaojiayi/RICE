@@ -1,4 +1,3 @@
-import { store } from "/@/store";
 import { appType } from "./types";
 import { defineStore } from "pinia";
 import { getConfig } from "/@/config";
@@ -62,6 +61,6 @@ export const useAppStore = defineStore({
   }
 });
 
-export function useAppStoreHook() {
-  return useAppStore(store);
-}
+// export function useAppStoreHook() {
+//   return useAppStore(store);
+// }

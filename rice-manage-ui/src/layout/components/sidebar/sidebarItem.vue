@@ -3,7 +3,7 @@ import path from "path";
 import { useNav } from "../../hooks/nav";
 import { childrenType } from "../../types";
 import { transformI18n } from "/@/plugins/i18n";
-import { useAppStoreHook } from "/@/store/modules/app";
+import { useAppStoreHook } from "/@/store";
 import { useRenderIcon } from "/@/components/ReIcon/src/hooks";
 import { ref, PropType, nextTick, computed, CSSProperties } from "vue";
 

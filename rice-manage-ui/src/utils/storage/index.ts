@@ -41,6 +41,12 @@ class localStorageProxy extends sessionStorageProxy implements ProxyStorage {
   }
 }
 
+// sessionStorage
+// 临时存储，为每一个数据源维持一个存储区域，在浏览器打开期间存在，包括页面重新加载。
+
 export const storageSession = new sessionStorageProxy(sessionStorage);
+
+// localStorage
+// 长期存储，与 sessionStorage 一样，但是浏览器关闭后，数据依然会一直存在。
 
 export const storageLocal = new localStorageProxy(localStorage);

@@ -1,7 +1,7 @@
 import { reactive } from "vue";
 import { isPhone } from "/@/utils/is";
 import type { FormRules } from "element-plus";
-import { useUserStoreHook } from "/@/store/modules/user";
+import { useUserStoreHook } from "/@/store";
 
 /** 6位数字验证码正则 */
 export const REGEXP_SIX = /^\d{6}$/;
