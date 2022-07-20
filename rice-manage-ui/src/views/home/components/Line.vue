@@ -1,39 +1,56 @@
 <script setup lang="ts">
 import { ECharts } from "echarts";
 import echarts from "/@/plugins/echarts";
-import { onBeforeMount, onMounted, nextTick, computed } from "vue";
+import { onBeforeMount, onMounted, nextTick, computed, PropType } from "vue";
 import { useEventListener, tryOnUnmounted, useTimeoutFn } from "@vueuse/core";
+import { it } from "element-plus/lib/locale";
 
 let echartInstance: ECharts;
+
+interface ColumnProps {
+  date: string;
+  num: number;
+}
 
 const props = defineProps({
   index: {
     type: Number,
     default: 0
+  },
+  lineData: {
+    type: Array as PropType<ColumnProps[]>,
+    default: []
   }
 });
 
-const formatDate = (time: any) => {
-  // 格式化日期，获取今天的日期
-  const Dates = new Date(time);
-  const year: number = Dates.getFullYear();
-  const month: any =
-    Dates.getMonth() + 1 < 10
-      ? "0" + (Dates.getMonth() + 1)
-      : Dates.getMonth() + 1;
-  const day: any =
-    Dates.getDate() < 10 ? "0" + Dates.getDate() : Dates.getDate();
-  return year + "-" + month + "-" + day;
-};
+// const formatDate = (time: any) => {
+//   // 格式化日期，获取今天的日期
+//   const Dates = new Date(time);
+//   const year: number = Dates.getFullYear();
+//   const month: any =
+//     Dates.getMonth() + 1 < 10
+//       ? "0" + (Dates.getMonth() + 1)
+//       : Dates.getMonth() + 1;
+//   const day: any =
+//     Dates.getDate() < 10 ? "0" + Dates.getDate() : Dates.getDate();
+//   return year + "-" + month + "-" + day;
+// };
 
 const getLineData = () => {
   const week: Array<any> = [];
-  for (let i = 6; i >= 0; i--) {
-    week.push(formatDate(new Date().getTime() + -1000 * 3600 * 24 * i));
-  }
+  const datay: Array<number> = [];
+  // for (let i = 6; i >= 0; i--) {
+  //   week.push(formatDate(new Date().getTime() + -1000 * 3600 * 24 * i));
+  // }
+
+  props.lineData.forEach(item => {
+    week.push(item.date);
+    datay.push(item.num);
+  });
+
   return {
     datax: week,
-    datay: [3, 204, 1079, 1079, 1079, 2079, 4455]
+    datay: datay
   };
 };
 
@@ -52,7 +69,7 @@ const echartData = {
     axisLabel: {
       interval: 0,
       show: true,
-      rotate:45
+      rotate: 45
     },
     data: []
   },

@@ -1,7 +1,12 @@
 import { getCurrentInstance } from "vue";
 import { defineStore } from "pinia";
 import { HomeType, OtherCollectorType } from "./type";
-import { getStatisticsinfo, getCollectorInfo } from "/@/api/home";
+import {
+  getStatisticsinfo,
+  getCollectorInfo,
+  getLastestTaskInstance,
+  getChartData
+} from "/@/api/home";
 
 export const useHomeStore = defineStore({
   id: "home",
@@ -18,15 +23,24 @@ export const useHomeStore = defineStore({
       status: 0,
       other_collectors: []
     },
-    task_info_intime: {
+    task_info_intime: [{
       trigger_time: "",
       task_name: "",
       app_name: "",
       processor_address: "",
       scheduler_address: "",
       status: 0
-    },
-    chart_data: {}
+    }],
+    chart_data: {
+      schedule_num_for_week: [],
+      app_processor_num_rank: [],
+      task_success_rate: {
+        timeout: 0,
+        success: 0,
+        failed: 0,
+        execption:0
+      }
+    }
   }),
   actions: {
     async getStatistic() {
@@ -51,6 +65,14 @@ export const useHomeStore = defineStore({
         }
       }
       this.current_controller_info.other_collectors = otherCollectors;
+    },
+    async getLastestTaskInstance() {
+      let { data } = await getLastestTaskInstance();
+      this.task_info_intime = data;
+    },
+    async getChartInfo() {
+      let { data } = await getChartData();
+      this.chart_data = data
     }
   }
 });

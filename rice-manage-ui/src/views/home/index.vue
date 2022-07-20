@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from "vue";
+import { computed, ref, onMounted, reactive, toRefs } from "vue";
 import { ReInfinite, RePie, ReLine, ReBar } from "./components";
 import { useHomeStoreHook } from "/@/store";
 
@@ -13,10 +13,13 @@ const change_clock = (time: string) => {
 };
 
 const date: Date = new Date();
-let loading = ref<boolean>(true);
-setTimeout(() => {
-  loading.value = !loading.value;
-}, 800);
+const loading = reactive({
+  loadingInfinte: true,
+  loadingPie: true,
+  loadingbar: true,
+  loadingLine: true
+});
+let { loadingInfinte, loadingPie, loadingbar, loadingLine } = toRefs(loading);
 
 const iconStyle = computed(() => {
   const marginMap = {
@@ -42,6 +45,14 @@ const blockMargin = computed(() => {
 onMounted(() => {
   homeStore.getStatistic();
   homeStore.getCollectors();
+  homeStore.getLastestTaskInstance().then(() => {
+    loadingInfinte.value = !loadingInfinte.value;
+  });
+  homeStore.getChartInfo().then(() => {
+    loadingPie.value = !loadingPie.value;
+    loadingbar.value = !loadingbar.value;
+    loadingLine.value = !loadingLine.value;
+  });
 });
 </script>
 
@@ -208,9 +219,9 @@ onMounted(() => {
               调度实时动态
             </span>
           </template>
-          <el-skeleton animated :rows="7" :loading="loading">
+          <el-skeleton animated :rows="7" :loading="loadingInfinte">
             <template #default>
-              <ReInfinite />
+              <ReInfinite :listData="homeStore.task_info_intime" />
             </template>
           </el-skeleton>
         </el-card>
@@ -240,9 +251,9 @@ onMounted(() => {
           <template #header>
             <span style="font-size: 16px; font-weight: 500"> 任务成功率 </span>
           </template>
-          <el-skeleton animated :rows="7" :loading="loading">
+          <el-skeleton animated :rows="7" :loading="loadingPie">
             <template #default>
-              <RePie />
+              <RePie :pieData="homeStore.chart_data.task_success_rate" />
             </template>
           </el-skeleton>
         </el-card>
@@ -274,9 +285,9 @@ onMounted(() => {
               应用执行器数
             </span>
           </template>
-          <el-skeleton animated :rows="7" :loading="loading">
+          <el-skeleton animated :rows="7" :loading="loadingbar">
             <template #default>
-              <ReBar />
+              <ReBar :barData="homeStore.chart_data.app_processor_num_rank" />
             </template>
           </el-skeleton>
         </el-card>
@@ -308,9 +319,9 @@ onMounted(() => {
               单日调度统计
             </span>
           </template>
-          <el-skeleton animated :rows="7" :loading="loading">
+          <el-skeleton animated :rows="7" :loading="loadingLine">
             <template #default>
-              <ReLine />
+              <ReLine :line-data="homeStore.chart_data.schedule_num_for_week" />
             </template>
           </el-skeleton>
         </el-card>

@@ -1,15 +1,24 @@
 <script setup lang="ts">
 import { ECharts } from "echarts";
 import echarts from "/@/plugins/echarts";
-import { onBeforeMount, onMounted, nextTick } from "vue";
+import { onBeforeMount, onMounted, nextTick, PropType } from "vue";
 import { useEventListener, tryOnUnmounted, useTimeoutFn } from "@vueuse/core";
+import { propTypes } from "/@/utils/propTypes";
 
 let echartInstance: ECharts;
 
+interface ColumnProps {
+  app_name: string;
+  processor_num: number;
+}
 const props = defineProps({
   index: {
     type: Number,
     default: 0
+  },
+  barData: {
+    type: Array as PropType<ColumnProps[]>,
+    default: []
   }
 });
 
@@ -19,6 +28,13 @@ function initechartInstance() {
   // @ts-ignore
   echartInstance = echarts.init(echartDom);
   echartInstance.clear(); //清除旧画布 重新渲染
+  let barDataX = [];
+  let barDataY = [];
+
+  props.barData.forEach(item => {
+    barDataX.push(item.app_name);
+    barDataY.push(item.processor_num);
+  });
 
   echartInstance.setOption({
     tooltip: {
@@ -43,7 +59,7 @@ function initechartInstance() {
           // width: "70",
           // overflow: "truncate"
         },
-        data: ["订单系统", "商品系统", "检索系统", "营销系统"]
+        data: barDataX
       }
     ],
     yAxis: [
@@ -55,7 +71,7 @@ function initechartInstance() {
       {
         name: "执行服务器数量",
         type: "bar",
-        data: [3, 204, 1079, 1079],
+        data: barDataY,
         itemStyle: {
           color: "#31b485" // 定义柱子的颜色
         }

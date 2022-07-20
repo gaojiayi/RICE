@@ -24,9 +24,31 @@ export type CurrentControllerInfoType = {
   status: number;
   other_collectors?: OtherCollectorType[];
 };
+
+export type AppProcessorNumRankType = {
+  app_name: string;
+  processor_num: number;
+};
+
+export type ScheduleNumForWeekType = {
+  date: string;
+  num: number;
+};
+
+export type TaskSuccessRateType = {
+  timeout: number;
+  failed: number;
+  success: number;
+  execption: number;
+};
+export type ChartType = {
+  task_success_rate: TaskSuccessRateType;
+  app_processor_num_rank: Array<AppProcessorNumRankType>;
+  schedule_num_for_week: ScheduleNumForWeekType[];
+};
 export type HomeType = {
   statistic: StatisticType;
   current_controller_info: CurrentControllerInfoType;
-  task_info_intime: TaskInfoIntimeType;
-  chart_data: Object;
+  task_info_intime: TaskInfoIntimeType[];
+  chart_data: ChartType;
 };

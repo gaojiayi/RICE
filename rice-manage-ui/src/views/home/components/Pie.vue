@@ -3,15 +3,35 @@ import { ECharts } from "echarts";
 import echarts from "/@/plugins/echarts";
 import { onBeforeMount, onMounted, nextTick } from "vue";
 import { useEventListener, tryOnUnmounted, useTimeoutFn } from "@vueuse/core";
+// import { TaskSuccessRateType} from "/@/store/home/type"
 
+interface PieDataType {
+  timeout: number;
+  failed: number;
+  success: number;
+  execption: number;
+}
 let echartInstance: ECharts;
 
 const props = defineProps({
   index: {
     type: Number,
     default: 0
+  },
+  pieData: {
+    type: Object as PropType<PieDataType>,
+    default: {}
   }
 });
+
+const pieData2RenderData = () => {
+  let data = [];
+  data.push({ name: "成功", value: props.pieData.success });
+  data.push({ name: "失败", value: props.pieData.failed });
+  data.push({ name: "异常", value: props.pieData.execption });
+  data.push({ name: "超时", value: props.pieData.timeout });
+  return data
+};
 
 function initechartInstance() {
   const echartDom = document.querySelector(".pie" + props.index);
@@ -32,12 +52,12 @@ function initechartInstance() {
         name: "任务调度统计",
         type: "pie",
         radius: ["40%", "70%"],
-                center: ["40%", "50%"],
+        center: ["40%", "50%"],
 
         label: {
           show: true,
           // position: "center",
-          formatter: '{b}: {c}'
+          formatter: "{b}: {c}"
         },
         emphasis: {
           label: {
@@ -49,12 +69,8 @@ function initechartInstance() {
         labelLine: {
           show: true
         },
-        data: [
-          { value: 1079, name: "成功" },
-          { value: 79, name: "异常" },
-          { value: 204, name: "失败" },
-          { value: 3, name: "超时" }
-        ],
+        data: pieData2RenderData()
+
         // emphasis: {
         //   itemStyle: {
         //     shadowBlur: 10,

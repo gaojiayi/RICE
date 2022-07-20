@@ -2,115 +2,17 @@
 import { ref, reactive } from "vue";
 import { templateRef } from "@vueuse/core";
 import SeamlessScroll from "/@/components/ReSeamlessScroll";
+import { TaskInfoIntimeType } from "/@/store/home/type";
 
 // 定义scroll是一个标签引用
 const scroll = templateRef<ElRef | null>("scroll", null);
-let listData = ref([
-  {
-    triger_time: "2021-09-01",
-    task_name: "vue-pure-admin",
-    app_name: "1000",
-    processor: "129.23.56.112",
-    scheduler: "134.23,1.12",
-    result: "成功"
-  },
-  {
-    triger_time: "2021-09-01",
-    task_name: "vue-pure-admin",
-    app_name: "1000",
-    processor: "129.23.56.112",
-    scheduler: "134.23,1.12",
-    result: "失败"
-  },
-  {
-    triger_time: "2021-09-01",
-    task_name: "vue-pure-admin",
-    app_name: "1000",
-    processor: "129.23.56.112",
-    scheduler: "134.23,1.12",
-    result: "失败"
-  },
-  {
-    triger_time: "2021-09-01",
-    task_name: "vue-pure-admin",
-    app_name: "1000",
-    processor: "129.23.56.112",
-    scheduler: "134.23,1.12",
-    result: "失败"
-  },
-  {
-    triger_time: "2021-09-01",
-    task_name: "vue-pure-admin",
-    app_name: "1000",
-    processor: "129.23.56.112",
-    scheduler: "134.23,1.12",
-    result: "失败"
-  },
-  {
-    triger_time: "2021-09-01",
-    task_name: "vue-pure-admin",
-    app_name: "1000",
-    processor: "129.23.56.112",
-    scheduler: "134.23,1.12",
-    result: "失败"
-  },
-  {
-    triger_time: "2021-09-01",
-    task_name: "vue-pure-admin",
-    app_name: "1000",
-    processor: "129.23.56.112",
-    scheduler: "134.23,1.12",
-    result: "失败"
-  },
-  {
-    triger_time: "2021-09-01",
-    task_name: "vue-pure-admin",
-    app_name: "1000",
-    processor: "129.23.56.112",
-    scheduler: "134.23,1.12",
-    result: "失败"
-  },
-  {
-    triger_time: "2021-09-01",
-    task_name: "vue-pure-admin",
-    app_name: "1000",
-    processor: "129.23.56.112",
-    scheduler: "134.23,1.12",
-    result: "失败"
-  },
-  {
-    triger_time: "2021-09-01",
-    task_name: "vue-pure-admin",
-    app_name: "1000",
-    processor: "129.23.56.112",
-    scheduler: "134.23,1.12",
-    result: "失败"
-  },
-  {
-    triger_time: "2021-09-01",
-    task_name: "vue-pure-admin",
-    app_name: "1000",
-    processor: "129.23.56.112",
-    scheduler: "134.23,1.12",
-    result: "失败"
-  },
-  {
-    triger_time: "2021-09-01",
-    task_name: "vue-pure-admin",
-    app_name: "1000",
-    processor: "129.23.56.112",
-    scheduler: "134.23,1.12",
-    result: "失败"
-  },
-  {
-    triger_time: "2021-09-01",
-    task_name: "vue-pure-admin",
-    app_name: "1000",
-    processor: "129.23.56.112",
-    scheduler: "134.23,1.12",
-    result: "失败"
+const props = defineProps({
+  listData: {
+    type: Array as () => Array<TaskInfoIntimeType>,
+    default: () => []
   }
-]);
+});
+
 let classOption = reactive({
   direction: "top"
 });
@@ -128,18 +30,22 @@ let classOption = reactive({
     </ul>
     <SeamlessScroll
       ref="scroll"
-      :data="listData"
+      :data="props.listData"
       :class-option="classOption"
       class="warp"
     >
       <ul class="item">
-        <li v-for="(item, index) in listData" :key="index">
-          <span v-text="item.triger_time" />
+        <li v-for="(item, index) in props.listData" :key="index" style="font-size: 10px;" >
+          <span v-text="item.trigger_time" />
           <span v-text="item.task_name" />
           <span v-text="item.app_name" />
-          <span v-text="item.processor" />
-          <span v-text="item.scheduler" />
-          <span v-text="item.result" />
+          <span v-text="item.processor_address" />
+          <span v-text="item.scheduler_address" />
+          <span v-if="item.status == 0" v-text="'待执行'" style="color: green" />
+          <span v-if="item.status == 1" v-text="'正在执行'" style="color: green" />
+          <span v-if="item.status == 2" v-text="'完成'" style="color: green" />
+          <span v-if="item.status == 3" v-text="'失败'" style="color: red" />
+          <span v-if="item.status == 4" v-text="'超时'" style="color: red" />
         </li>
       </ul>
     </SeamlessScroll>
