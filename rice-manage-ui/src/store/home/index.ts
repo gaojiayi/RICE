@@ -1,4 +1,3 @@
-import { getCurrentInstance } from "vue";
 import { defineStore } from "pinia";
 import { HomeType, OtherCollectorType } from "./type";
 import {

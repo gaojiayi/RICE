@@ -7,5 +7,5 @@ interface ReponseType extends Promise<any> {
 }
 
 export const fetchTaskInfo = (data?: object) : ReponseType=> {
-  return http.request("get", "/fetchTaskInfo", { data });
+  return http.request("get", "/task/list", { data });
 };

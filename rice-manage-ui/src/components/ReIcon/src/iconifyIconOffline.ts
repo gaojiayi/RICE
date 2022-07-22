@@ -44,6 +44,11 @@ import AddCircleLine from "@iconify-icons/ri/add-circle-line";
 import More2Fill from "@iconify-icons/ri/more-2-fill";
 import CheckboxBlankCircleFill from "@iconify-icons/ri/checkbox-blank-circle-fill";
 import FileListLine from "@iconify-icons/ri/file-list-line";
+import stopFill from "@iconify-icons/ri/stop-fill";
+import startFill from "@iconify-icons/ri/play-fill";
+import editFill from "@iconify-icons/ri/edit-2-fill";
+import restartFill from "@iconify-icons/ri/restart-line";
+
 
 addIcon("arrow-right-s-line", ArrowRightSLine);
 addIcon("arrow-left-s-line", ArrowLeftSLine);
@@ -62,8 +67,10 @@ addIcon("add-circle-line", AddCircleLine);
 addIcon("more-vertical", More2Fill);
 addIcon("checkbox-blank-circle-fill", CheckboxBlankCircleFill);
 addIcon("log-consule", FileListLine);
-
-
+addIcon("stop-fill", stopFill);
+addIcon("start-fill", startFill);
+addIcon("edit-fill", editFill);
+addIcon("restart-fill", restartFill);
 // Iconify Icon在Vue里离线使用（用于内网环境）https://docs.iconify.design/icon-components/vue/offline.html
 export default defineComponent({
   name: "IconifyIcon",

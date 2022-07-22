@@ -7,6 +7,7 @@ import { usePermissionStore } from "./modules/permission";
 import { useSettingStore } from "./modules/settings";
 import { useUserStore } from "./modules/user";
 import { useHomeStore } from "./home/index";
+import { useTaskListStore } from "./taskmanager/index";
 const store = createPinia();
 
 export function setupStore(app: App<Element>) {
@@ -40,6 +41,12 @@ const useUserStoreHook = () => {
 const useHomeStoreHook = () => {
   return useHomeStore(store);
 };
+
+const useTaskManagerHook = () => {
+  return {
+    taskList: useTaskListStore(store)
+  };
+};
 export {
   useAppStoreHook,
   useEpThemeStoreHook,
@@ -47,5 +54,6 @@ export {
   usePermissionStoreHook,
   useSettingStoreHook,
   useUserStoreHook,
-  useHomeStoreHook
+  useHomeStoreHook,
+  useTaskManagerHook
 };

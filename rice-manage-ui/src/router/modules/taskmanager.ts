@@ -5,17 +5,17 @@ const wfTaskManagerRouter = {
   path: "/task",
   // name: "task",
   component: Layout,
-  redirect: "/task/index",
+  redirect: "/task/list",
   meta: {
-    icon: "home-filled",
+    icon: "log-consule",
     title: $t("menus.hstaskmanager"),
     rank: 10
   },
   children: [
     {
-      path: "/task/index",
-      name: "taskmanager",
-      component: () => import("/@/views/taskmanager/index.vue"),
+      path: "/task/list",
+      name: "taskmanagerlist",
+      component: () => import("/@/views/taskmanager/list/index.vue"),
       meta: {
         title: $t("menus.hstasklist")
       }
