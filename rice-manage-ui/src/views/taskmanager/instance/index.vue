@@ -3,11 +3,12 @@ import { ref, reactive } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { fetchTaskInfo } from "/@/api/task";
 import { LogDialog, TaskInstanceDataTable } from "./components";
-
+import { useTaskManagerHook} from "/@/store"
 defineOptions({
   name: "taskinstanceinfo"
 });
 
+const taskInstanceStore = useTaskManagerHook().taskInstance;
 const query = reactive({
   address: "",
   name: "",
@@ -28,59 +29,25 @@ const pageTotal = ref(0);
 
 // 获取表格数据
 const getData = () => {
-  fetchTaskInfo(query).then(res => {
+  taskInstanceStore.FETCH_INSTANCE_BY_CODE().then(res => {
     taskInfoData.value = res.list;
-    pageTotal.value = res.pageTotal || 50;
+    pageTotal.value = res.pageTotal || 0;
   });
 };
 getData();
 
 // 查询操作
 const searchTaskInfo = () => {
-  query.pageIndex = 1;
+  taskInstanceStore.queryParam.pageIndex  = 1;
   getData();
 };
 
 // 分页导航
 const handlePageChange = val => {
-  query.pageIndex = val;
+  taskInstanceStore.queryParam.pageIndex = val;
   getData();
 };
 
-// 删除操作
-const handleDelete = index => {
-  // 二次确认删除
-  ElMessageBox.confirm("确定要删除吗？", "提示", {
-    type: "warning"
-  })
-    .then(() => {
-      ElMessage.success("删除成功");
-      taskInfoData.value.splice(index, 1);
-    })
-    .catch(() => {});
-};
-
-// 表格编辑时弹窗和保存
-const editVisible = ref(false);
-let form = reactive({
-  name: "",
-  address: ""
-});
-let idx = -1;
-const handleEdit = (index, row) => {
-  idx = index;
-  Object.keys(form).forEach(item => {
-    form[item] = row[item];
-  });
-  editVisible.value = true;
-};
-const saveEdit = () => {
-  editVisible.value = false;
-  ElMessage.success(`修改第 ${idx + 1} 行成功`);
-  Object.keys(form).forEach(item => {
-    taskInfoData.value[idx][item] = form[item];
-  });
-};
 </script>
 
 <template>
@@ -90,7 +57,7 @@ const saveEdit = () => {
         <!-- <span >任务编码:</span -->
         <!-- > -->
         <el-input
-          v-model="query.name"
+          v-model="taskInstanceStore.queryParam.taskCode"
           placeholder="任务编码"
           class="handle-input mr3"
         ></el-input>
@@ -98,13 +65,12 @@ const saveEdit = () => {
           ><iconify-icon-offline icon="search" />搜索</el-button
         >
       </div>
-      <el-empty v-if="pageTotal === 0 && !loading" description="暂无搜索结果" />
+      <!-- <el-empty v-if="pageTotal === 0 && !loading" description="暂无搜索结果" /> -->
       <el-table
         :data="taskInfoData"
         v-loading="loading"
         stripe
         class="table"
-        ref="multipleTable"
         header-cell-class-name="table-header"
       >
         <el-table-column
@@ -113,32 +79,32 @@ const saveEdit = () => {
           align="center"
         ></el-table-column>
         <el-table-column
-          prop="task_code"
+          prop="taskCode"
           label="任务编码"
           align="center"
         ></el-table-column>
         <el-table-column
-          prop="instance_params"
+          prop="instanceParams"
           label="运行参数"
           align="center"
         ></el-table-column>
         <el-table-column
-          prop="actual_trigger_time"
+          prop="actualTriggerTime"
           label="触发时间"
           align="center"
         ></el-table-column>
         <el-table-column
-          prop="running_times"
+          prop="runningTimes"
           label="运行时间"
           align="center"
         ></el-table-column>
-        <el-table-column
+        <!-- <el-table-column
           prop="type"
           label="任务类型"
           align="center"
-        ></el-table-column>
+        ></el-table-column> -->
         <el-table-column
-          prop="task_tracker_address"
+          prop="taskTrackerAddress"
           label="执行器地址"
           align="center"
         ></el-table-column>
@@ -148,15 +114,15 @@ const saveEdit = () => {
           align="center"
         ></el-table-column>
         <el-table-column
-          prop="finished_time"
+          prop="finishedTime"
           label="完成时间"
           align="center"
         ></el-table-column>
 
-        <el-table-column prop="task_type" label="子任务详情" align="center"
+        <el-table-column prop="" label="子任务详情" align="center"
           ><template #default="scope">
           <!-- v-if="scope.row.parent_instance_id" -->
-            <el-button
+            <el-button  v-if="scope.row.parentInstanceId"
               type="text"
               @click="childTaskTableVisible = true"
               >子任务
@@ -164,7 +130,7 @@ const saveEdit = () => {
           </template>
         </el-table-column>
 
-        <el-table-column prop="create_time" label="创建时间" align="center">
+        <el-table-column prop="createTime" label="创建时间" align="center">
         </el-table-column>
         <el-table-column prop="status" label="实例运行状态" align="center">
           <template #default="scope">
@@ -182,7 +148,7 @@ const saveEdit = () => {
         </el-table-column>
         <el-table-column label="日志" width="" align="center">
           <template #default="scope">
-            <el-button
+            <el-button   v-if="!scope.row.parentInstanceId"
               type="text"
               @click="
                 () => {
@@ -190,7 +156,7 @@ const saveEdit = () => {
                   logDialogTaskInstanceId = scope.row.task_instance_id;
                 }
               "
-              ><IconifyIconOffline icon="log-consule" />
+              ><IconifyIconOffline icon="log-consule" class="icon-log-consule"/>
             </el-button>
           </template>
         </el-table-column>
@@ -239,5 +205,8 @@ const saveEdit = () => {
   .handle-input {
     width: 10%;
   }
+}
+.icon-log-consule{
+  font-size: 20px;
 }
 </style>

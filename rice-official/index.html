@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- // CSS FILES // -->
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="bootstrap-4.1.1-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+        integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <!-- OWl Carousel CSS Files -->
+    <link rel="stylesheet" href="js/plugins/owl-carousel/owl.carousel.css">
+    <link rel="stylesheet" href="js/plugins/owl-carousel/owl.theme.css">
+    <link rel="stylesheet" href="js/plugins/owl-carousel/owl.transitions.css">
+    <!-- ANIMATE CSS -->
+    <link rel="stylesheet" href="css/animate.css">
+    <!-- Video Pop Up Plugin -->
+    <link rel="stylesheet" href="js/plugins/YouTube_PopUp-master/YouTubePopUp.css">
+    <!-- PRELOADER -->
+    <link rel="stylesheet" href="css/preloader.css">
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <title>RICE - Faster And More Accurate</title>
+    <script src="https://code.iconify.design/2/2.2.1/iconify.min.js"></script>
+
+    <link rel="shortcut icon" href="favicon.ico">
+</head>
+
+<body data-spy="scroll" data-target=".navbar">
+
+    <!-- ==============================================
+    PRELOADER
+    =============================================== -->
+
+    <div class="preloader-holder">
+        <div class="loading">
+            <div class="finger finger-1">
+                <div class="finger-item">
+                    <span></span><i></i>
+                </div>
+            </div>
+            <div class="finger finger-2">
+                <div class="finger-item">
+                    <span></span><i></i>
+                </div>
+            </div>
+            <div class="finger finger-3">
+                <div class="finger-item">
+                    <span></span><i></i>
+                </div>
+            </div>
+            <div class="finger finger-4">
+                <div class="finger-item">
+                    <span></span><i></i>
+                </div>
+            </div>
+            <div class="last-finger">
+                <div class="last-finger-item"><i></i></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==============================================
+    HEADER
+    =============================================== -->
+
+    <header id="home">
+
+        <!-- /// Navbar /// -->
+
+        <nav class="navbar navbar-expand-lg fixed-top">
+            <div class="container">
+                <!-- // Brand // -->
+
+                <a class="navbar-brand" href="#"><img src="./imgs/logo_icon.png"><span>RICE</span></a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"><i
+                        class="material-icons">menu</i></button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <!-- / NavLinks / -->
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link page-scroll" href="#home">首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link page-scroll" href="#architecture">架构设计</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link page-scroll" href="#features">关键特性</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link page-scroll" href="#prices">在线Demo</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link page-scroll" href="#">文档</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link page-scroll" href="#team">关于</a>
+                        </li>
+                        <!-- <li class="nav-item">
+                            <a class="nav-link page-scroll" href="#contact">Contact</a>
+                        </li> -->
+                        <!-- <button class="btn btn-primary"> -->
+                        <a class="nav-link page-scroll" href="https://github.com/gaojiayi/RICE" target="_blank"> <span
+                                class="iconify icon-github" data-icon="ri:github-fill" data-width="48"
+                                data-height="48"></span></a>
+                        <!-- </button> -->
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+        </nav>
+
+        <!-- /// BANNER /// -->
+        <div class="banner">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 offset-md-2">
+                        <!-- // Caption // -->
+                        <div class="caption">
+                            <h1>Faster And More Accurate</h1>
+                            <p class="sub">RICE新一代分布式调度平台,支持多种任务类型,易于接入,直观的管理维护UI,让你的调度更快更精准.</p>
+                            <a class="btn btn-primary" href="#">快速入门</a>
+                            <!-- / Macbook IMG / -->
+                            <img class="img-fluid mx-auto wow fadeInUp" data-wow-duration="1s" data-wow-delay=".3s"
+                                src="imgs/macbook.png" alt="macbook">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==============================================
+    HOME 
+    =============================================== -->
+
+    <section id="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 wow bounceIn" data-wow-duration=".5s" data-wow-delay=".2s">
+                    <!-- /// Icon /// -->
+                    <i data-vi="layers" data-vi-size="70" data-vi-primary="#1992ec" data-vi-accent="#daeffd"
+                        data-vi-prop="#CEFAFF"></i>
+                    <!-- // Title // -->
+                    <h4>模块化</h4>
+                    <!-- / Caption / -->
+                    <p>不同于其他的开源调度平台,调度器跟业务系统高度耦合，这就不得不占用业务系统的机器资源.</p>
+                    <p>主要分3个模块,分别是控制器(类似注册中心),调度器集成了调度框架,处理器则是由业务系统对外暴露的服务(类似Dubbo的服务端).</p>
+                </div>
+                <div class="col-md-4 wow bounceIn" data-wow-duration=".5s" data-wow-delay=".4s">
+                    <!-- /// Icon /// -->
+                    <i data-vi="website" data-vi-size="70" data-vi-primary="#1992ec" data-vi-accent="#daeffd"
+                        data-vi-prop="#CEFAFF"></i>
+                    <!-- // Title // -->
+                    <h4>易管理</h4>
+                    <!-- / Caption / -->
+                    <p>RICE的管理方便,维护简单,依赖其功能完善的UI操作平台.</p>
+                    <p>不仅提供业务线的注册,任务的创建,并支持在线DAG工作流任务编排,自定义的组装调度逻辑.</p>
+                </div>
+                <div class="col-md-4 wow bounceIn" data-wow-duration=".5s" data-wow-delay=".6s">
+                    <!-- /// Icon /// -->
+                    <i data-vi="chat" data-vi-size="70" data-vi-primary="#1992ec" data-vi-accent="#daeffd"
+                        data-vi-prop="#CEFAFF"></i>
+                    <!-- // Title // -->
+                    <h4>持续迭代</h4>
+                    <!-- / Caption / -->
+                    <p>RICE是基于MIT协议开源,期望借助社区的力量,使得产品的生态更加完善,功能更加齐全,性能更加稳定,开发团队将会持续优化,持续迭代.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==============================================
+    architecture 
+    =============================================== -->
+
+    <section id="architecture">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-5 wow fadeInLeft" data-wow-duration=".5s" data-wow-delay=".2s">
+                    <h3>调度与执行分离 控制器运维托管</h3>
+                    <p>调度器脱离业务系统,更容易记录任务的执行状态,同时业务系统不用关注何时应该调度,只需要暴露任务执行的入口即可。控制器则监听业务系统的上线,任务上线,以及调度器的状态,以便任务能在调度器集群中尽可能分散调度.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li><i data-vi="check" data-vi-size="40" data-vi-primary="#1992ec" data-vi-accent="#daeffd"
+                                data-vi-prop="#CEFAFF"></i> <span>高可用:业务实例的宕机或者调度器实例的故障不影响任务被执行</span></li>
+                        <li><i data-vi="check" data-vi-size="40" data-vi-primary="#1992ec" data-vi-accent="#daeffd"
+                                data-vi-prop="#CEFAFF"></i> <span>高性能:采用时间轮调度算法,单台调度器实例托管任务数1000+.</span></li>
+                        <li><i data-vi="check" data-vi-size="40" data-vi-primary="#1992ec" data-vi-accent="#daeffd"
+                                data-vi-prop="#CEFAFF"></i> <span>可维护性:接入RICE只需要引入处理器SDK,不会跟业务代码强耦合.</span></li>
+                    </ul>
+                </div>
+                <div class="col-md-7 wow fadeInRight" data-wow-duration=".5s" data-wow-delay=".5s">
+                    <div class="img-table">
+                        <img src="imgs/rice_design.png" class="img-fluid" alt="table">
+                    </div>
+                </div>
+            </div>
+            <div class="row seconde">
+                <div class="col-md-7 wow fadeInLeft" data-wow-duration=".5s" data-wow-delay=".2s">
+                    <img src="imgs/rice_home.png" class="img-fluid" alt="update">
+                </div>
+                <div class="col-md-5 wow fadeInRight" data-wow-duration=".5s" data-wow-delay=".5s">
+                    <div class="caption">
+                        <h3>完善的数据报表 监控指标 告警机制 </h3>
+                        <p>RICE首页提供直观的数据,用于展示当前调度器的托管任务数,调用总次数以及调度器实例总数.</p>
+                        <p>每一个管理UI后台对应一个控制器,控制器的参数同样展示在首页.</p>
+                        <p>另外集成了数据图标来展示RICE平台的调用结果统计,负载以及实时动态调度情况.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==============================================
+    FEATURES 
+    =============================================== -->
+
+    <section id="features">
+        <div class="container">
+            <!-- /// Title /// -->
+            <div class="row">
+                <div class="col-md-6 col-sm-offset-2 text-center mx-auto">
+                    <h2 class="section-title">RICE关键特性:</h2>
+                    <p>相比于其他的调度框架如QuartZ,xxl-job,SchedulerX 2.0,power-job,rice基本上集成了所有的功能,并总结了几大关键特性.</p>
+                </div>
+            </div>
+            <!-- /// Features /// -->
+            <div class="row">
+                <div class="col-md-4 feature wow bounceIn" data-wow-duration=".5s" data-wow-delay=".2s">
+                    <div class="feature-icon">
+                        <i data-vi="processor" data-vi-primary="#cfecff" data-vi-accent="#60b6f4"
+                            data-vi-prop="#CEFAFF"></i>
+                    </div>
+                    <h4>UI/UX 设计</h4>
+                    <p>RICE管理平台采用vite+typescript+vue3+pinia+sass,界面风格更美观,切换更流畅.</p>
+                </div>
+                <div class="col-md-4 feature wow bounceIn" data-wow-duration=".5s" data-wow-delay=".4s">
+                    <div class="feature-icon">
+                        <i data-vi="newspaper" data-vi-primary="#60b6f4" data-vi-accent="#cfecff"
+                            data-vi-prop="#CEFAFF"></i>
+                    </div>
+                    <h4>更少的依赖</h4>
+                    <p>RICE没有像其他的调度框架一样依赖注册中心(如Zookeeper),而是自己基于netty实现了服务注册发现机制.</p>
+                </div>
+                <div class="col-md-4 feature wow bounceIn" data-wow-duration=".5s" data-wow-delay=".6s">
+                    <div class="feature-icon">
+                        <i data-vi="controller" data-vi-primary="#60b6f4" data-vi-accent="#cfecff"
+                            data-vi-prop="#CEFAFF"></i>
+                    </div>
+                    <h4>容易使用</h4>
+                    <p>如果业务系统想要接入RICE,首先在平台上添加应用并创建任务,然后在自己的业务系统中引入SDK,开发时传入刚创建的任务编码即可.</p>
+                </div>
+                <div class="col-md-4 feature wow bounceIn" data-wow-duration=".5s" data-wow-delay=".8s">
+                    <div class="feature-icon">
+                        <i data-vi="doc" data-vi-primary="#60b6f4" data-vi-accent="#cfecff" data-vi-prop="#CEFAFF"></i>
+                    </div>
+                    <h4>私有化协议</h4>
+                    <p>RICE内部采用rpc长连接,重新定义了一套传输数据字节结构,在此基础上可以自定义多种数据格式,具体参考rice-remote.</p>
+                </div>
+                <div class="col-md-4 feature wow bounceIn" data-wow-duration=".5s" data-wow-delay="1s">
+                    <div class="feature-icon">
+                        <i data-vi="user" data-vi-primary="#cfecff" data-vi-accent="#60b6f4" data-vi-prop="#CEFAFF"></i>
+                    </div>
+                    <h4>实时日志</h4>
+                    <p>业务系统的日志数据,可以近实时的发送到调度器,在UI上能够实时展示.</p>
+                </div>
+                <div class="col-md-4 feature wow bounceIn" data-wow-duration=".5s" data-wow-delay="1.2s">
+                    <div class="feature-icon">
+                        <i data-vi="cloud" data-vi-primary="#60b6f4" data-vi-accent="#60b6f4"
+                            data-vi-prop="#CEFAFF"></i>
+                    </div>
+                    <h4>任务再平衡</h4>
+                    <p>不官是处理器宕机还是调度器异常,控制层都能动态感知,并通知在活的所有调度器基于一次性hash算法拉取任务.</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 col-sm-offset-2 text-center mx-auto">
+                    <h2 class="section-title">产品展示:</h2>
+                   
+                </div>
+            </div>
+            <div class="row">
+                <div id="owl-screenshots">
+                    <div class="item"><img src="imgs/screenshots/app_list.png" class="img-fluid" alt="screen-1"></div>
+                    <div class="item"><img src="imgs/screenshots/app_processor.png" class="img-fluid" alt="screen-2"></div>
+                    <div class="item"><img src="imgs/screenshots/task_create.jpg" class="img-fluid" alt="screen-3"></div>
+                    <div class="item"><img src="imgs/screenshots/task_list.png" class="img-fluid" alt="screen-1"></div>
+                    <div class="item"><img src="imgs/screenshots/task_instance.png" class="img-fluid" alt="screen-2"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==============================================
+    TESTIMONIALS 
+    =============================================== -->
+
+    <!-- <section id="testimonials">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-sm-offset-2 carousel-container">
+                    <div id="owl-testimonials" class="owl-carousel owl-theme">
+                        <div class="item">
+                            <div class="testi-icon">
+                                <i data-vi="bullhorn" data-vi-primary="#cfecff" data-vi-accent="#60b6f4"
+                                    data-vi-prop="#CEFAFF"></i>
+                            </div>
+                            <p class="quote">" Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus.
+                                Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet
+                                adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit
+                                id, lorem. "</p>
+                            <img src="imgs/1.png" class="img-fluid" alt="1">
+                            <h4>John Doe</h4>
+                            <span>CEO Founder</span>
+                        </div>
+                        <div class="item">
+                            <div class="testi-icon">
+                                <i data-vi="bullhorn" data-vi-primary="#cfecff" data-vi-accent="#60b6f4"
+                                    data-vi-prop="#CEFAFF"></i>
+                            </div>
+                            <p class="quote">" Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus.
+                                Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet
+                                adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit
+                                id, lorem. "</p>
+                            <img src="imgs/2.png" class="img-fluid" alt="2">
+                            <h4>Nadine Tores</h4>
+                            <span>Project Manager</span>
+                        </div>
+                        <div class="item">
+                            <div class="testi-icon">
+                                <i data-vi="bullhorn" data-vi-primary="#cfecff" data-vi-accent="#60b6f4"
+                                    data-vi-prop="#CEFAFF"></i>
+                            </div>
+                            <p class="quote">" Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus.
+                                Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet
+                                adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit
+                                id, lorem ".</p>
+                            <img src="imgs/3.png" class="img-fluid" alt="3">
+                            <h4>James Doe</h4>
+                            <span>CEO Founder</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    -->
+
+
+
+    <!-- ==============================================
+    APP SCREENSHOTS 
+    =============================================== -->
+
+    <!-- <section id="screenshots">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-sm-offset-2 col-md-offset-3 text-center title-container">
+                    <h2 class="section-title">产品展示:</h2>
+                   
+                </div>
+            </div>
+            <div class="row">
+                <div id="owl-screenshots">
+                    <div class="item"><img src="imgs/screenshots/1.png" class="img-fluid" alt="screen-1"></div>
+                    <div class="item"><img src="imgs/screenshots/2.png" class="img-fluid" alt="screen-2"></div>
+                    <div class="item"><img src="imgs/screenshots/3.png" class="img-fluid" alt="screen-3"></div>
+                    <div class="item"><img src="imgs/screenshots/1.png" class="img-fluid" alt="screen-1"></div>
+                    <div class="item"><img src="imgs/screenshots/2.png" class="img-fluid" alt="screen-2"></div>
+                    <div class="item"><img src="imgs/screenshots/3.png" class="img-fluid" alt="screen-3"></div>
+                    <div class="item"><img src="imgs/screenshots/1.png" class="img-fluid" alt="screen-1"></div>
+                    <div class="item"><img src="imgs/screenshots/2.png" class="img-fluid" alt="screen-2"></div>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+    <!-- ==============================================
+    VIDEO POP UP 
+    =============================================== -->
+
+    <div id="video-popup">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-8 col-sm-offset-2 video-box">
+                    <img src="imgs/video-bg.png" class="img-fluid wow rotateIn" data-wow-duration=".5s"
+                        data-wow-delay=".2s" alt="popup">
+                    <div class="play-button">
+                        <a class="bla-2 wow flipInY" data-wow-duration=".5s" data-wow-delay=".4s"
+                            href="https://www.youtube.com/watch?v=3qyhgV0Zew0"><i
+                                class="material-icons">play_arrow</i></a>
+                        <div class="waves-block">
+                            <div class="waves wave-1"></div>
+                            <div class="waves wave-2"></div>
+                            <div class="waves wave-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==============================================
+    TEAM
+    =============================================== -->
+
+    <section id="team">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-md-6 col-sm-offset-2 col-md-offset-3 text-center title-container">
+                    <!-- /// Title /// -->
+                    <h2 class="section-title">Our Team Of Experts:</h2>
+                    <p>But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was
+                        born.</p>
+                </div>
+            </div>
+            <div class="row">
+                <!-- /// TEAM MEMBERS /// -->
+                <div class="col-md-4 member wow fadeInLeft" data-wow-duration=".5s" data-wow-delay=".2s">
+                    <div class="member-img">
+                        <img src="imgs/team/team1.png" class="img-fluid" alt="team-1">
+                    </div>
+                    <h4>Jason Brody</h4>
+                    <p>CEO Founder</p>
+                    <ul class="social-media">
+                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+                        <li><a href="#"><i class="fab fa-google-plus-g"></i></a></li>
+                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 member wow bounceIn" data-wow-duration=".5s" data-wow-delay=".4s">
+                    <div class="member-img">
+                        <img src="imgs/team/team-2.png" class="img-fluid" alt="team-2">
+                    </div>
+                    <h4>Myra Johns</h4>
+                    <p>web designer</p>
+                    <ul class="social-media">
+                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+                        <li><a href="#"><i class="fab fa-google-plus-g"></i></a></li>
+                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 member wow fadeInRight" data-wow-duration=".5s" data-wow-delay=".2s">
+                    <div class="member-img">
+                        <img src="imgs/team/team-3.png" class="img-fluid" alt="team-3">
+                    </div>
+                    <h4>Mike Smith</h4>
+                    <p>web developer</p>
+                    <ul class="social-media">
+                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+                        <li><a href="#"><i class="fab fa-google-plus-g"></i></a></li>
+                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==============================================
+    BRAND
+    =============================================== -->
+
+    <section id="brands">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3 text-center title-container">
+                    <!-- /// Title /// -->
+                    <h2 class="section-title">We Are Trusted By:</h2>
+                    <p>But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was
+                        born.</p>
+                </div>
+            </div>
+            <div class="row">
+                <div id="owl-brands">
+                    <div class="item"><img src="imgs/brands/brand-1.png" class="img-fluid" alt="brand-1"></div>
+                    <div class="item"><img src="imgs/brands/brand-2.png" class="img-fluid" alt="brand-1"></div>
+                    <div class="item"><img src="imgs/brands/brand-3.png" class="img-fluid" alt="brand-3"></div>
+                    <div class="item"><img src="imgs/brands/brand-1.png" class="img-fluid" alt="brand-1"></div>
+                    <div class="item"><img src="imgs/brands/brand-2.png" class="img-fluid" alt="brand-2"></div>
+                    <div class="item"><img src="imgs/brands/brand-3.png" class="img-fluid" alt="brand-3"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==============================================
+    FOOTER
+    =============================================== -->
+
+    <section id="contact">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3 text-center title-container">
+                    <!-- /// Title /// -->
+                    <h2 class="section-title">Don't Be Shy Send a Message:</h2>
+                    <p>But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was
+                        born.</p>
+                </div>
+            </div>
+
+            <!-- /// CONTACT FORMS /// -->
+
+            <form>
+                <div class="form-row">
+                    <div class="form-group col-xs-12 col-sm-4">
+                        <label>Name:</label>
+                        <input type="text" class="form-control" id="inputName4">
+                    </div>
+                    <div class="form-group col-xs-12 col-sm-4">
+                        <label for="inputPassword4">Email:</label>
+                        <input type="email" class="form-control" id="inputPassword4">
+                    </div>
+                    <div class="form-group col-xs-12 col-sm-4">
+                        <label>Phone:</label>
+                        <input type="text" class="form-control" id="inputPhone">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Subject:</label>
+                    <input type="text" class="form-control" id="inputSubject">
+                </div>
+                <div class="form-group">
+                    <label>Message:</label>
+                    <textarea id="form-message" cols="30" rows="5" class="form-control"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+            </form>
+            <p>&copy; Rice All Right Reserved 2022. Made By Jiayi Gao</p>
+        </div>
+    </section>
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Popper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <!-- Bootstrap JS -->
+    <script src="bootstrap-4.1.1-dist/js/bootstrap.min.js"></script>
+    <!-- Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/vivid-icons"></script>
+    <script src="https://unpkg.com/vivid-icons"></script>
+    <!-- OWL Carousel -->
+    <script src="js/plugins/owl-carousel/owl.carousel.js"></script>
+    <!-- Video Pop Up Plugin -->
+    <script src="js/plugins/YouTube_PopUp-master/YouTubePopUp.jquery.js"></script>
+    <script src="js/plugins/wow/wow.min.js"></script>
+    <!-- Easing -->
+    <script src="js/plugins/jquery.easing.min.js"></script>
+    <!-- Main JS -->
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>

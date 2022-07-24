@@ -16,7 +16,18 @@ console.log(props);
 
 const dialogVisible = ref(props.logDialogVisible);
 
-const logData = ref(["sdd","dfghjk","d","d","d","d","d","d","d","d","d","d","d","d","d","d","d","d","d","d","d","d","d","d","d","d","d",]);
+const logData = ref([
+  "18:24:04 [vite] hmr update /src/views/taskmanager/instance/components/TaskInstancedDataTable.vue (x11)",
+  "18:24:17 [vite] hmr update /src/views/taskmanager/instance/components/TaskInstancedDataTable.vue (x13)",
+  "18:24:41 [vite] hmr update /src/views/taskmanager/instance/components/TaskInstancedDataTable.vue (x17)",
+  "18:24:51 [vite] Internal server error: unplugin-vue-define-options SyntaxError: [@vue/compiler-sfc] Missing semicolon. (10:5)",
+  "8  |  });",
+  "9  |  useTaskManagerHook().",
+  "10 |  const props = defineProps({",
+  "11 |    parentTaskInstanceId: { type: String, default: \"\" }\,",
+  "12 |    childTaskTableVisible: {",
+  "  Plugin: unplugin-vue-define-options",
+  "File: /Users/gaojiayi/RICE/rice-manage-ui/src/views/taskmanager/instance/components/TaskInstancedDataTable.vue"]);
 
 
 watch(

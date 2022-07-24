@@ -7,9 +7,9 @@ const applicationRouter = {
   component: Layout,
   redirect: "/application/detail",
   meta: {
-    icon: "information-line",
+    icon: "app-line",
     title: $t("menus.hsapplication"),
-    rank: 19
+    rank: 10
   },
   children: [
     {

@@ -154,7 +154,7 @@ watch(imgCode, (value) => {
             </el-form-item>
           </Motion>
 
-          <Motion :delay="300">
+          <!-- <Motion :delay="300">
             <el-form-item>
               <div class="w-full h-20px flex justify-between items-center">
                 <el-button
@@ -168,10 +168,10 @@ watch(imgCode, (value) => {
                 </el-button>
               </div>
             </el-form-item>
-          </Motion>
+          </Motion> -->
         </el-form>
 
-        <Motion v-if="currentPage === 0" :delay="350">
+        <!-- <Motion v-if="currentPage === 0" :delay="350">
           <el-form-item>
             <el-divider>
               <p class="text-gray-500 text-xs">第三方登录</p>
@@ -181,9 +181,9 @@ watch(imgCode, (value) => {
                 v-for="(item, index) in thirdParty"
                 :key="index"
                 :title="`${item.title}登陆`"
-              >
+              > -->
               <!-- unocss 写法 -->
-                <IconifyIconOnline
+                <!-- <IconifyIconOnline
                   :icon="`ri:${item.icon}-fill`"
                   width="20"
                   class="cursor-pointer text-gray-500 hover:text-blue-700"
@@ -191,15 +191,15 @@ watch(imgCode, (value) => {
               </span>
             </div>
           </el-form-item>
-        </Motion>
+        </Motion> -->
         <!-- 手机号登陆 -->
-        <phone v-if="currentPage === 1" />
+        <!-- <phone v-if="currentPage === 1" /> -->
         <!-- 二维码登陆 -->
-        <qrCode v-if="currentPage === 2" />
+        <!-- <qrCode v-if="currentPage === 2" /> -->
         <!-- 注册 -->
-        <regist v-if="currentPage === 3" />
+        <!-- <regist v-if="currentPage === 3" /> -->
         <!-- 忘记密码 -->
-        <update v-if="currentPage === 4" />
+        <!-- <update v-if="currentPage === 4" /> -->
       </div>
     </div>
   </div>

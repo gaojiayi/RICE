@@ -1,24 +1,18 @@
 <script setup lang="ts">
-import { ref, reactive ,watch} from "vue";
-import { fetchTaskInfo } from "/@/api/task";
+import { ref, reactive ,watch, onMounted} from "vue";
+import { useTaskManagerHook } from "/@/store";
 import { LogDialog } from ".";
 
 defineOptions({
   name: "childtaskinstanceinfo"
 });
-
+const instanceStore = useTaskManagerHook().taskInstance;
 const props = defineProps({
   parentTaskInstanceId: { type: String, default: "" },
   childTaskTableVisible: {
     type: Boolean,
     default: false
   }
-});
-const query = reactive({
-  address: "",
-  name: "",
-  pageIndex: 1,
-  pageSize: 10
 });
 
 const childTaskTableVisible = ref(props.childTaskTableVisible);
@@ -31,18 +25,21 @@ const pageTotal = ref(0);
 
 // 获取表格数据
 const getData = () => {
-  fetchTaskInfo(query).then(res => {
-    taskInfoData.value = res.list;
-    pageTotal.value = res.pageTotal || 50;
+  instanceStore.QUERY_CHILD_INSTANCES(props.parentTaskInstanceId).then(res => {
+    taskInfoData.value = res;
+    // pageTotal.value = res.pageTotal || 50;
   });
 };
-getData();
+
+onMounted(() => {
+  getData();
+})
 
 // 分页导航
-const handlePageChange = val => {
-  query.pageIndex = val;
-  getData();
-};
+// const handlePageChange = val => {
+//   query.pageIndex = val;
+//   getData();
+// };
 
 
 
@@ -80,13 +77,12 @@ watch(
   >
     <div class="container">
 
-      <el-empty v-if="pageTotal === 0 && !loading" description="暂无搜索结果" />
+      <!-- <el-empty v-if="pageTotal === 0 && !loading" description="暂无搜索结果" /> -->
       <el-table
         :data="taskInfoData"
         v-loading="loading"
         stripe
         class="table"
-        ref="multipleTable"
         header-cell-class-name="table-header"
       >
         <el-table-column
@@ -95,32 +91,32 @@ watch(
           align="center"
         ></el-table-column>
         <el-table-column
-          prop="task_code"
+          prop="taskCode"
           label="任务编码"
           align="center"
         ></el-table-column>
         <el-table-column
-          prop="instance_params"
+          prop="instanceParams"
           label="运行参数"
           align="center"
         ></el-table-column>
         <el-table-column
-          prop="actual_trigger_time"
+          prop="actualTriggerTime"
           label="触发时间"
           align="center"
         ></el-table-column>
         <el-table-column
-          prop="running_times"
+          prop="runningTimes"
           label="运行时间"
           align="center"
         ></el-table-column>
-        <el-table-column
+        <!-- <el-table-column
           prop="type"
           label="任务类型"
           align="center"
-        ></el-table-column>
+        ></el-table-column> -->
         <el-table-column
-          prop="task_tracker_address"
+          prop="taskTrackerAddress"
           label="执行器地址"
           align="center"
         ></el-table-column>
@@ -130,12 +126,12 @@ watch(
           align="center"
         ></el-table-column>
         <el-table-column
-          prop="finished_time"
+          prop="finishedTime"
           label="完成时间"
           align="center"
         ></el-table-column>
 
-        <el-table-column prop="create_time" label="创建时间" align="center">
+        <el-table-column prop="createTime" label="创建时间" align="center">
         </el-table-column>
         <el-table-column prop="status" label="实例运行状态" align="center">
           <template #default="scope">
@@ -166,7 +162,7 @@ watch(
           </template>
         </el-table-column>
       </el-table>
-      <div class="pagination">
+      <!-- <div class="pagination">
         <el-pagination
           background
           layout="total, prev, pager, next"
@@ -175,7 +171,7 @@ watch(
           :total="pageTotal"
           @current-change="handlePageChange"
         ></el-pagination>
-      </div>
+      </div> -->
     </div>
     <!-- 日志弹出框 -->
     <LogDialog

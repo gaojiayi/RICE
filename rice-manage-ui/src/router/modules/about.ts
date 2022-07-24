@@ -7,9 +7,9 @@ const aboutRouter = {
   component: Layout,
   redirect: "/about/introduce",
   meta: {
-    icon: "home-filled",
+    icon: "about-line",
     title: $t("menus.hsabout"),
-    rank: 99
+    rank: 40
   },
   children: [
     {

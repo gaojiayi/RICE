@@ -8,9 +8,9 @@ const taskManagerRouter = {
   component: Layout,
   redirect: "/wf/task/list",
   meta: {
-    icon: "home-filled",
+    icon: "work-flow",
     title: $t("menus.hswfmanager"),
-    rank: 10
+    rank: 30
   },
   children: [
     {

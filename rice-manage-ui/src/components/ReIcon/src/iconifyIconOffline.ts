@@ -48,6 +48,10 @@ import stopFill from "@iconify-icons/ri/stop-fill";
 import startFill from "@iconify-icons/ri/play-fill";
 import editFill from "@iconify-icons/ri/edit-2-fill";
 import restartFill from "@iconify-icons/ri/restart-line";
+import flowChart from "@iconify-icons/ri/flow-chart";
+import appLine from "@iconify-icons/ri/apps-line";
+import openSourceFill from "@iconify-icons/ri/open-source-fill";
+
 
 
 addIcon("arrow-right-s-line", ArrowRightSLine);
@@ -71,6 +75,10 @@ addIcon("stop-fill", stopFill);
 addIcon("start-fill", startFill);
 addIcon("edit-fill", editFill);
 addIcon("restart-fill", restartFill);
+addIcon("work-flow", flowChart);
+addIcon("app-line", appLine);
+addIcon("about-line", openSourceFill);
+
 // Iconify Icon在Vue里离线使用（用于内网环境）https://docs.iconify.design/icon-components/vue/offline.html
 export default defineComponent({
   name: "IconifyIcon",

@@ -9,7 +9,7 @@ const wfTaskManagerRouter = {
   meta: {
     icon: "log-consule",
     title: $t("menus.hstaskmanager"),
-    rank: 10
+    rank: 20
   },
   children: [
     {

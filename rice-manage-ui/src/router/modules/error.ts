@@ -8,6 +8,7 @@ const errorRouter = {
   meta: {
     icon: "information-line",
     title: $t("menus.hserror"),
+    showLink:false,
     rank: 9
   },
   children: [

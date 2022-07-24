@@ -21,7 +21,6 @@ const INITIAL_DATA = {
 defineOptions({
   name: "appDetail"
 });
-const currentDate = ref(new Date());
 
 const formDialogVisible = ref(false);
 const searchValue = ref("");
@@ -104,9 +103,7 @@ const handleDeleteItem = product => {
             <div style="">
               <div class="bottom-app-info">
                 <span class=""
-                  >一旦为页面设置了恰当的
-                  DTD，大多数浏览器都会按照上面的图示来呈现内容。然而 IE 5 和 6
-                  的呈现却是不正确的。根据 W3C 的规范，。</span
+                  >订单系统收集了来自h5,小程序,客户端的订单请求,作为支付的重要重要凭证,订单系统努力打造订单中台,为公司提供统一的订单解决方案.</span
                 >
               </div>
             </div>

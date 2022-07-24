@@ -23,7 +23,7 @@ const props = defineProps({
     type: Object as PropType<CardPrcessorType>
   }
 });
-const emit = defineEmits(["delete-item", "manage-product"]);
+const emit = defineEmits(["delete-item"]);
 
 const handleClickShield = (processor: CardPrcessorType) => {
   emit("delete-item", processor);

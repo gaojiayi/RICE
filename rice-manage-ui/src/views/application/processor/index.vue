@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { getProcessorinfo } from "/@/api/application";
+import { appStore } from "/@/store";
 import Card from "/@/views/application/components/Card.vue";
 import { ref, onMounted, nextTick } from "vue";
 // import dialogForm from "./components/DialogForm.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { useRenderIcon } from "/@/components/ReIcon/src/hooks";
 
 defineOptions({
   name: "appProcessor"
 });
-
 const svg = `
         <path class="path" d="
           M 30 15
@@ -21,28 +20,16 @@ const svg = `
         " style="stroke-width: 4px; fill: rgba(0, 0, 0, 0)"/>
       `;
 
-const INITIAL_DATA = {
-  name: "",
-  status: "",
-  description: "",
-  type: "",
-  mark: ""
-};
-
-const pagination = ref({ current: 1, pageSize: 12, total: 0 });
+const pageTotal = ref(0);
 
 const productList = ref([]);
 const dataLoading = ref(true);
 
 const getCardListData = async () => {
   try {
-    const { data } = await getProcessorinfo();
-    console.log(data)
+    const { data } = await appStore.processorStore.GET_ALL_PROCESSOR();
     productList.value = data.list;
-    pagination.value = {
-      ...pagination.value,
-      total: data.list.length
-    };
+    pageTotal.value = data.list.length;
   } catch (e) {
     console.log(e);
   } finally {
@@ -56,21 +43,16 @@ onMounted(() => {
   getCardListData();
 });
 
-const formDialogVisible = ref(false);
-const formData = ref({ ...INITIAL_DATA });
-const searchValue = ref("");
-
 const onPageSizeChange = (size: number) => {
-  pagination.value.pageSize = size;
-  pagination.value.current = 1;
+  appStore.processorStore.pageSize = size;
 };
 const onCurrentChange = (current: number) => {
-  pagination.value.current = current;
+  appStore.processorStore.pageIndex = current;
 };
-const handleDeleteItem = product => {
+const handleDownItem = product => {
   ElMessageBox.confirm(
     product
-      ? `确认删除后${product.name}的所有产品信息将被清空, 且无法恢复`
+      ? `确认隔离处理器${product.address},其所属任务不再被调度.`
       : "",
     "提示",
     {
@@ -80,16 +62,10 @@ const handleDeleteItem = product => {
     .then(() => {
       ElMessage({
         type: "success",
-        message: "删除成功"
+        message: "隔离成功"
       });
     })
     .catch(() => {});
-};
-const handleManageProduct = product => {
-  formDialogVisible.value = true;
-  nextTick(() => {
-    formData.value = { ...product, status: product?.isSetup ? "1" : "0" };
-  });
 };
 </script>
 
@@ -98,18 +74,21 @@ const handleManageProduct = product => {
     <div class="w-full flex justify-end mb-4">
       <el-input
         style="width: 300px"
-        v-model="searchValue"
+        v-model="appStore.processorStore.appName"
         placeholder="请输入应用名称"
         clearable
       >
         <template #suffix>
           <el-icon class="el-input__icon">
             <IconifyIconOffline
-              v-show="searchValue.length === 0"
+              v-show="appStore.processorStore.appName.length === 0"
               icon="search"
             />
           </el-icon>
         </template>
+        <el-button type="primary"
+          ><iconify-icon-offline icon="search" />搜索</el-button
+        >
       </el-input>
     </div>
     <div
@@ -120,27 +99,21 @@ const handleManageProduct = product => {
       <el-empty
         description="暂无数据"
         v-show="
-          productList
-            .slice(
-              pagination.pageSize * (pagination.current - 1),
-              pagination.pageSize * pagination.current
-            )
-            .filter(v =>
-              v.app_name.toLowerCase().includes(searchValue.toLowerCase())
-            ).length === 0
+          productList.filter(v =>
+            v.app_name
+              .toLowerCase()
+              .includes(appStore.processorStore.appName.toLowerCase())
+          ).length === 0
         "
       />
-      <template v-if="pagination.total > 0">
+      <template v-if="pageTotal > 0">
         <el-row :gutter="16">
           <el-col
-            v-for="(product, index) in productList
-              .slice(
-                pagination.pageSize * (pagination.current - 1),
-                pagination.pageSize * pagination.current
-              )
-              .filter(v =>
-                v.app_name.toLowerCase().includes(searchValue.toLowerCase())
-              )"
+            v-for="(product, index) in productList.filter(v =>
+              v.app_name
+                .toLowerCase()
+                .includes(appStore.processorStore.appName.toLowerCase())
+            )"
             :key="index"
             :xs="24"
             :sm="12"
@@ -148,18 +121,14 @@ const handleManageProduct = product => {
             :lg="6"
             :xl="4"
           >
-            <Card
-              :processor="product"
-              @delete-item="handleDeleteItem"
-              @manage-product="handleManageProduct"
-            />
+            <Card :processor="product" @delete-item="handleDownItem" />
           </el-col>
         </el-row>
         <el-pagination
           class="float-right"
-          v-model:currentPage="pagination.current"
-          :page-size="pagination.pageSize"
-          :total="pagination.total"
+          v-model:currentPage="appStore.processorStore.pageIndex"
+          :page-size="appStore.processorStore.pageSize"
+          :total="pageTotal"
           :page-sizes="[12, 24, 36]"
           :background="true"
           layout="total, sizes, prev, pager, next, jumper"

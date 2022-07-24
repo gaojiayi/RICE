@@ -41,7 +41,7 @@ export const useTaskListStore = defineStore({
           task["scheduler_policy"] = schedulePolicy;
         }
         this.data = filterTasks;
-        this.pageTotal = res.pageTotal || 0;
+        this.pageTotal = filterTasks.length || 0;
       });
     }
   }

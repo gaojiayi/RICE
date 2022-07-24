@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>YouTubePopUp Plugin</title>
+	<link rel="stylesheet" type="text/css" href="YouTubePopUp.css">
+	<script type="text/javascript" src="jquery-1.12.1.min.js"></script>
+	<script type="text/javascript" src="YouTubePopUp.jquery.js"></script>
+	<script type="text/javascript">
+		jQuery(function(){
+			jQuery("a.bla-1").YouTubePopUp();
+			jQuery("a.bla-2").YouTubePopUp( { autoplay: 0 } ); // Disable autoplay
+		});
+	</script>
+</head>
+<body>
+
+<h3>YouTube</h3>
+<p>
+	<a class="bla-1" href="https://www.youtube.com/watch?v=3qyhgV0Zew0">This YouTube video with autoplay</a> and
+	<a class="bla-2" href="https://www.youtube.com/watch?v=3qyhgV0Zew0">This YouTube video without autoplay</a>
+</p>
+
+<p>---------------</p>
+
+<h3>Vimeo</h3>
+<p>
+	<a class="bla-1" href="https://vimeo.com/81527238">This Vimeo video with autoplay</a> and
+	<a class="bla-2" href="https://vimeo.com/81527238">This Vimeo video without autoplay</a>
+</p>
+
+<p>---------------</p>
+
+<p><a target="_blank" href="http://wp-time.com">Visit WP Time</a> - <a target="_blank" href="http://wp-plugins.in">Free WordPress Plugins</a> - <a target="_blank" href="https://creativemarket.com/WPTime?u=WPTime">WordPress Themes</a> - <a target="_blank" href="http://qass.im">Qassim Hassan</a></p>
+
+</body>
+</html>
