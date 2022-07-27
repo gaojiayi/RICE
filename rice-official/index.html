@@ -20,13 +20,46 @@
     <!-- ANIMATE CSS -->
     <link rel="stylesheet" href="css/animate.css">
     <!-- Video Pop Up Plugin -->
-    <link rel="stylesheet" href="js/plugins/YouTube_PopUp-master/YouTubePopUp.css">
+    <!-- <link rel="stylesheet" href="js/plugins/YouTube_PopUp-master/YouTubePopUp.css"> -->
     <!-- PRELOADER -->
     <link rel="stylesheet" href="css/preloader.css">
     <!-- Main CSS -->
     <link rel="stylesheet" href="css/style.css">
     <title>RICE - Faster And More Accurate</title>
-    <script src="https://code.iconify.design/2/2.2.1/iconify.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script> -->
+    <script>
+        var $videoSrc = ""
+        function openVideo(src) {
+
+            videoSrc = src;
+
+        }
+        window.document.onkeydown = function (e) {
+            if (!e) {
+                e = event;
+            }
+            if (e.keyCode == 27) {
+                lightbox_close();
+            }
+        }
+
+        function lightbox_open() {
+            var lightBoxVideo = document.getElementById("VisaChipCardVideo");
+            //window.scrollTo(0, 0);
+            document.getElementById('light').style.display = 'block';
+            document.getElementById('fade').style.display = 'block';
+            lightBoxVideo.play();
+        }
+
+        function lightbox_close() {
+            var lightBoxVideo = document.getElementById("VisaChipCardVideo");
+            document.getElementById('light').style.display = 'none';
+            document.getElementById('fade').style.display = 'none';
+            lightBoxVideo.pause();
+        }
+
+
+    </script>
 
     <link rel="shortcut icon" href="favicon.ico">
 </head>
@@ -95,7 +128,7 @@
                             <a class="nav-link page-scroll" href="#features">关键特性</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link page-scroll" href="#prices">在线Demo</a>
+                            <a class="nav-link page-scroll" href="http://localhost:7850/" target="_blank">在线Demo</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link page-scroll" href="#">文档</a>
@@ -286,19 +319,101 @@
             <div class="row">
                 <div class="col-md-6 col-sm-offset-2 text-center mx-auto">
                     <h2 class="section-title">产品展示:</h2>
-                   
+
                 </div>
             </div>
             <div class="row">
-                <div id="owl-screenshots">
+                <!-- <div id="owl-screenshots">
                     <div class="item"><img src="imgs/screenshots/app_list.png" class="img-fluid" alt="screen-1"></div>
-                    <div class="item"><img src="imgs/screenshots/app_processor.png" class="img-fluid" alt="screen-2"></div>
-                    <div class="item"><img src="imgs/screenshots/task_create.jpg" class="img-fluid" alt="screen-3"></div>
+                    <div class="item"><img src="imgs/screenshots/app_processor.png" class="img-fluid" alt="screen-2">
+                    </div>
+                    <div class="item"><img src="imgs/screenshots/task_create.jpg" class="img-fluid" alt="screen-3">
+                    </div>
                     <div class="item"><img src="imgs/screenshots/task_list.png" class="img-fluid" alt="screen-1"></div>
-                    <div class="item"><img src="imgs/screenshots/task_instance.png" class="img-fluid" alt="screen-2"></div>
+                    <div class="item"><img src="imgs/screenshots/task_instance.png" class="img-fluid" alt="screen-2">
+                    </div>
+                </div> -->
+                <div id="demo" class="carousel slide" data-ride="carousel">
+
+                    <!-- 指示符 -->
+                    <ul class="carousel-indicators">
+                        <li data-target="#demo" data-slide-to="0" class="active"></li>
+                        <li data-target="#demo" data-slide-to="1"></li>
+                        <li data-target="#demo" data-slide-to="2"></li>
+                    </ul>
+
+                    <!-- 轮播图片 -->
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="imgs/screenshots/app_list.png">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="imgs/screenshots/app_processor.png" />
+                        </div>
+                        <div class="carousel-item">
+                            <img src="imgs/screenshots/task_create.jpg" />
+                        </div>
+                        <div class="carousel-item">
+                            <img src="imgs/screenshots/task_list.png" />
+                        </div>
+                        <div class="carousel-item">
+                            <img src="imgs/screenshots/task_instance.png" />
+                        </div>
+                    </div>
+
+                    <!-- 左右切换按钮 -->
+                    <a class="carousel-control-prev" href="#demo" data-slide="prev">
+                        <span class="iconify" data-icon="ri:arrow-left-s-line" style="color: black;" data-width="48"
+                            data-height="48"></span>
+
+                    </a>
+                    <a class="carousel-control-next" href="#demo" data-slide="next">
+                        <!-- <span class="carousel-control-next-icon"></span> -->
+                        <span class="iconify" data-icon="ri:arrow-right-s-line" style="color: black;" data-width="48"
+                            data-height="48"></span>
+
+                    </a>
+
                 </div>
-            </div>
-        </div>
+                <!-- ==============================================
+                VIDEO POP UP 
+                =============================================== -->
+
+                <div id="video-popup">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-8 col-sm-offset-2 video-box">
+                                <img src="imgs/work-flow.png" class="img-fluid wow rotateIn" data-wow-duration=".5s"
+                                    data-wow-delay=".2s" alt="popup">
+                                <div class="play-button">
+
+                                    <a class="bla-2 wow flipInY" data-wow-duration=".5s" data-wow-delay=".4s"
+                                        href="javascript:;" onclick="javascript:lightbox_open()">
+                                        <i class="material-icons">play_arrow</i></a>
+                                    <div class="waves-block">
+                                        <div class="waves wave-1"></div>
+                                        <div class="waves wave-2"></div>
+                                        <div class="waves wave-3"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- ------------- -->
+                            <div id="light">
+                                <a class="boxclose" id="boxclose" onclick="lightbox_close();"></a>
+                                <video id="VisaChipCardVideo" width="800" controls>
+                                    <source src="workflow.mov" type="video/mp4">
+                                    <!--Browser does not support <video> tag -->
+                                </video>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div id="fade" onClick="lightbox_close();"></div>
+
     </section>
 
     <!-- ==============================================
@@ -386,30 +501,7 @@
         </div>
     </section> -->
 
-    <!-- ==============================================
-    VIDEO POP UP 
-    =============================================== -->
 
-    <div id="video-popup">
-        <div class="container">
-            <div class="row">
-                <div class="col-xs-12 col-sm-8 col-sm-offset-2 video-box">
-                    <img src="imgs/video-bg.png" class="img-fluid wow rotateIn" data-wow-duration=".5s"
-                        data-wow-delay=".2s" alt="popup">
-                    <div class="play-button">
-                        <a class="bla-2 wow flipInY" data-wow-duration=".5s" data-wow-delay=".4s"
-                            href="https://www.youtube.com/watch?v=3qyhgV0Zew0"><i
-                                class="material-icons">play_arrow</i></a>
-                        <div class="waves-block">
-                            <div class="waves wave-1"></div>
-                            <div class="waves wave-2"></div>
-                            <div class="waves wave-3"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- ==============================================
     TEAM
@@ -420,68 +512,15 @@
             <div class="row">
                 <div class="col-xs-12 col-md-6 col-sm-offset-2 col-md-offset-3 text-center title-container">
                     <!-- /// Title /// -->
-                    <h2 class="section-title">Our Team Of Experts:</h2>
-                    <p>But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was
-                        born.</p>
+                    <h2 class="section-title">关于我们:</h2>
+                    <p>互联网技术爱好者,活跃于java中间件社区,注重产品体验,全栈开发者.</p>
                 </div>
             </div>
-            <div class="row">
-                <!-- /// TEAM MEMBERS /// -->
-                <div class="col-md-4 member wow fadeInLeft" data-wow-duration=".5s" data-wow-delay=".2s">
-                    <div class="member-img">
-                        <img src="imgs/team/team1.png" class="img-fluid" alt="team-1">
-                    </div>
-                    <h4>Jason Brody</h4>
-                    <p>CEO Founder</p>
-                    <ul class="social-media">
-                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                        <li><a href="#"><i class="fab fa-google-plus-g"></i></a></li>
-                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4 member wow bounceIn" data-wow-duration=".5s" data-wow-delay=".4s">
-                    <div class="member-img">
-                        <img src="imgs/team/team-2.png" class="img-fluid" alt="team-2">
-                    </div>
-                    <h4>Myra Johns</h4>
-                    <p>web designer</p>
-                    <ul class="social-media">
-                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                        <li><a href="#"><i class="fab fa-google-plus-g"></i></a></li>
-                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4 member wow fadeInRight" data-wow-duration=".5s" data-wow-delay=".2s">
-                    <div class="member-img">
-                        <img src="imgs/team/team-3.png" class="img-fluid" alt="team-3">
-                    </div>
-                    <h4>Mike Smith</h4>
-                    <p>web developer</p>
-                    <ul class="social-media">
-                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                        <li><a href="#"><i class="fab fa-google-plus-g"></i></a></li>
-                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ==============================================
-    BRAND
-    =============================================== -->
-
-    <section id="brands">
-        <div class="container">
             <div class="row">
                 <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3 text-center title-container">
                     <!-- /// Title /// -->
-                    <h2 class="section-title">We Are Trusted By:</h2>
-                    <p>But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was
-                        born.</p>
+                    <h2 class="section-title">加入我们:</h2>
+                    <p>RICE致力于给更多的用户带来业务能力的提升,在服务用户的同时优化自身,更好的打造产品生态.</p>
                 </div>
             </div>
             <div class="row">
@@ -493,6 +532,49 @@
                     <div class="item"><img src="imgs/brands/brand-2.png" class="img-fluid" alt="brand-2"></div>
                     <div class="item"><img src="imgs/brands/brand-3.png" class="img-fluid" alt="brand-3"></div>
                 </div>
+
+            </div>
+            <div class="row">
+                <!-- /// TEAM MEMBERS /// -->
+                <!-- <div class="col-md-4 member wow fadeInLeft" data-wow-duration=".5s" data-wow-delay=".2s">
+                    <div class="member-img">
+                        <img src="imgs/team/team1.png" class="img-fluid" alt="team-1">
+                    </div>
+                    <h4>Jason Brody</h4>
+                    <p>CEO Founder</p>
+                    <ul class="social-media">
+                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+                        <li><a href="#"><i class="fab fa-google-plus-g"></i></a></li>
+                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
+                    </ul>
+                </div> -->
+                <!-- <div class="col-md-4 member wow bounceIn" data-wow-duration=".5s" data-wow-delay=".4s">
+                    <div class="member-img">
+                        <img src="imgs/team/team-3.png" class="img-fluid" alt="team-2">
+                    </div>
+                    <h4>Myra Johns</h4>
+                    <p>web designer</p>
+                    <ul class="social-media">
+                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+                        <li><a href="#"><i class="fab fa-google-plus-g"></i></a></li>
+                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
+                    </ul>
+                </div> -->
+                <!-- <div class="col-md-4 member wow fadeInRight" data-wow-duration=".5s" data-wow-delay=".2s">
+                    <div class="member-img">
+                        <img src="imgs/team/team-3.png" class="img-fluid" alt="team-3">
+                    </div>
+                    <h4>Mike Smith</h4>
+                    <p>web developer</p>
+                    <ul class="social-media">
+                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+                        <li><a href="#"><i class="fab fa-google-plus-g"></i></a></li>
+                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
+                    </ul>
+                </div> -->
             </div>
         </div>
     </section>
@@ -506,9 +588,8 @@
             <div class="row">
                 <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3 text-center title-container">
                     <!-- /// Title /// -->
-                    <h2 class="section-title">Don't Be Shy Send a Message:</h2>
-                    <p>But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was
-                        born.</p>
+                    <h2 class="section-title">联系我们:</h2>
+                    <p>如果你有任何问题,欢迎给我们留言,也希望RICE能够发展的越来越好.</p>
                 </div>
             </div>
 
@@ -517,27 +598,27 @@
             <form>
                 <div class="form-row">
                     <div class="form-group col-xs-12 col-sm-4">
-                        <label>Name:</label>
+                        <label>姓名:</label>
                         <input type="text" class="form-control" id="inputName4">
                     </div>
                     <div class="form-group col-xs-12 col-sm-4">
-                        <label for="inputPassword4">Email:</label>
+                        <label for="inputPassword4">邮箱:</label>
                         <input type="email" class="form-control" id="inputPassword4">
                     </div>
                     <div class="form-group col-xs-12 col-sm-4">
-                        <label>Phone:</label>
+                        <label>电话:</label>
                         <input type="text" class="form-control" id="inputPhone">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Subject:</label>
+                    <label>主题:</label>
                     <input type="text" class="form-control" id="inputSubject">
                 </div>
                 <div class="form-group">
-                    <label>Message:</label>
+                    <label>内容:</label>
                     <textarea id="form-message" cols="30" rows="5" class="form-control"></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">Send Message</button>
+                <button type="submit" class="btn btn-primary">发送消息</button>
             </form>
             <p>&copy; Rice All Right Reserved 2022. Made By Jiayi Gao</p>
         </div>
@@ -557,7 +638,9 @@
     <!-- OWL Carousel -->
     <script src="js/plugins/owl-carousel/owl.carousel.js"></script>
     <!-- Video Pop Up Plugin -->
-    <script src="js/plugins/YouTube_PopUp-master/YouTubePopUp.jquery.js"></script>
+    <!-- <script src="js/plugins/YouTube_PopUp-master/YouTubePopUp.jquery.js"></script> -->
+    <script src="https://code.iconify.design/2/2.2.1/iconify.min.js"></script>
+
     <script src="js/plugins/wow/wow.min.js"></script>
     <!-- Easing -->
     <script src="js/plugins/jquery.easing.min.js"></script>

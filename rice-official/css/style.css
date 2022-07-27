@@ -454,7 +454,14 @@ h4 {
    margin-right: 30px;
    width: 480px;
 }
-
+.carousel-inner img {
+    width: 80%;
+    height: 80%;
+}
+.material-icons{
+    position: relative;
+    bottom: 15px;
+}
 /*=======================================================
 			TESTIMONIALS:
 ========================================================*/
@@ -800,6 +807,71 @@ h4 {
 #contact p {
     text-align: center;
 }
+
+
+/* =======================  vedio  ================ */
+
+#fade {
+    display: none;
+    position: fixed;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    z-index: 1001;
+    -moz-opacity: 0.8;
+    opacity: .80;
+    filter: alpha(opacity=80);
+  }
+  /* .video-popup{
+    position: relative;
+  } */
+  #light {
+    display: none;
+    position: relative;
+    top: 50%;
+    left: 40%;
+    max-width: 10000px;
+    max-height: 800px;
+    margin-left: -300px;
+    margin-top: -386px;
+    border: 2px solid #FFF;
+    background: #FFF;
+    z-index: 1002;
+    overflow: visible;
+  }
+  
+  #boxclose {
+    float: right;
+    cursor: pointer;
+    color: #fff;
+    border: 1px solid #AEAEAE;
+    border-radius: 3px;
+    background: #222222;
+    font-size: 31px;
+    font-weight: bold;
+    display: inline-block;
+    line-height: 0px;
+    padding: 11px 3px;
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    z-index: 1002;
+    opacity: 0.9;
+  }
+  
+  .boxclose:before {
+    content: "×";
+  }
+  
+  #fade:hover ~ #boxclose {
+    display:none;
+  }
+  
+  .test:hover ~ .test2 {
+    display: none;
+  }
 
 /*=======================================================
 			MEDIA QUERIES:
