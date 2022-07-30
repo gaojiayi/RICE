@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author gaojy
  * @ClassName TransfUtil.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/02 11:00:00
  */
 public class TransfUtil {

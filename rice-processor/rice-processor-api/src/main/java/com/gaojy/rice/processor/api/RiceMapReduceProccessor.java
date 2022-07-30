@@ -7,6 +7,7 @@ package com.gaojy.rice.processor.api;
  * @createTime 2022/01/02 14:07:00
  */
 public interface RiceMapReduceProccessor extends RiceBasicProcessor, RiceMapProcessor {
+
     public ProcessResult reduce(TaskContext context);
 
 }

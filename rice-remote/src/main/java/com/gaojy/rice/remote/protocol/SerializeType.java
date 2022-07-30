@@ -3,7 +3,7 @@ package com.gaojy.rice.remote.protocol;
 /**
  * @author gaojy
  * @ClassName SerializeType.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/03 00:18:00
  */
 public enum SerializeType {

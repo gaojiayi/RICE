@@ -3,7 +3,7 @@ package com.gaojy.rice.common.constants;
 /**
  * @author gaojy
  * @ClassName RequestCode.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/07 16:35:00
  */
 public class RequestCode {

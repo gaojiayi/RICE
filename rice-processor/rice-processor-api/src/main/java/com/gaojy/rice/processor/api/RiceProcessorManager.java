@@ -2,7 +2,7 @@ package com.gaojy.rice.processor.api;
 
 import com.gaojy.rice.common.RiceThreadFactory;
 import com.gaojy.rice.common.balance.Balance;
-import com.gaojy.rice.common.balance.RoundRobinBalance;
+import com.gaojy.rice.common.balance.BalanceFactory;
 import com.gaojy.rice.common.constants.RequestCode;
 import com.gaojy.rice.common.exception.RegisterProcessorException;
 import com.gaojy.rice.common.exception.RemotingCommandException;
@@ -19,11 +19,13 @@ import com.gaojy.rice.processor.api.config.ProcessorConfig;
 import com.gaojy.rice.processor.api.invoker.TaskInvoker;
 import com.gaojy.rice.processor.api.log.RiceClientLogger;
 import com.gaojy.rice.processor.api.register.DefaultTaskScheduleProcessor;
+import com.gaojy.rice.remote.ChannelEventListener;
 import com.gaojy.rice.remote.protocol.RemotingSysResponseCode;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.TransportClient;
 import com.gaojy.rice.remote.transport.TransportServer;
 
+import io.netty.channel.Channel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
@@ -36,8 +38,8 @@ import org.slf4j.Logger;
  * @Description RICE 处理器管理类
  * @createTime 2022/01/04 20:56:00
  */
-public class RiceProcessorManager {
-    Logger log = RiceClientLogger.getLog();
+public class RiceProcessorManager implements ChannelEventListener {
+    private final Logger log = RiceClientLogger.getLog();
     private static RiceProcessorManager manager = null;
     private static Object monitorObj = new Object();
     private final ProcessorConfig config;
@@ -46,17 +48,13 @@ public class RiceProcessorManager {
     // 处理业务线程池
     private final ExecutorService remotingExecutor;
 
-    private final ElectionClient electionClient;
-
     private RiceProcessorManager(ProcessorConfig config) {
         this.config = config;
-        server = new TransportServer(config.getTransfServerConfig());
+        server = new TransportServer(config.getTransfServerConfig(), this);
         client = new TransportClient(config.getTransfClientConfig());
         remotingExecutor =
-                Executors.newFixedThreadPool(config.getTransfServerConfig().getServerWorkerThreads(),
-                        new RiceThreadFactory("RemotingExecutorThread_"));
-        electionClient = new ElectionClient(config);
-
+            Executors.newFixedThreadPool(config.getTransfServerConfig().getServerWorkerThreads(),
+                new RiceThreadFactory("RemotingExecutorThread_"));
 
     }
 
@@ -77,36 +75,29 @@ public class RiceProcessorManager {
         // 收集所有的task 并缓存起来
         TaskInvoker.init(config);
 
-
         // 注册业务处理器  启动监听
         register();
         this.server.start();
 
         this.client.start();
 
-        // 创建网络事件监听器
-        // TODO:
-
         RiceRemoteContext context = buildRegisterRequest();
         doRegister(context);
-
+        // 完成注册之后 close client
+        this.client.shutdown();
         // 如果控制器成功返回 打印banner
         RiceBanner.show(7);
     }
 
     public void close() {
-        electionClient.close();
         this.server.shutdown();
-
-        this.client.shutdown();
-
     }
 
     private void register() {
         server.registerProcessor(RequestCode.INVOKE_PROCESSOR,
-                new DefaultTaskScheduleProcessor(this), this.remotingExecutor);
+            new DefaultTaskScheduleProcessor(this), this.remotingExecutor);
         server.registerProcessor(RequestCode.SCHEDULER_HEART_BEAT,
-                new DefaultTaskScheduleProcessor(this), this.remotingExecutor);
+            new DefaultTaskScheduleProcessor(this), this.remotingExecutor);
 
     }
 
@@ -125,25 +116,23 @@ public class RiceProcessorManager {
     }
 
     /**
-     * 向主控制器注册  并且最多重试5次
+     * 向控制器注册  并且最多重试5次
+     *
      * @param riceRemoteContext
      */
     void doRegister(RiceRemoteContext riceRemoteContext) {
-        //Balance balance = new RoundRobinBalance();
+        Balance balance = BalanceFactory.getBalance(this.config.getBalancePolicy());
         String addr = null;
         int retryConnCount = 5;
         while (retryConnCount >= 0) {
             try {
-                // 向主控制器注册
-                addr = electionClient.getMasterController();
-                //addr = balance.select(config.getControllerServerList());
+                addr = balance.select(config.getControllerServerList());
                 RiceRemoteContext registerResult = client.invokeSync(addr, riceRemoteContext, 3 * 1000);
                 switch (registerResult.getCode()) {
                     case RemotingSysResponseCode.SUCCESS: {
                         ExportTaskResponseBody body = ExportTaskResponseBody.decode(registerResult.getBody(), ExportTaskResponseBody.class);
-
-                        //ExportTaskResponseHeader header = (ExportTaskResponseHeader) registerResult.decodeCommandCustomHeader(ExportTaskResponseHeader.class);
                         if (!body.getTaskSchedulerInfo().isEmpty()) {
+                            log.info("app:" + config.getAppId() + " register to controller [" + addr + "] successfully");
                             body.getTaskSchedulerInfo().forEach((k, v) -> {
                                 if (StringUtil.isNotEmpty(v)) {
                                     log.info("taskcode:" + k + " will scheduled by server " + v);
@@ -160,19 +149,39 @@ public class RiceProcessorManager {
 
                 }
             } catch (RemotingConnectException | RemotingTimeoutException
-                    | RemotingSendRequestException | InterruptedException | TimeoutException e) {
+                | RemotingSendRequestException | InterruptedException e) {
                 log.error("Register to controller Exception, controller address is " + addr);
             }
             retryConnCount--;
-
-            try {
-                Thread.sleep(1000L);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
 
-        throw new RegisterProcessorException("Register to controller Exception");
+        throw new RegisterProcessorException("Register to controller Exception,please check controller servers");
     }
 
+    public TransportClient getClient() {
+        return client;
+    }
+
+    @Override
+    public void onChannelConnect(String remoteAddr, Channel channel) {
+        log.info("New Scheduler join to execute,remoteAddr=" + remoteAddr);
+    }
+
+    @Override
+    public void onChannelClose(String remoteAddr, Channel channel) {
+        log.warn("Scheduler:" + remoteAddr + " ,no longer to execute tasks on this processor ");
+        channel.close();
+    }
+
+    @Override
+    public void onChannelException(String remoteAddr, Channel channel) {
+        log.error("Scheduler exception,remoteAddr:" + remoteAddr + " ,no longer to execute tasks on this processor ");
+        channel.close();
+    }
+
+    @Override
+    public void onChannelIdle(String remoteAddr, Channel channel) {
+        log.error("The dispatcher has not communicated for a long time and is idle abnormally");
+        channel.close();
+    }
 }

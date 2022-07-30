@@ -3,7 +3,7 @@ package com.gaojy.rice.common.constants;
 /**
  * @author gaojy
  * @ClassName TaskSataus.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/02/11 14:32:00
  */
 public enum TaskStatus {

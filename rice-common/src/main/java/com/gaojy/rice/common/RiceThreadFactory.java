@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author gaojy
  * @ClassName RiceThreadFactory.java
- * @Description TODO
+ * @Description
  * @createTime 2022/01/01 22:52:00
  */
 public class RiceThreadFactory implements ThreadFactory {

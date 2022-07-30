@@ -5,7 +5,7 @@ import com.gaojy.rice.common.exception.RemotingCommandException;
 /**
  * @author gaojy
  * @ClassName CommandCustomHeader.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/03 00:30:00
  */
 public interface CommandCustomHeader {

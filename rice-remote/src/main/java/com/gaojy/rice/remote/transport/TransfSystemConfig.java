@@ -3,7 +3,7 @@ package com.gaojy.rice.remote.transport;
 /**
  * @author gaojy
  * @ClassName RiceSystemConfig.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/02 10:37:00
  */
 public class TransfSystemConfig {

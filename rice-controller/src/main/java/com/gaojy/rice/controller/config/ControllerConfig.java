@@ -5,7 +5,7 @@ import com.gaojy.rice.common.constants.ElectionConstants;
 /**
  * @author gaojy
  * @ClassName ControllerConfig.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/13 22:18:00
  */
 public class ControllerConfig extends ElectionConstants {

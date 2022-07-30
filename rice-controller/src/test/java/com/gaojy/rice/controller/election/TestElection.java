@@ -13,7 +13,7 @@ import org.junit.runners.JUnit4;
 /**
  * @author gaojy
  * @ClassName TestElection.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/13 23:23:00
  */
 @RunWith(JUnit4.class)

@@ -7,7 +7,7 @@ import com.gaojy.rice.common.protocol.header.CommandCustomHeader;
 /**
  * @author gaojy
  * @ClassName ExportTaskRequestHeader.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/02 14:21:00
  */
 public class ExportTaskRequestHeader implements CommandCustomHeader {

@@ -3,7 +3,7 @@ package com.gaojy.rice.remote.protocol;
 /**
  * @author gaojy
  * @ClassName RemotingCommandType.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/03 09:33:00
  */
 public enum RemotingCommandType {

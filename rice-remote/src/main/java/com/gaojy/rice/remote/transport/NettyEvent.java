@@ -5,7 +5,7 @@ import io.netty.channel.Channel;
 /**
  * @author gaojy
  * @ClassName NettyEvent.java
- * @Description TODO
+ * @Description
  * @createTime 2022/01/02 16:57:00
  */
 public class NettyEvent {

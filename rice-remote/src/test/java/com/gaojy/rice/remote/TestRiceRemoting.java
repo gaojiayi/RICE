@@ -18,14 +18,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import com.gaojy.rice.remote.protocol.*;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author gaojy
  * @ClassName TestRiceRemoting.java
- * @Description TODO
+ * @Description
  * @createTime 2022/01/04 00:36:00
  */
 @RunWith(JUnit4.class)

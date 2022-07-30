@@ -6,7 +6,7 @@ import com.gaojy.rice.common.protocol.header.CommandCustomHeader;
 /**
  * @author gaojy
  * @ClassName SchedulerHeartBeatHeader.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/02/07 13:38:00
  */
 public class SchedulerHeartBeatHeader implements CommandCustomHeader {

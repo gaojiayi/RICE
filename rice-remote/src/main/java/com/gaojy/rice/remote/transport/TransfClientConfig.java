@@ -3,7 +3,7 @@ package com.gaojy.rice.remote.transport;
 /**
  * @author gaojy
  * @ClassName TransfClientConfig.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/01 22:33:00
  */
 public class TransfClientConfig {

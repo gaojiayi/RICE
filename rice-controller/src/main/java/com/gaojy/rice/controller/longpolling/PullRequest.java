@@ -6,7 +6,7 @@ import io.netty.channel.Channel;
 /**
  * @author gaojy
  * @ClassName PullRequest.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/17 14:54:00
  */
 public class PullRequest {

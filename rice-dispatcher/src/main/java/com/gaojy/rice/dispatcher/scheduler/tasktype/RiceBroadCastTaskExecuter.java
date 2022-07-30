@@ -5,7 +5,7 @@ import com.gaojy.rice.dispatcher.scheduler.TaskScheduleClient;
 /**
  * @author gaojy
  * @ClassName RiceBroadCastTaskExecuter.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/03/02 21:53:00
  */
 public class RiceBroadCastTaskExecuter implements RiceExecuter{

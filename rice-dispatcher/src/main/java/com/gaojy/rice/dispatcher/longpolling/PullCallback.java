@@ -3,7 +3,7 @@ package com.gaojy.rice.dispatcher.longpolling;
 /**
  * @author gaojy
  * @ClassName PullCallback.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/02/10 21:20:00
  */
 public interface PullCallback {

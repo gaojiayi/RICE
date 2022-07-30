@@ -5,7 +5,7 @@ import com.gaojy.rice.controller.directory.Directory;
 /**
  * @author gaojy
  * @ClassName DirectoryEvent.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/08 23:58:00
  */
 public abstract class DirectoryEvent {

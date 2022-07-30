@@ -3,7 +3,7 @@ package com.gaojy.rice.common.constants;
 /**
  * @author gaojy
  * @ClassName LoggerName.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/02 16:02:00
  */
 public class LoggerName {

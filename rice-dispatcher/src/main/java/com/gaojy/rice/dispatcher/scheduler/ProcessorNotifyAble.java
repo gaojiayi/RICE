@@ -3,7 +3,7 @@ package com.gaojy.rice.dispatcher.scheduler;
 /**
  * @author gaojy
  * @ClassName ProcessorNotifyAble.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/02/11 17:32:00
  */
 public interface ProcessorNotifyAble {

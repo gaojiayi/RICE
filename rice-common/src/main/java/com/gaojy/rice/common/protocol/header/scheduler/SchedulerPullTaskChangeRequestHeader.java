@@ -6,7 +6,7 @@ import com.gaojy.rice.common.protocol.header.CommandCustomHeader;
 /**
  * @author gaojy
  * @ClassName SchedulerPullTaskChangeRequestHeader.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/02/10 21:00:00
  */
 public class SchedulerPullTaskChangeRequestHeader implements CommandCustomHeader {

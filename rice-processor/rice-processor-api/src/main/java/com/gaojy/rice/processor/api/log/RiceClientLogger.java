@@ -7,7 +7,9 @@ import java.net.URL;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+/**
+ * @description  RICE的日志实例
+ */
 public class RiceClientLogger {
     public static final String CLIENT_LOG_ROOT = "rice.client.logRoot";
     public static final String CLIENT_LOG_MAXINDEX = "rice.client.logFileMaxIndex";

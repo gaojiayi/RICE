@@ -3,7 +3,7 @@ package com.gaojy.rice.common.exception;
 /**
  * @author gaojy
  * @ClassName ProcessorException.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/07 23:34:00
  */
 public class ProcessorException extends RuntimeException {

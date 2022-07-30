@@ -3,7 +3,7 @@ package com.gaojy.rice.common.exception;
 /**
  * @author gaojy
  * @ClassName DuplicateProcessorException.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/07 15:57:00
  */
 public class DuplicateProcessorException extends ProcessorException {

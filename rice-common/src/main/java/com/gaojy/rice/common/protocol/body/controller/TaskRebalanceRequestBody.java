@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * @author gaojy
  * @ClassName TaskRebalanceRequestBody.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/02/13 16:22:00
  */
 public class TaskRebalanceRequestBody extends RemotingSerializable {

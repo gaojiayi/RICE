@@ -3,7 +3,7 @@ package com.gaojy.rice.common.utils;
 /**
  * @author gaojy
  * @ClassName Holder.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/17 12:06:00
  */
 public class Holder<T> {

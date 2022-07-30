@@ -136,7 +136,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
             Date firstStartTime = cexpStart.getNextValidTimeAfter(current);
             delay = firstStartTime.getTime() - current.getTime();
         }
-        if (ScheduleType.FIX_RATE.equals(scheduleType) || ScheduleType.FIX_DELAY.equals(scheduleType)) {
+        if (ScheduleType.FIXED_FREQUENCY.equals(scheduleType) || ScheduleType.FIX_DELAY.equals(scheduleType)) {
             delay = Long.parseLong(timeExpression);
         }
 

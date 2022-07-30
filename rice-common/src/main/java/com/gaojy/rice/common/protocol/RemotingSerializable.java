@@ -6,7 +6,7 @@ import java.nio.charset.Charset;
 /**
  * @author gaojy
  * @ClassName RemotingSerializable.java
- * @Description TODO
+ * @Description
  * @createTime 2022/01/07 20:57:00
  */
 public abstract class RemotingSerializable {

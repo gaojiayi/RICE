@@ -15,7 +15,7 @@ import org.apache.commons.dbutils.handlers.BeanListHandler;
 /**
  * @author gaojy
  * @ClassName RiceTaskInfoDaoImpl.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/28 16:25:00
  */
 public class RiceTaskInfoDaoImpl implements RiceTaskInfoDao {

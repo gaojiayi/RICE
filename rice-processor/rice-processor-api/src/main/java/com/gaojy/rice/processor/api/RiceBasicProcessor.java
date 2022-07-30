@@ -3,7 +3,7 @@ package com.gaojy.rice.processor.api;
 /**
  * @author gaojy
  * @ClassName RiceTaskProcessor.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/02 13:55:00
  */
 public interface RiceBasicProcessor {

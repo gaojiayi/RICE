@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * @author gaojy
  * @ClassName TaskDetailData.java
- * @Description TODO
+ * @Description
  * @createTime 2022/01/07 20:50:00
  */
 public class TaskDetailData {
@@ -17,17 +17,19 @@ public class TaskDetailData {
 
     private String className;
 
-    private TaskType taskType;
+    private boolean logEnable;
 
-    public TaskDetailData(String taskCode, String taskName, String className, TaskType taskType) {
+    public TaskDetailData(String taskCode, String taskName, String className, boolean logEnable) {
         this.taskCode = taskCode;
         this.taskName = taskName;
         this.className = className;
-        this.taskType = taskType;
+        this.logEnable = logEnable;
     }
 
-    public TaskDetailData() {
+    public boolean isLogEnable() {
+        return logEnable;
     }
+
 
     public String getTaskCode() {
         return taskCode;
@@ -53,24 +55,18 @@ public class TaskDetailData {
         this.className = className;
     }
 
-    public TaskType getTaskType() {
-        return taskType;
-    }
-
-    public void setTaskType(TaskType taskType) {
-        this.taskType = taskType;
-    }
-
-    @Override public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
         TaskDetailData data = (TaskDetailData) o;
-        return taskCode.equals(data.taskCode) && className.equals(data.className) && taskType == data.taskType;
+        return taskCode.equals(data.taskCode) && className.equals(data.className) && logEnable == data.logEnable;
     }
 
-    @Override public int hashCode() {
-        return Objects.hash(taskCode, className, taskType);
+    @Override
+    public int hashCode() {
+        return Objects.hash(taskCode, className, logEnable);
     }
 }

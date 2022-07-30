@@ -3,7 +3,7 @@ package com.gaojy.rice.common.exception;
 /**
  * @author gaojy
  * @ClassName ControllerException.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/02/07 12:52:00
  */
 public class ControllerException extends RuntimeException{

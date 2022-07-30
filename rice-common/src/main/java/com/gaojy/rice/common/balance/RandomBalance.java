@@ -6,7 +6,7 @@ import java.util.Random;
 /**
  * @author gaojy
  * @ClassName RandomBalance.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/02/14 12:26:00
  */
 public class RandomBalance implements Balance{

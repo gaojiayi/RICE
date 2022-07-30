@@ -5,7 +5,7 @@ import com.gaojy.rice.controller.directory.Directory;
 /**
  * @author gaojy
  * @ClassName TaskDeleteEvent.java
- * @Description TODO
+ * @Description
  * @createTime 2022/01/08 23:57:00
  */
 public class TaskDeleteEvent extends DirectoryEvent {

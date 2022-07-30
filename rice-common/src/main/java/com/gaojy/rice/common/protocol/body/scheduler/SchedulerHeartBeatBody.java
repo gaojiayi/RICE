@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * @author gaojy
  * @ClassName SchedulerHeartBeatBody.java
- * @Description TODO
+ * @Description
  * @createTime 2022/02/07 13:43:00
  */
 public class SchedulerHeartBeatBody extends RemotingSerializable {

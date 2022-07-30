@@ -1,27 +1,28 @@
 package com.gaojy.rice.processor.api;
 
-import com.gaojy.rice.common.exception.RemotingConnectException;
-import com.gaojy.rice.common.exception.RemotingSendRequestException;
-import com.gaojy.rice.common.exception.RemotingTimeoutException;
+import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.doNothing;
 
 /**
  * @author gaojy
  * @ClassName TestProcessorManager.java
- * @Description TODO
+ * @Description mocktio ref:https://blog.csdn.net/qq_38056704/article/details/120208878
  * @createTime 2022/01/26 14:36:00
  */
 @RunWith(MockitoJUnitRunner.class)
 public class TestProcessorManager {
+    @Spy
+    RiceProcessorManager manager = RiceProcessorManager.getManager();
 
     @Test
-    public void testRegister() throws RemotingConnectException, RemotingSendRequestException, RemotingTimeoutException, InterruptedException {
-        RiceProcessorManager.getManager().export();
+    public void testRegister() {
+        doNothing().when(manager).doRegister(any(RiceRemoteContext.class));
+        manager.export();
     }
 }

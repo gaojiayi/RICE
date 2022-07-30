@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * @author gaojy
  * @ClassName RiceTaskChangeRecordDao.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/17 18:38:00
  */
 public interface RiceTaskChangeRecordDao {

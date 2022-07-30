@@ -5,12 +5,12 @@ import java.util.Locale;
 /**
  * @author gaojy
  * @ClassName ScheduleType.java
- * @Description TODO
+ * @Description
  * @createTime 2022/02/11 14:02:00
  */
 public enum ScheduleType {
     CRON,
-    FIX_RATE,
+    FIXED_FREQUENCY,
     FIX_DELAY;
 
     public static ScheduleType getType(String type) {

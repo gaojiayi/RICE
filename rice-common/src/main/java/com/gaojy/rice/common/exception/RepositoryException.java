@@ -3,7 +3,7 @@ package com.gaojy.rice.common.exception;
 /**
  * @author gaojy
  * @ClassName RepositoryException.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/17 19:12:00
  */
 public class RepositoryException extends RuntimeException {

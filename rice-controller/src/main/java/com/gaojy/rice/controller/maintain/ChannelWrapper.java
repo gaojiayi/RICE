@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * @author gaojy
  * @ClassName ChannelWrapper.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/18 22:57:00
  */
 public class ChannelWrapper {

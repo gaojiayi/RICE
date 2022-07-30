@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * @author gaojy
  * @ClassName PullRequest.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/02/09 14:08:00
  */
 public class PullRequest {

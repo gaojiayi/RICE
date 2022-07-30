@@ -10,7 +10,7 @@ import org.junit.runners.JUnit4;
 /**
  * @author gaojy
  * @ClassName TestRiceController.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/26 20:37:00
  */
 @RunWith(JUnit4.class)

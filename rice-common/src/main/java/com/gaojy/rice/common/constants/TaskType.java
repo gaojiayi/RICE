@@ -9,29 +9,39 @@ package com.gaojy.rice.common.constants;
 public enum TaskType {
 
     /**
-     * 广播执行
+     * SHELL 任务
      */
-    BROADCAST(0),
+    SHELL(0),
 
     /**
-     * 单机执行
+     * Python 任务
      */
-    STANDALONE(1),
+    PYTHON(1),
+
+    /**
+     * Http 任务
+     */
+    HTTP(2),
+
+    /**
+     * JAVA内置任务
+     */
+    JAVA_INTERNAL(3),
 
     /**
      * MAP 任务
      */
-    RICE_MAP(2),
+    RICE_MAP(4),
+
     /**
      * MAP REDUCE 任务
      */
-    RICE_MAPREDUCE(3),
+    RICE_MAPREDUCE(5),
+
     /**
      * 工作流任务
      */
-    RICE_WORKFLOW(4);
-
-
+    RICE_WORKFLOW(6);
 
     private int code;
 
@@ -39,7 +49,7 @@ public enum TaskType {
         this.code = code;
     }
 
-    public  static TaskType getType(int type){
+    public static TaskType getType(int type) {
         return TaskType.values()[type];
     }
 }

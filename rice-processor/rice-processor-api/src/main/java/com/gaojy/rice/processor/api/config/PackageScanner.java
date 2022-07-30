@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * @author gaojy
  * @ClassName PackageScanner.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/06 23:42:00
  */
 public interface PackageScanner {

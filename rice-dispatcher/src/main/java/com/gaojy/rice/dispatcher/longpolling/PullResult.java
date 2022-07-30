@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * @author gaojy
  * @ClassName PullResult.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/02/09 14:47:00
  */
 public class PullResult {

@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * @author gaojy
  * @ClassName ManyTaskPullRequest.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/17 14:53:00
  */
 public class ManyTaskPullRequest {

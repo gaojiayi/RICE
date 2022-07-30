@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author gaojy
  * @ClassName PullTaskService.java
- * @Description TODO
+ * @Description
  * @createTime 2022/02/09 13:18:00
  */
 public class PullTaskService extends BackgroundThread {

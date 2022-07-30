@@ -15,7 +15,7 @@ import javax.sql.DataSource;
 /**
  * @author gaojy
  * @ClassName MysqlRepository.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/17 19:42:00
  */
 public class MysqlRepository implements Repository {

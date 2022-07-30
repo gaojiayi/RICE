@@ -1,24 +1,19 @@
 package com.gaojy.rice.processor.api.invoker;
 
-import com.gaojy.rice.common.constants.TaskType;
+import com.gaojy.rice.processor.api.annotation.LogEnable;
 import com.gaojy.rice.common.exception.ProcessorException;
 import com.gaojy.rice.common.protocol.body.processor.TaskDetailData;
 import com.gaojy.rice.common.utils.ClassHelper;
 import com.gaojy.rice.common.utils.ReflectUtils;
-import com.gaojy.rice.processor.api.RiceBasicProcessor;
 import com.gaojy.rice.processor.api.annotation.Executer;
 import com.gaojy.rice.processor.api.config.ClasspathPackageScanner;
 import com.gaojy.rice.processor.api.config.ProcessorConfig;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,12 +21,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 
 /**
  * @author gaojy
  * @ClassName TaskInvoker.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/05 19:42:00
  */
 public abstract class TaskInvoker {
@@ -68,13 +62,12 @@ public abstract class TaskInvoker {
                                     }
                                     TASK_CODE_INSTANCE_MAP.put(executer.taskCode(), clazz.newInstance());
                                     TaskInvoker invoker = getInvoker(clazz);
-                                    // TODO 判断taskType
-                                    TaskType taskType = TaskType.STANDALONE;
-                                    if (clazz.getInterfaces()[0].getSimpleName().toLowerCase().indexOf("mapreduce") > 0) {
-                                        taskType = TaskType.RICE_MAPREDUCE;
+                                    boolean logEnable = false;
+                                    if (clazz.getAnnotation(LogEnable.class) != null) {
+                                        logEnable = true;
                                     }
                                     TaskDetailData data = new TaskDetailData(executer.taskCode(), executer.taskName(),
-                                        className, taskType);
+                                        className, logEnable);
                                     invoker.taskDetailData = data;
                                     //invoker.setPropertyValue(invoker, "taskDetailData", data);
                                 }

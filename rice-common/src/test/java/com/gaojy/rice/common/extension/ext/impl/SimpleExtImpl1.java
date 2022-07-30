@@ -6,7 +6,7 @@ import java.net.URL;
 /**
  * @author gaojy
  * @ClassName SimpleExtImpl1.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/17 21:28:00
  */
 public class SimpleExtImpl1 implements SimpleExt {

@@ -6,7 +6,7 @@ import java.net.URL;
 /**
  * @author gaojy
  * @ClassName SimpleExt.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/01/17 21:27:00
  */
 @SPI

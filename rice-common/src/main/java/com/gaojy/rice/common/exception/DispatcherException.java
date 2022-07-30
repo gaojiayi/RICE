@@ -3,7 +3,7 @@ package com.gaojy.rice.common.exception;
 /**
  * @author gaojy
  * @ClassName DispatcherException.java
- * @Description TODO
+ * @Description 
  * @createTime 2022/02/07 12:52:00
  */
 public class DispatcherException extends RuntimeException{

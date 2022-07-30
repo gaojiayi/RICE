@@ -8,7 +8,6 @@ import java.util.Locale;
  * @Description 执行类型
  * @createTime 2022/01/04 19:16:00
  */
-@Deprecated
 public enum ExecuteType {
     /**
      * 广播执行
