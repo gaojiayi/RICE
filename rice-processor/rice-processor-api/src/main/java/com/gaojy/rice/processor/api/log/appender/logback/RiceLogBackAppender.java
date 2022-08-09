@@ -26,12 +26,16 @@ public class RiceLogBackAppender extends AppenderBase<ILoggingEvent> implements 
         }
         String logStr = this.layout.doLayout(event);
         schedulersOfLog.forEach((taskInstanceId, channel) -> {
-            LogReportRequestBody body = new LogReportRequestBody();
-            body.setTaskInstanceId(taskInstanceId);
-            body.setLogMessage(logStr);
-            RiceRemoteContext requestBody = RiceRemoteContext.createRequestCommand(RequestCode.LOG_REPORT, null);
-            requestBody.setBody(body.encode());
-            channel.writeAndFlush(channel);
+            try {
+                LogReportRequestBody body = new LogReportRequestBody();
+                body.setTaskInstanceId(taskInstanceId);
+                body.setLogMessage(logStr);
+                RiceRemoteContext requestBody = RiceRemoteContext.createRequestCommand(RequestCode.LOG_REPORT, null);
+                requestBody.setBody(body.encode());
+                channel.writeAndFlush(channel);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
 

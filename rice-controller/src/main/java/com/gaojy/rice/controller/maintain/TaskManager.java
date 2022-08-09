@@ -17,7 +17,7 @@ public class TaskManager {
 
     public static TaskManager getTaskManager() {
         if (taskManager == null) {
-            synchronized (taskManager) {
+            synchronized (TaskManager.class) {
                 if (taskManager == null) {
                     taskManager = new TaskManager();
                 }

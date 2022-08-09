@@ -5,12 +5,12 @@ import com.gaojy.rice.common.constants.LoggerName;
 import com.gaojy.rice.common.constants.RequestCode;
 import com.gaojy.rice.common.extension.ExtensionLoader;
 import com.gaojy.rice.controller.config.ControllerConfig;
-import com.gaojy.rice.controller.election.LeaderStateListener;
-import com.gaojy.rice.controller.election.RiceElectionManager;
 import com.gaojy.rice.controller.longpolling.PullTaskRequestHoldService;
 import com.gaojy.rice.controller.maintain.SchedulerManager;
 import com.gaojy.rice.controller.processor.SchedulerManagerProcessor;
 import com.gaojy.rice.controller.processor.TaskAccessProcessor;
+import com.gaojy.rice.controller.replicator.LeaderStateListener;
+import com.gaojy.rice.controller.replicator.RiceReplicatorManager;
 import com.gaojy.rice.http.api.HttpBinder;
 import com.gaojy.rice.http.api.HttpServer;
 import com.gaojy.rice.remote.ChannelEventListener;
@@ -20,7 +20,6 @@ import com.gaojy.rice.repository.api.Repository;
 import io.netty.channel.Channel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +39,7 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
 
     private final ControllerConfig controllerConfig;
 
-    private final RiceElectionManager riceElectionManager;
+    private final RiceReplicatorManager replicatorManager;
 
     private TransfServerConfig transfServerConfig;
 
@@ -59,9 +58,10 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
     public RiceController(ControllerConfig controllerConfig, TransfServerConfig transfServerConfig) {
         this.controllerConfig = controllerConfig;
         this.transfServerConfig = transfServerConfig;
+        // 替换业务端口
+        this.transfServerConfig.setListenPort(controllerConfig.getControllerPort());
         this.remotingServer = new TransportServer(this.transfServerConfig, this);
-        this.riceElectionManager = new RiceElectionManager(this.controllerConfig, this);
-
+        this.replicatorManager = new RiceReplicatorManager(this.controllerConfig, this);
         this.taskAccessExecutor = Executors.newFixedThreadPool(this.controllerConfig.getTaskAccessThreadPoolNums(),
             new RiceThreadFactory("TaskAccessThread_"));
         this.schedulerManagerExecutor = Executors.newFixedThreadPool(this.controllerConfig.getSchedulerManagerThreadPoolNums(),
@@ -86,15 +86,15 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
 
     public void start() {
         // 启动选举
-        this.riceElectionManager.start();
+        this.replicatorManager.start();
         // 启动业务服务端
         this.remotingServer.start();
         // 启动管理员控制台
-        httpServer = this.httpBinder.bind(this.controllerConfig.getController_console_port());
+        httpServer = this.httpBinder.bind(this.controllerConfig.getManagePort());
     }
 
     public void shutdown() {
-        this.riceElectionManager.stopElection();
+        this.replicatorManager.stop();
         this.remotingServer.shutdown();
         if (httpServer != null && !httpServer.isClosed()) {
             httpServer.close();
@@ -165,7 +165,7 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
             // 删除该scheulerserver
             SchedulerManager.getManager().closeScheduler(remoteAddr);
 
-            if (this.riceElectionManager.isLeader()) {
+            if (this.replicatorManager.isLeader()) {
                 // 并且是leader 那么就触发任务分配
                 schedulerManagerProcessor.crashDownScheduler(remoteAddr);
             }
@@ -184,7 +184,7 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
     }
 
     public Boolean isMaster() {
-        return riceElectionManager.isLeader();
+        return replicatorManager.isLeader();
     }
 
     public ExecutorService getSchedulerManagerExecutor() {

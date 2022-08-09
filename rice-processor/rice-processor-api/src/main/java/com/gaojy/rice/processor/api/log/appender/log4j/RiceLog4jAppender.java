@@ -18,12 +18,16 @@ public class RiceLog4jAppender extends AppenderSkeleton implements ILogHandler {
     @Override
     protected void append(LoggingEvent event) {
         schedulersOfLog.forEach((taskInstanceId, channel) -> {
-            LogReportRequestBody body = new LogReportRequestBody();
-            body.setTaskInstanceId(taskInstanceId);
-            body.setLogMessage(this.layout.format(event));
-            RiceRemoteContext requestBody = RiceRemoteContext.createRequestCommand(RequestCode.LOG_REPORT,null);
-            requestBody.setBody(body.encode());
-            channel.writeAndFlush(channel);
+            try {
+                LogReportRequestBody body = new LogReportRequestBody();
+                body.setTaskInstanceId(taskInstanceId);
+                body.setLogMessage(this.layout.format(event));
+                RiceRemoteContext requestBody = RiceRemoteContext.createRequestCommand(RequestCode.LOG_REPORT,null);
+                requestBody.setBody(body.encode());
+                channel.writeAndFlush(channel);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
     }

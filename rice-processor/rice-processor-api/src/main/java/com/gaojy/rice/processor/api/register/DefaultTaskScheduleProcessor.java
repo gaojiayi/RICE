@@ -4,6 +4,7 @@ import com.gaojy.rice.common.constants.LoggerName;
 import com.gaojy.rice.common.constants.RequestCode;
 import com.gaojy.rice.common.constants.TaskInstanceStatus;
 import com.gaojy.rice.common.exception.ProcessorException;
+import com.gaojy.rice.common.protocol.body.scheduler.Processor2SchedulerHeartBeatBody;
 import com.gaojy.rice.common.protocol.body.scheduler.TaskInvokerResponseBody;
 import com.gaojy.rice.common.protocol.header.CommandCustomHeader;
 import com.gaojy.rice.common.protocol.header.scheduler.TaskInvokeRequestHeader;
@@ -19,6 +20,9 @@ import com.gaojy.rice.remote.common.TransfUtil;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.RiceRequestProcessor;
 import io.netty.channel.ChannelHandlerContext;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +39,8 @@ public class DefaultTaskScheduleProcessor implements RiceRequestProcessor {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.CLIENT_LOGGER_NAME);
 
     private RiceProcessorManager manager;
+
+    private Map<Long, RiceRemoteContext> failedTaskHandlerResult = new ConcurrentHashMap<>();
 
     public DefaultTaskScheduleProcessor(RiceProcessorManager manager) {
         this.manager = manager;
@@ -108,10 +114,33 @@ public class DefaultTaskScheduleProcessor implements RiceRequestProcessor {
                     log.info("本次任务实例：" + requestHeader.getTaskInstanceId() + ",已完成调度，将停止发送日志数据");
                     ILogHandler.schedulersOfLog.remove(requestHeader.getTaskInstanceId());
                 }
-                return response;
+
+                try {
+                    response.setOpaque(request.getOpaque());
+                    response.markResponseType();
+                    ctx.writeAndFlush(response);
+                } catch (Throwable e) {
+                    log.error("返回任务实例ID:" + requestHeader.getTaskInstanceId() + ",taskCode:" + requestHeader.getTaskCode() + "失败，执行结果将缓存起来。");
+                    failedTaskHandlerResult.put(requestHeader.getTaskInstanceId(), response);
+                }
+                return null;
             case RequestCode.SCHEDULER_HEART_BEAT:
+                //  返回因为由于调度器异常而没有返回给调度器的任务处理结果
                 String address = RemoteHelper.parseChannelRemoteAddr(ctx.channel());
                 log.info("Heartbeat probe received from scheduler:{}", address);
+                Map<Long, RiceRemoteContext> faildTasks = fetchFailedTask();
+                RiceRemoteContext responseHeartBeat = RiceRemoteContext.createResponseCommand(null);
+                Processor2SchedulerHeartBeatBody processor2SchedulerHeartBeatBody = new Processor2SchedulerHeartBeatBody();
+                if (faildTasks != null) {
+
+                    faildTasks.forEach((id, cmd) -> {
+                        processor2SchedulerHeartBeatBody.getSendFailedTasks().put((TaskInvokeRequestHeader) cmd.readCustomHeader(),
+                            TaskInvokerResponseBody.decode(cmd.getBody(), TaskInvokerResponseBody.class));
+                        cmd.setCode(RequestCode.SCHEDULER_HEART_BEAT);
+                    });
+                }
+                responseHeartBeat.setBody(processor2SchedulerHeartBeatBody.encode());
+                return responseHeartBeat;
             default:
                 return null;
         }
@@ -121,5 +150,21 @@ public class DefaultTaskScheduleProcessor implements RiceRequestProcessor {
     @Override
     public boolean rejectRequest() {
         return false;
+    }
+
+    private Map<Long, RiceRemoteContext> fetchFailedTask() {
+        if (failedTaskHandlerResult.size() != 0) {
+            synchronized (this) {
+                if (failedTaskHandlerResult.size() != 0) {
+                    HashMap<Long, RiceRemoteContext> ret = new HashMap<>();
+                    ret.putAll(failedTaskHandlerResult);
+                    ret.keySet().stream().forEach(id -> {
+                        failedTaskHandlerResult.remove(id);
+                    });
+                    return ret;
+                }
+            }
+        }
+        return null;
     }
 }

@@ -75,7 +75,7 @@ public class TestProcessor {
         TaskDetailData data = new TaskDetailData();
         data.setTaskCode("TestTaskCode");
         data.setTaskName("TestTaskName");
-        data.setTaskType(TaskType.STANDALONE);
+        //data.setTaskType(TaskType.STANDALONE);
         data.setClassName("com.gaojy.rice.common.protocol.body.processor.ExportTaskRequestBody");
         list.add(data);
         body.setTasks(list);

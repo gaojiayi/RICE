@@ -51,10 +51,10 @@
             <artifactId>logback-classic</artifactId>
             <optional>true</optional>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.alipay.sofa</groupId>-->
-<!--            <artifactId>jraft-core</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.alipay.sofa</groupId>
+            <artifactId>jraft-core</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>

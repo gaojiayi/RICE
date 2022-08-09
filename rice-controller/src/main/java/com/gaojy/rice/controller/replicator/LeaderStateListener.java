@@ -14,8 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gaojy.rice.controller.election;
+package com.gaojy.rice.controller.replicator;
 
+/**
+ * Leader state listener.
+ *
+ * @author dennis
+ */
 public interface LeaderStateListener {
 
     /**

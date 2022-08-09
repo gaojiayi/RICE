@@ -48,6 +48,8 @@ public class RiceProcessorManager implements ChannelEventListener {
     // 处理业务线程池
     private final ExecutorService remotingExecutor;
 
+    private final ElectionClient electionClient;
+
     private RiceProcessorManager(ProcessorConfig config) {
         this.config = config;
         server = new TransportServer(config.getTransfServerConfig(), this);
@@ -55,7 +57,7 @@ public class RiceProcessorManager implements ChannelEventListener {
         remotingExecutor =
             Executors.newFixedThreadPool(config.getTransfServerConfig().getServerWorkerThreads(),
                 new RiceThreadFactory("RemotingExecutorThread_"));
-
+        electionClient = new ElectionClient(config);
     }
 
     public static RiceProcessorManager getManager() {
@@ -80,6 +82,7 @@ public class RiceProcessorManager implements ChannelEventListener {
         this.server.start();
 
         this.client.start();
+        this.electionClient.close();
 
         RiceRemoteContext context = buildRegisterRequest();
         doRegister(context);
@@ -121,12 +124,13 @@ public class RiceProcessorManager implements ChannelEventListener {
      * @param riceRemoteContext
      */
     void doRegister(RiceRemoteContext riceRemoteContext) {
-        Balance balance = BalanceFactory.getBalance(this.config.getBalancePolicy());
+//        Balance balance = BalanceFactory.getBalance(this.config.getBalancePolicy());
         String addr = null;
         int retryConnCount = 5;
         while (retryConnCount >= 0) {
             try {
-                addr = balance.select(config.getControllerServerList());
+                addr = this.electionClient.getMasterController();
+//                addr = balance.select(config.getControllerServerList());
                 RiceRemoteContext registerResult = client.invokeSync(addr, riceRemoteContext, 3 * 1000);
                 switch (registerResult.getCode()) {
                     case RemotingSysResponseCode.SUCCESS: {
@@ -149,7 +153,7 @@ public class RiceProcessorManager implements ChannelEventListener {
 
                 }
             } catch (RemotingConnectException | RemotingTimeoutException
-                | RemotingSendRequestException | InterruptedException e) {
+                | RemotingSendRequestException | InterruptedException | TimeoutException e) {
                 log.error("Register to controller Exception, controller address is " + addr);
             }
             retryConnCount--;

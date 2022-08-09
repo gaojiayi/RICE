@@ -16,7 +16,7 @@ public class ProcessorManager {
 
     public static ProcessorManager getManager() {
         if (processorManager == null) {
-            synchronized (processorManager) {
+            synchronized (ProcessorManager.class) {
                 if (processorManager == null) {
                     processorManager = new ProcessorManager();
                 }

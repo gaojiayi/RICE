@@ -85,7 +85,7 @@ public class TaskAccessProcessor implements RiceRequestProcessor {
                     TaskChangeRecord record = new TaskChangeRecord();
                     record.setCreateTime(new Date(currentTime));
                     record.setTaskCode(info.getTaskCode());
-                    record.setOptType(TaskOptType.TASK_PROCESSOR_OFFLINE.getCode());
+                    record.setOptType(TaskOptType.TASK_PROCESSOR_ISOLATION.getCode());
                     records.add(record);
                 }
             });

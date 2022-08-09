@@ -23,6 +23,6 @@ public class TestRiceController {
         serverConfig.setListenPort(8881);
         RiceController controller = new RiceController(config, serverConfig);
         controller.start();
-        System.in.read();
+        controller.shutdown();
     }
 }

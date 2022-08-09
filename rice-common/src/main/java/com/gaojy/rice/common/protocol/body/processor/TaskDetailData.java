@@ -26,6 +26,9 @@ public class TaskDetailData {
         this.logEnable = logEnable;
     }
 
+    public TaskDetailData() {
+    }
+
     public boolean isLogEnable() {
         return logEnable;
     }

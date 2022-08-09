@@ -45,12 +45,16 @@ class RiceLog4j2Appender extends AbstractAppender implements ILogHandler {
     public void append(LogEvent event) {
         final String log = new String(this.getLayout().toByteArray(event), StandardCharsets.UTF_8);
         schedulersOfLog.forEach((taskInstanceId, channel) -> {
-            LogReportRequestBody body = new LogReportRequestBody();
-            body.setTaskInstanceId(taskInstanceId);
-            body.setLogMessage(log);
-            RiceRemoteContext requestBody = RiceRemoteContext.createRequestCommand(RequestCode.LOG_REPORT, null);
-            requestBody.setBody(body.encode());
-            channel.writeAndFlush(channel);
+            try {
+                LogReportRequestBody body = new LogReportRequestBody();
+                body.setTaskInstanceId(taskInstanceId);
+                body.setLogMessage(log);
+                RiceRemoteContext requestBody = RiceRemoteContext.createRequestCommand(RequestCode.LOG_REPORT, null);
+                requestBody.setBody(body.encode());
+                channel.writeAndFlush(channel);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
     }
