@@ -19,7 +19,6 @@ public class RiceTaskInfo{
 	private String executeType;
 	private int threads;
 	private int taskRetryCount;
-	private int instanceRetryCount;
 	private Date nextTriggerTime;
 	private Date createTime;
 	private Date updateTime;
@@ -127,14 +126,6 @@ public class RiceTaskInfo{
 
 	public int getTaskRetryCount(){
 		return taskRetryCount;
-	}
-
-	public void setInstanceRetryCount(int instanceRetryCount){
-		this.instanceRetryCount=instanceRetryCount;
-	}
-
-	public int getInstanceRetryCount(){
-		return instanceRetryCount;
 	}
 
 	public void setNextTriggerTime(Date nextTriggerTime){

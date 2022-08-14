@@ -1,23 +1,76 @@
 package com.gaojy.rice.repository.mysql.impl;
 
+import com.gaojy.rice.common.constants.LoggerName;
 import com.gaojy.rice.common.entity.TaskChangeRecord;
+import com.gaojy.rice.common.exception.RepositoryException;
 import com.gaojy.rice.repository.api.dao.RiceTaskChangeRecordDao;
-
+import com.gaojy.rice.repository.mysql.DataSourceFactory;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
+import javax.sql.DataSource;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.BeanListHandler;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RiceTaskChangeRecordDaoImpl implements RiceTaskChangeRecordDao {
+    private static final Logger LOG = LoggerFactory.getLogger(LoggerName.REPOSITORY_LOGGER_NAME);
+    private final DataSource dataSource = DataSourceFactory.getDataSource();
+    private String baseSql = "select * from task_change_record";
+
     @Override
     public long getLatestRecord(String taskCode) {
-        return 0;
+        QueryRunner queryRunner = new QueryRunner(dataSource);
+        String sql = "select MAX(create_time) from task_change_record where task_code = ?";
+        try {
+            Date createTime = queryRunner.query(sql, new ScalarHandler<Timestamp>(),taskCode);
+            if (createTime != null) {
+                return createTime.getTime();
+            }
+            return 0L;
+        } catch (SQLException e) {
+            LOG.error("getLatestRecord error", e);
+            throw new RepositoryException("getLatestRecord error");
+        }
     }
 
     @Override
     public List<TaskChangeRecord> getChanges(String taskCode, Long startTime) {
-        return null;
+        QueryRunner queryRunner = new QueryRunner(dataSource);
+        String sql = "select * from task_change_record where task_code = ? and create_time >= ? ";
+
+        Object[] params = {taskCode, new Timestamp(startTime)};
+        try {
+            List<TaskChangeRecord> rets = queryRunner.query(sql, new BeanListHandler<TaskChangeRecord>(TaskChangeRecord.class), params);
+            return rets;
+        } catch (SQLException e) {
+            LOG.error("getChanges SQLException", e);
+            throw new RepositoryException("getChanges SQLException", e);
+        }
     }
 
     @Override
     public void insert(List<TaskChangeRecord> taskChangeRecords) {
+        QueryRunner qr = new QueryRunner(dataSource);
+        String sql = "insert into  task_change_record (task_code,opt_type,create_time) " +
+            " values (?,?,?)";
+
+        Object[][] params = new Object[taskChangeRecords.size()][3];
+        for (int i = 0; i < taskChangeRecords.size(); i++) {
+            TaskChangeRecord taskChangeRecord = taskChangeRecords.get(i);
+            params[i][0] = taskChangeRecord.getTaskCode();
+            params[i][1] = taskChangeRecord.getOptType();
+            params[i][2] = new Timestamp(taskChangeRecord.getCreateTime().getTime());
+        }
+        try {
+            qr.batch(sql, params);
+        } catch (SQLException e) {
+            LOG.error("insert taskChangeRecords SQLException", e);
+            throw new RepositoryException("insert taskChangeRecords SQLException", e);
+        }
 
     }
 }

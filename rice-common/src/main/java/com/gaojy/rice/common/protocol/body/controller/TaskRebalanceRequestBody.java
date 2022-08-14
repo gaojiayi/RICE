@@ -14,6 +14,10 @@ public class TaskRebalanceRequestBody extends RemotingSerializable {
 
     private List<String> currentActiveSchedulers;
 
+    private String changeScheduler;
+
+    private byte schedulerOpt;
+
     public String getCurrentScheduler() {
         return currentScheduler;
     }
@@ -28,5 +32,21 @@ public class TaskRebalanceRequestBody extends RemotingSerializable {
 
     public void setCurrentActiveSchedulers(List<String> currentActiveSchedulers) {
         this.currentActiveSchedulers = currentActiveSchedulers;
+    }
+
+    public String getChangeScheduler() {
+        return changeScheduler;
+    }
+
+    public void setChangeScheduler(String changeScheduler) {
+        this.changeScheduler = changeScheduler;
+    }
+
+    public byte getSchedulerOpt() {
+        return schedulerOpt;
+    }
+
+    public void setSchedulerOpt(byte schedulerOpt) {
+        this.schedulerOpt = schedulerOpt;
     }
 }

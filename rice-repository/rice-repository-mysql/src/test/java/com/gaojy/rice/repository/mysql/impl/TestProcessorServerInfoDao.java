@@ -26,18 +26,18 @@ public class TestProcessorServerInfoDao {
         List<ProcessorServerInfo> infos = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             ProcessorServerInfo info = new ProcessorServerInfo();
+            info.setAppId(111L);
             info.setAddress("127.0.0." + i);
             info.setPort(1234);
             info.setLatestActiveTime(new Date());
             info.setCreateTime(new Date());
             info.setStatus(0);
-            info.setVersion("-1");
             info.setTaskCode("test_task_code");
             infos.add(info);
         }
         int i = dao.batchCreateOrUpdateInfo(infos);
         Assert.assertEquals(10, i);
-        List<ProcessorServerInfo> server = dao.getInfosByServer("127.0.0.5", 1234);
+        List<ProcessorServerInfo> server = dao.getInfosByServer(0,"127.0.0.5", 1234);
         server.get(0).setStatus(1);
         i = dao.batchCreateOrUpdateInfo(server);
         Assert.assertEquals(1, i);

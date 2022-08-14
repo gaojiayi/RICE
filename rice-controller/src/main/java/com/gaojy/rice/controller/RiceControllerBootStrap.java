@@ -7,12 +7,15 @@ import com.alipay.remoting.RemotingContext;
 import com.gaojy.rice.common.constants.LoggerName;
 import com.gaojy.rice.common.utils.CommandUtil;
 import com.gaojy.rice.common.utils.MixAll;
+import com.gaojy.rice.common.utils.RiceBanner;
 import com.gaojy.rice.common.utils.StringUtil;
 import com.gaojy.rice.controller.config.ControllerConfig;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.TransfServerConfig;
 import com.gaojy.rice.remote.transport.TransfSystemConfig;
+import com.gaojy.rice.repository.api.Repository;
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,22 +66,34 @@ public class RiceControllerBootStrap {
         // 默认业务端口
         // controllerConfig.setControllerPort(9876);
         try {
+            String file = controllerConfig.getRiceHome() + File.separator + "conf" + File.separator + "rice-controller.properties";
             //  优先级最低的配置是文件
             if (commandLine.hasOption('c')) {
-                String file = commandLine.getOptionValue('f');
-                if (file != null) {
-                    InputStream in = new BufferedInputStream(new FileInputStream(file));
-                    properties = new Properties();
-                    properties.load(in);
-                    MixAll.properties2Object(properties, controllerConfig);
-                    MixAll.properties2Object(properties, transfServerConfig);
-
-                    controllerConfig.setConfigStorePath(file);
-
-                    System.out.printf("load config properties file OK, " + file + "%n");
-                    in.close();
-                }
+                file = commandLine.getOptionValue('f');
             }
+            if (file != null) {
+                InputStream in = new BufferedInputStream(new FileInputStream(file));
+                properties = new Properties();
+                properties.load(in);
+                MixAll.properties2Object(properties, controllerConfig);
+                MixAll.properties2Object(properties, transfServerConfig);
+
+                controllerConfig.setConfigStorePath(file);
+
+                //repository related config
+                System.setProperty(Repository.REPOSITORY_PASSWORD_KEY,
+                    properties.getProperty(Repository.REPOSITORY_PASSWORD_KEY));
+                System.setProperty(Repository.REPOSITORY_TYPE_KEY,
+                    properties.getProperty(Repository.REPOSITORY_TYPE_KEY));
+                System.setProperty(Repository.REPOSITORY_USERNAME_KEY,
+                    properties.getProperty(Repository.REPOSITORY_USERNAME_KEY));
+                System.setProperty(Repository.REPOSITORY_URL_KEY,
+                    properties.getProperty(Repository.REPOSITORY_URL_KEY));
+
+                System.out.printf("load config properties file OK, " + file + "%n");
+                in.close();
+            }
+
             if (commandLine.hasOption('p')) {
                 MixAll.printObjectProperties(null, controllerConfig);
                 MixAll.printObjectProperties(null, transfServerConfig);
@@ -96,7 +111,8 @@ public class RiceControllerBootStrap {
             JoranConfigurator configurator = new JoranConfigurator();
             configurator.setContext(lc);
             lc.reset();
-            configurator.doConfigure(controllerConfig.getRiceHome() + "/conf/logback_controller.xml");
+            configurator.doConfigure(controllerConfig.getRiceHome() + File.separator + "conf"
+                + File.separator + "logback_controller.xml");
             final Logger log = LoggerFactory.getLogger(LoggerName.CONTROLLER_LOGGER_NAME);
 
             MixAll.printObjectProperties(log, controllerConfig);
@@ -105,6 +121,8 @@ public class RiceControllerBootStrap {
             // TODO: 后面再接入配置持久化方案
             try {
                 controller.start();
+                // 打印banner
+                RiceBanner.show(7);
                 String tip = "The RICE Controller boot success. serializeType=" + RiceRemoteContext.getSerializeTypeConfigInThisServer();
                 log.info(tip);
                 System.out.printf(tip + "%n");
@@ -113,7 +131,7 @@ public class RiceControllerBootStrap {
                 System.exit(-3);
             }
             // JVM 钩子
-            Runtime.getRuntime().addShutdownHook(new Thread(()->{
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 controller.shutdown();
             }));
             return controller;

@@ -1,6 +1,5 @@
 package com.gaojy.rice.repository.mysql;
 
-import com.gaojy.rice.common.entity.TaskInstanceInfo;
 import com.gaojy.rice.repository.api.Repository;
 import com.gaojy.rice.repository.api.dao.ProcessorServerInfoDao;
 import com.gaojy.rice.repository.api.dao.RiceTaskChangeRecordDao;

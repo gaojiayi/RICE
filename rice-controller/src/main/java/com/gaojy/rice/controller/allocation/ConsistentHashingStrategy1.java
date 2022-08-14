@@ -14,6 +14,7 @@ import java.util.TreeMap;
  * 调度器的下线，会逐个分配其托管的任务  当调度器上线，则根据其所处的位置 把下一个节点的task分摊到新节点上
  * @createTime 2022/01/18 22:40:00
  */
+@Deprecated
 public class ConsistentHashingStrategy1 {
     /**
      * 待添加入Hash环的服务器列表

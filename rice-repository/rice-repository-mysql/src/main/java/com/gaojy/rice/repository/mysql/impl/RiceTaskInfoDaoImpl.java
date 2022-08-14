@@ -25,7 +25,7 @@ public class RiceTaskInfoDaoImpl implements RiceTaskInfoDao {
     public List<RiceTaskInfo> getInfoByCodes(List<String> taskCodes) {
         QueryRunner qr = new QueryRunner(dataSource);
         String condition = String.join(",", taskCodes);
-        String sql = "select * from rice_task_info where task_code in (" + condition + ") and status != 0";
+        String sql = "select * from rice_task_info where task_code in ('" + condition + "') and status != 0";
         try {
             List<RiceTaskInfo> riceTaskInfos = qr.query(sql,
                 new BeanListHandler<RiceTaskInfo>(RiceTaskInfo.class,
@@ -36,15 +36,18 @@ public class RiceTaskInfoDaoImpl implements RiceTaskInfoDao {
         }
     }
 
-    @Override public void addTask(RiceTaskInfo riceTaskInfo) {
+    @Override
+    public void addTask(RiceTaskInfo riceTaskInfo) {
 
     }
 
-    @Override public void updateTask(RiceTaskInfo riceTaskInfo) {
+    @Override
+    public void updateTask(RiceTaskInfo riceTaskInfo) {
 
     }
 
-    @Override public void taskStatusChange(int status) {
+    @Override
+    public void taskStatusChange(int status) {
 
     }
 

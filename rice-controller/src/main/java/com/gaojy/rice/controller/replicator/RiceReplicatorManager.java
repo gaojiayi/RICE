@@ -31,4 +31,8 @@ public class RiceReplicatorManager {
     public void stop() {
         server.shutdown();
     }
+
+    public ReplicatorServer getServer() {
+        return server;
+    }
 }

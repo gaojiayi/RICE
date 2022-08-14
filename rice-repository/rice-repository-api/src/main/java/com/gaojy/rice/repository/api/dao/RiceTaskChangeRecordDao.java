@@ -13,6 +13,10 @@ public interface RiceTaskChangeRecordDao {
 
     public long getLatestRecord(String taskCode);
 
+    /**
+     * @description   order by createTime asc
+     * @throws
+     */
     public List<TaskChangeRecord> getChanges(String taskCode, Long startTime);
 
     public void  insert(List<TaskChangeRecord> taskChangeRecords);

@@ -2,6 +2,7 @@ package com.gaojy.rice.repository.mysql;
 
 import com.gaojy.rice.common.constants.LoggerName;
 import com.gaojy.rice.common.exception.RepositoryConnectionException;
+import com.gaojy.rice.repository.api.Repository;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import java.beans.PropertyVetoException;
 import java.sql.Connection;
@@ -19,9 +20,6 @@ import org.slf4j.LoggerFactory;
 public class DataSourceFactory {
     public static final Logger logger = LoggerFactory.getLogger(LoggerName.REPOSITORY_LOGGER_NAME);
     private static final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
-    private static final String JDBC_URL_PROP = "mysql.jdbc.url";
-    private static final String MYSQL_USER_PROP = "mysql.user";
-    private static final String MYSQL_PASSWORD_PROP = "mysql.password";
 
     private static volatile ComboPooledDataSource dataSource;
 
@@ -35,9 +33,9 @@ public class DataSourceFactory {
                     try {
                         dataSource = new ComboPooledDataSource();
                         dataSource.setDriverClass(MYSQL_DRIVER);
-                        dataSource.setJdbcUrl(System.getProperty(JDBC_URL_PROP, "jdbc:mysql://localhost:3306/rice"));
-                        dataSource.setUser(System.getProperty(MYSQL_USER_PROP, "root"));
-                        dataSource.setPassword(System.getProperty(MYSQL_PASSWORD_PROP, "root"));
+                        dataSource.setJdbcUrl(System.getProperty(Repository.REPOSITORY_URL_KEY, "jdbc:mysql://localhost:3306/rice"));
+                        dataSource.setUser(System.getProperty(Repository.REPOSITORY_USERNAME_KEY, "root"));
+                        dataSource.setPassword(System.getProperty(Repository.REPOSITORY_PASSWORD_KEY, "root"));
                         dataSource.setInitialPoolSize(3);
                         dataSource.setMaxPoolSize(10);
                         dataSource.setMinPoolSize(3);

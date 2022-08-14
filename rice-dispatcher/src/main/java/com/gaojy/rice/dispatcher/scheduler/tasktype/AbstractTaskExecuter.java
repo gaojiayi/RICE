@@ -1,7 +1,5 @@
 package com.gaojy.rice.dispatcher.scheduler.tasktype;
 
-import com.gaojy.rice.common.constants.ExecuteType;
-import com.gaojy.rice.common.constants.ExecuterMethodName;
 import com.gaojy.rice.common.constants.RequestCode;
 import com.gaojy.rice.common.constants.TaskInstanceStatus;
 import com.gaojy.rice.common.entity.TaskInstanceInfo;
@@ -18,7 +16,6 @@ import com.gaojy.rice.dispatcher.scheduler.TaskScheduleClient;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.repository.api.Repository;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;

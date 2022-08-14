@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 处理器状态维护
  */
+@Deprecated
 public class ProcessorManager {
     private Map<String /* ip:port */, Long/* 最近一次心跳的时间搓*/> processors = new ConcurrentHashMap<>();
 

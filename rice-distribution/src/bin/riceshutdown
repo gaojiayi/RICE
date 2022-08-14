@@ -1,0 +1,35 @@
+#!/bin/sh
+
+case $1 in
+    controller)
+
+    pid=`ps ax | grep -i 'com.gaojy.rice.controller.RiceController' |grep java | grep -v grep | awk '{print $1}'`
+    if [ -z "$pid" ] ; then
+            echo "No rice controller running."
+            exit 0;
+    fi
+
+    echo "The rice controller (${pid}) is running..."
+
+    kill -9 ${pid}
+
+    echo "Send shutdown request to rice controller (${pid}) OK"
+    ;;
+
+    dispatcher)
+
+    pid=`ps ax | grep -i 'com.gaojy.rice.dispatcher.RiceDispatchScheduler' |grep java | grep -v grep | awk '{print $1}'`
+    if [ -z "$pid" ] ; then
+            echo "No rice dispatcher running."
+            exit 0;
+    fi
+
+    echo "The rice dispatcher (${pid}) is running..."
+
+    kill -9 ${pid}
+
+    echo "Send shutdown request to rice dispatcher(${pid}) OK"
+    ;;
+    *)
+    echo "Useage: riceshutdown controller | dispatcher"
+esac

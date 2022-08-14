@@ -55,6 +55,9 @@ public class ControllerConfig extends ElectionConstants {
 
     private int taskAccessThreadPoolNums = 16;
 
+    /**
+     * 处理来自调度器的请求和长轮询处理的线程池
+     */
     private int schedulerManagerThreadPoolNums = 16 + Runtime.getRuntime().availableProcessors() * 2;
 
     public String getLocalHost() {

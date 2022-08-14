@@ -5,8 +5,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 任务管理器 保存着各个任务在哪个调度器上面运行
+ * 任务管理器 保存着各个任务在哪个调度器上面运行   后期加入到jraft状态机中
  */
+@Deprecated
 public class TaskManager {
     private Map<String, String> tasks = new ConcurrentHashMap<>();
 

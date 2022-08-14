@@ -1,12 +1,9 @@
 package com.gaojy.rice.controller.longpolling;
 
-import com.alipay.remoting.RemotingCommand;
 import com.gaojy.rice.common.BackgroundThread;
-import com.gaojy.rice.common.RiceThreadFactory;
 import com.gaojy.rice.common.constants.LoggerName;
 import com.gaojy.rice.common.constants.ResponseCode;
 import com.gaojy.rice.common.entity.TaskChangeRecord;
-import com.gaojy.rice.common.exception.RemotingCommandException;
 import com.gaojy.rice.common.protocol.body.scheduler.SchedulerPullTaskChangeResponseBody;
 import com.gaojy.rice.controller.RiceController;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
@@ -17,8 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +26,10 @@ import org.slf4j.LoggerFactory;
 public class PullTaskRequestHoldService extends BackgroundThread {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.CONTROLLER_LOGGER_NAME);
     private final SystemClock systemClock = new SystemClock();
+    public static final long LONG_POLLING_INTERVAL = 6 * 1000L;
     /**
      * 存放来自调度器的任务拉取请求
+     * TODO: 随着任务数越来越多  单线程扫描会越来越耗时 后期多线程取数据
      */
     private ConcurrentMap<String/* taskCode */, ManyTaskPullRequest> pullRequestTable =
         new ConcurrentHashMap<String, ManyTaskPullRequest>(1024);
@@ -67,7 +64,7 @@ public class PullTaskRequestHoldService extends BackgroundThread {
         while (!this.isStopped()) {
             try {
                 if (this.controller.isLongPollingEnable()) {
-                    this.waitForRunning(5 * 1000);
+                    this.waitForRunning(LONG_POLLING_INTERVAL);
                 } else {
                     this.waitForRunning(this.controller.getShortPollingTimeMills());
                 }
@@ -75,7 +72,7 @@ public class PullTaskRequestHoldService extends BackgroundThread {
                 long beginLockTimestamp = this.systemClock.now();
                 this.checkHoldRequest();
                 long costTime = this.systemClock.now() - beginLockTimestamp;
-                if (costTime > 5 * 1000) {
+                if (costTime > LONG_POLLING_INTERVAL) {
                     log.info("[NOTIFYME] check hold request cost {} ms.", costTime);
                 }
             } catch (Throwable e) {
@@ -107,14 +104,15 @@ public class PullTaskRequestHoldService extends BackgroundThread {
 
     /**
      * @param taskCode
-     * @param latestTaskUpdateTime
+     * @param latestTaskUpdateTime 当前taskcode 发生change的最新时间
      * @throws
-     * @description 当发生调度器宕机  任务删改  新调度器上线  ，并通过长轮询让对应的调度器获取
+     * @description 任务删改 并通过长轮询让对应的调度器获取
      */
     public void notifyTaskOccurChange(String taskCode, Long latestTaskUpdateTime) {
 
         ManyTaskPullRequest mpr = this.pullRequestTable.get(taskCode);
         if (mpr != null) {
+            // 加锁 clone  +  clear ， 后续不用在pullRequestTable执行remove操作了
             List<PullRequest> requestList = mpr.cloneListAndClear();
             if (requestList != null) {
                 List<PullRequest> replayList = new ArrayList<PullRequest>();
@@ -125,6 +123,7 @@ public class PullTaskRequestHoldService extends BackgroundThread {
                         continue;
                     }
                     if (newestOffset <= request.getPullFromThisOffset()) { // 没有更新
+                        // 再次同步一下newestOffset
                         newestOffset = this.controller.getRepository().getRiceTaskChangeRecordDao()
                             .getLatestRecord(taskCode);
                     }
@@ -137,6 +136,7 @@ public class PullTaskRequestHoldService extends BackgroundThread {
                             SchedulerPullTaskChangeResponseBody body = new SchedulerPullTaskChangeResponseBody();
                             List<TaskChangeRecord> changes = this.controller.getRepository().getRiceTaskChangeRecordDao().getChanges(taskCode, request.getPullFromThisOffset());
                             body.setTaskChangeRecordList(changes);
+                            body.setLatestOffset(newestOffset);
                             responseCommand.setBody(body.encode());
                             // 获取到所有的task变更 并发送出去
                             executeRequestWhenWakeup(request.getClientChannel(), request.getRiceRemoteContext(), responseCommand);
@@ -149,11 +149,12 @@ public class PullTaskRequestHoldService extends BackgroundThread {
                     }
 
                     // 如果scheduler的客户端请求以后超时了   则立即返回
-                    if (System.currentTimeMillis() >= (request.getSuspendTimestamp() + request.getTimeoutMillis())) {
+                    if (systemClock.now() >= (request.getSuspendTimestamp() + request.getTimeoutMillis())) {
                         try {
                             RiceRemoteContext responseCommand = RiceRemoteContext.createResponseCommand(null);
                             responseCommand.setCode(ResponseCode.SUCCESS);
                             SchedulerPullTaskChangeResponseBody body = new SchedulerPullTaskChangeResponseBody();
+                            body.setLatestOffset(newestOffset);
                             responseCommand.setBody(body.encode());
                             // 获取到所有的task变更 并发送出去
                             executeRequestWhenWakeup(request.getClientChannel(), request.getRiceRemoteContext(), responseCommand);
@@ -162,6 +163,10 @@ public class PullTaskRequestHoldService extends BackgroundThread {
                             log.error("execute request when wakeup failed.", e);
                         }
                         continue;
+                    } else {
+                        // 没有超时  重新放回到队列中
+                        log.info("taskCode:{},not found changes and not timeout , reput to queue", taskCode);
+                        this.suspendPullRequest(taskCode, request);
                     }
 
                 }
@@ -177,7 +182,6 @@ public class PullTaskRequestHoldService extends BackgroundThread {
         }
     }
 
-    // 在Dispatcher中的DispatcherAPIWrapper@pullTask处理响应
     private void executeRequestWhenWakeup(final Channel channel, RiceRemoteContext request,
         final RiceRemoteContext response) {
         if (response != null) {

@@ -16,20 +16,20 @@ import org.apache.commons.dbutils.handlers.BeanListHandler;
 /**
  * @author gaojy
  * @ClassName ProcessorServerInfoDaoImpl.java
- * @Description 
+ * @Description
  * @createTime 2022/01/28 10:14:00
  */
 public class ProcessorServerInfoDaoImpl implements ProcessorServerInfoDao {
     private final DataSource dataSource = DataSourceFactory.getDataSource();
 
     @Override
-    public List<ProcessorServerInfo> getInfosByServer(String address, int port) throws RepositoryException {
+    public List<ProcessorServerInfo> getInfosByServer(long appId, String address, int port) throws RepositoryException {
         QueryRunner qr = new QueryRunner(dataSource);
-        String sql = "select * from processor_server_info where address = ? and port = ? and status = 1";
+        String sql = "select * from processor_server_info where address = ? and port = ? and app_id = ? and status = 1";
         try {
             List<ProcessorServerInfo> processorServerInfoList = qr.query(sql,
                 new BeanListHandler<ProcessorServerInfo>(ProcessorServerInfo.class,
-                    new BasicRowProcessor(new GenerousBeanProcessor())), address, port);
+                    new BasicRowProcessor(new GenerousBeanProcessor())), address, port, appId);
             return processorServerInfoList;
         } catch (SQLException e) {
             throw new RepositoryException(e);
@@ -41,9 +41,9 @@ public class ProcessorServerInfoDaoImpl implements ProcessorServerInfoDao {
         List<ProcessorServerInfo> updateInfos = processorServerInfoList.stream().filter(info -> info.getId() > 0).collect(Collectors.toList());
         List<ProcessorServerInfo> addInfos = processorServerInfoList.stream().filter(info -> info.getId() <= 0).collect(Collectors.toList());
         int count = 0;
-        if (updateInfos != null && updateInfos.size() > 0) {
+        if (updateInfos.size() > 0) {
             String sql = "update processor_server_info set address = ?, port = ?, task_code = ?, " +
-                "version = ?, latest_active_time = ?, create_time = ?, status = ? where id = ?";
+                "app_id = ?, latest_active_time = ?, create_time = ?, status = ? where id = ?";
             QueryRunner qr = new QueryRunner(dataSource);
             Object[][] params = new Object[updateInfos.size()][8];
 
@@ -52,7 +52,7 @@ public class ProcessorServerInfoDaoImpl implements ProcessorServerInfoDao {
                 params[i][0] = info.getAddress();
                 params[i][1] = info.getPort();
                 params[i][2] = info.getTaskCode();
-                params[i][3] = info.getVersion();
+                params[i][3] = info.getAppId();
                 params[i][4] = info.getLatestActiveTime();
                 params[i][5] = info.getCreateTime();
                 params[i][6] = info.getStatus();
@@ -66,7 +66,7 @@ public class ProcessorServerInfoDaoImpl implements ProcessorServerInfoDao {
             }
         }
         if (addInfos != null && addInfos.size() > 0) {
-            String sql = "insert into  processor_server_info (address,port,task_code,version,latest_active_time,create_time,status) " +
+            String sql = "insert into  processor_server_info (address,port,task_code,app_id,latest_active_time,create_time,status) " +
                 " values (?,?,?,?,?,?,?)";
             QueryRunner qr = new QueryRunner(dataSource);
             Object[][] params = new Object[addInfos.size()][7];
@@ -76,7 +76,7 @@ public class ProcessorServerInfoDaoImpl implements ProcessorServerInfoDao {
                 params[i][0] = info.getAddress();
                 params[i][1] = info.getPort();
                 params[i][2] = info.getTaskCode();
-                params[i][3] = info.getVersion();
+                params[i][3] = info.getAppId();
                 params[i][4] = info.getLatestActiveTime();
                 params[i][5] = info.getCreateTime();
                 params[i][6] = info.getStatus();
@@ -91,7 +91,9 @@ public class ProcessorServerInfoDaoImpl implements ProcessorServerInfoDao {
         return count;
     }
 
-    @Override public List<ProcessorServerInfo> getInfosByTask(String taskCode) {
+    @Override
+    public List<ProcessorServerInfo> getInfosByTask(String taskCode) {
+
         return null;
     }
 }

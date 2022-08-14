@@ -9,6 +9,8 @@ import com.gaojy.rice.controller.longpolling.PullTaskRequestHoldService;
 import com.gaojy.rice.controller.maintain.SchedulerManager;
 import com.gaojy.rice.controller.processor.SchedulerManagerProcessor;
 import com.gaojy.rice.controller.processor.TaskAccessProcessor;
+import com.gaojy.rice.controller.replicator.ControllerDataService;
+import com.gaojy.rice.controller.replicator.ControllerDataServiceImpl;
 import com.gaojy.rice.controller.replicator.LeaderStateListener;
 import com.gaojy.rice.controller.replicator.RiceReplicatorManager;
 import com.gaojy.rice.http.api.HttpBinder;
@@ -26,14 +28,15 @@ import org.slf4j.LoggerFactory;
 /**
  * @author gaojy
  * @ClassName RiceController.java
- * @Description 
+ * @Description
  * @createTime 2022/01/08 10:39:00
  */
 public class RiceController implements LeaderStateListener, ChannelEventListener {
 
     private static final Logger log = LoggerFactory.getLogger(LoggerName.CONTROLLER_LOGGER_NAME);
 
-    private final Repository repository = ExtensionLoader.getExtensionLoader(Repository.class).getExtension("mysql");
+    private final Repository repository = ExtensionLoader.getExtensionLoader(Repository.class)
+        .getExtension(System.getProperty(Repository.REPOSITORY_TYPE_KEY, "mysql"));
 
     private final HttpBinder httpBinder = ExtensionLoader.getExtensionLoader(HttpBinder.class).getExtension("jetty");
 
@@ -55,13 +58,18 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
 
     private PullTaskRequestHoldService pullTaskRequestHoldService;
 
+    private ControllerDataService controllerDataService;
+
     public RiceController(ControllerConfig controllerConfig, TransfServerConfig transfServerConfig) {
         this.controllerConfig = controllerConfig;
         this.transfServerConfig = transfServerConfig;
         // 替换业务端口
         this.transfServerConfig.setListenPort(controllerConfig.getControllerPort());
+
         this.remotingServer = new TransportServer(this.transfServerConfig, this);
         this.replicatorManager = new RiceReplicatorManager(this.controllerConfig, this);
+        controllerDataService = new ControllerDataServiceImpl(this.replicatorManager.getServer());
+
         this.taskAccessExecutor = Executors.newFixedThreadPool(this.controllerConfig.getTaskAccessThreadPoolNums(),
             new RiceThreadFactory("TaskAccessThread_"));
         this.schedulerManagerExecutor = Executors.newFixedThreadPool(this.controllerConfig.getSchedulerManagerThreadPoolNums(),
@@ -152,21 +160,20 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
 
     @Override
     public void onChannelConnect(String remoteAddr, Channel channel) {
-        //对于处理器和调度器，都由业务请求来保存channel
-
-        // 处理器注册上来以后，找到器处理器处理的所有task的调度服务器，对这个服务器做处理器注册。
 
     }
 
     @Override
     public void onChannelClose(String remoteAddr, Channel channel) {
+        // 首先看一下调度器列表中是否存在该连接，如果连接确是已经失效 则删除该通道信息
 
         if (SchedulerManager.getManager().is_scheduler(remoteAddr)) {
             // 删除该scheulerserver
             SchedulerManager.getManager().closeScheduler(remoteAddr);
 
-            if (this.replicatorManager.isLeader()) {
+            if (isMaster()) {
                 // 并且是leader 那么就触发任务分配
+                log.info("Detects that the scheduler:{} is offline and notifies other schedulers by broadcasting", remoteAddr);
                 schedulerManagerProcessor.crashDownScheduler(remoteAddr);
             }
         }
@@ -193,5 +200,9 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
 
     public PullTaskRequestHoldService getPullTaskRequestHoldService() {
         return pullTaskRequestHoldService;
+    }
+
+    public ControllerDataService getControllerDataService() {
+        return controllerDataService;
     }
 }

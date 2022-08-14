@@ -21,6 +21,7 @@ public class PullRequest {
         this.riceRemoteContext = riceRemoteContext;
         this.clientChannel = clientChannel;
         this.timeoutMillis = timeoutMillis;
+        // 放进长轮询队列的时间
         this.suspendTimestamp = suspendTimestamp;
         this.pullFromThisOffset = pullFromThisOffset;
     }

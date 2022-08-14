@@ -72,4 +72,13 @@ public class TaskDetailData {
     public int hashCode() {
         return Objects.hash(taskCode, className, logEnable);
     }
+
+    @Override public String toString() {
+        return "TaskDetailData{" +
+            "taskCode='" + taskCode + '\'' +
+            ", taskName='" + taskName + '\'' +
+            ", className='" + className + '\'' +
+            ", logEnable=" + logEnable +
+            '}';
+    }
 }

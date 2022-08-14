@@ -52,4 +52,8 @@ public enum TaskType {
     public static TaskType getType(int type) {
         return TaskType.values()[type];
     }
+
+    public int getCode() {
+        return code;
+    }
 }

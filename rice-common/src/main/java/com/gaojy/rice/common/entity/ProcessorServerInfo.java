@@ -7,10 +7,10 @@ import java.util.Date;
 
 public class ProcessorServerInfo{
 	private long id;
+	private long appId;
 	private String address;
 	private int port;
 	private String taskCode;
-	private String version;
 	private Date latestActiveTime;
 	private Date createTime;
 	private int status;
@@ -47,14 +47,6 @@ public class ProcessorServerInfo{
 		return taskCode;
 	}
 
-	public void setVersion(String version){
-		this.version=version;
-	}
-
-	public String getVersion(){
-		return version;
-	}
-
 	public void setLatestActiveTime(Date latestActiveTime){
 		this.latestActiveTime=latestActiveTime;
 	}
@@ -79,4 +71,11 @@ public class ProcessorServerInfo{
 		return status;
 	}
 
+	public long getAppId() {
+		return appId;
+	}
+
+	public void setAppId(long appId) {
+		this.appId = appId;
+	}
 }

@@ -24,9 +24,9 @@ public enum TaskOptType {
 
     TASK_RUN(7, "任务立即运行"),
 
-    SCHEDULER_ONLINE(8, "调度器上线"),
-
-    SCHEDULER_OFFLINE(9, "调度器下线"),
+//    SCHEDULER_ONLINE(8, "调度器上线"),
+//
+//    SCHEDULER_OFFLINE(9, "调度器下线"),
 
     UNKNOWN(10,"未知");
 

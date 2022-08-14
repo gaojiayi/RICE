@@ -13,12 +13,19 @@ import java.util.Set;
  * @createTime 2022/02/07 13:43:00
  */
 public class SchedulerHeartBeatBody extends RemotingSerializable {
-    List<ProcessorDetail> processorDetailList = new ArrayList<>();
-    List<String>    taskCodes = new ArrayList<>();
+    //  调度器管理的处理器
+    private List<ProcessorDetail> processorDetailList = new ArrayList<>();
+    // 调度器管理的任务
+    List<String> taskCodes = new ArrayList<>();
+
+    private int CPURate;
+
+    private int menRate;
 
     public static class ProcessorDetail {
         private String address;
         private Long latestActiveTime;
+        private int port;
 
         public String getAddress() {
             return address;
@@ -35,6 +42,14 @@ public class SchedulerHeartBeatBody extends RemotingSerializable {
         public void setLatestActiveTime(Long latestActiveTime) {
             this.latestActiveTime = latestActiveTime;
         }
+
+        public int getPort() {
+            return port;
+        }
+
+        public void setPort(int port) {
+            this.port = port;
+        }
     }
 
     public List<ProcessorDetail> getProcessorDetailList() {
@@ -46,7 +61,7 @@ public class SchedulerHeartBeatBody extends RemotingSerializable {
         this.processorDetailList = processorDetailList;
     }
 
-    public  void addProcessorDetail(ProcessorDetail pd){
+    public void addProcessorDetail(ProcessorDetail pd) {
         processorDetailList.add(pd);
     }
 
@@ -56,5 +71,21 @@ public class SchedulerHeartBeatBody extends RemotingSerializable {
 
     public void setTaskCodes(List<String> taskCodes) {
         this.taskCodes = taskCodes;
+    }
+
+    public int getCPURate() {
+        return CPURate;
+    }
+
+    public void setCPURate(int CPURate) {
+        this.CPURate = CPURate;
+    }
+
+    public int getMenRate() {
+        return menRate;
+    }
+
+    public void setMenRate(int menRate) {
+        this.menRate = menRate;
     }
 }

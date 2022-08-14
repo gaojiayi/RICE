@@ -9,7 +9,6 @@ public class TaskChangeRecord{
 	private long id;
 	private String taskCode;
 	private int optType;
-	private String schedulerServer;
 	private Date createTime;
 
 	public void setId(long id){
@@ -36,14 +35,6 @@ public class TaskChangeRecord{
 		return optType;
 	}
 
-	public void setSchedulerServer(String schedulerServer){
-		this.schedulerServer=schedulerServer;
-	}
-
-	public String getSchedulerServer(){
-		return schedulerServer;
-	}
-
 	public void setCreateTime(Date createTime){
 		this.createTime=createTime;
 	}
@@ -57,7 +48,6 @@ public class TaskChangeRecord{
 			"id=" + id +
 			", taskCode='" + taskCode + '\'' +
 			", optType=" + optType +
-			", schedulerServer='" + schedulerServer + '\'' +
 			", createTime=" + createTime +
 			'}';
 	}

@@ -1,7 +1,6 @@
 package com.gaojy.rice.dispatcher.scheduler.tasktype;
 
 import com.gaojy.rice.common.constants.TaskType;
-import com.gaojy.rice.common.entity.RiceTaskInfo;
 import com.gaojy.rice.dispatcher.scheduler.TaskScheduleClient;
 
 /**

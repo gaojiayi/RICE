@@ -7,6 +7,7 @@ import java.util.List;
 
 public class SchedulerPullTaskChangeResponseBody extends RemotingSerializable {
     private List<TaskChangeRecord> taskChangeRecordList;
+    private Long latestOffset;
 
     public List<TaskChangeRecord> getTaskChangeRecordList() {
         return taskChangeRecordList;
@@ -14,5 +15,13 @@ public class SchedulerPullTaskChangeResponseBody extends RemotingSerializable {
 
     public void setTaskChangeRecordList(List<TaskChangeRecord> taskChangeRecordList) {
         this.taskChangeRecordList = taskChangeRecordList;
+    }
+
+    public Long getLatestOffset() {
+        return latestOffset;
+    }
+
+    public void setLatestOffset(Long latestOffset) {
+        this.latestOffset = latestOffset;
     }
 }
