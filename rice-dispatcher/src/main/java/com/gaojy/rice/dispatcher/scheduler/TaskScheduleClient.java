@@ -61,14 +61,18 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     private ScheduleType scheduleType = ScheduleType.CRON;
     private String timeExpression;
     private ExecuteType executeType;
-    private int executeThreads = 1;
+    //    private int executeThreads = 1;
     private int taskRetryCount = 1;
     private int instanceRetryCount = 1;
     private CronExpression cexpStart;
     private volatile Set<String> processes = new CopyOnWriteArraySet();
     private AtomicReference<TaskStatus> taskStatus = new AtomicReference<>(TaskStatus.ONLINE);
     private DispatcherAPIWrapper outApiWrapper;
-    private ExecutorService threadPool;
+
+    private static ExecutorService fixedDelayScheduleThreadPool = Executors.newFixedThreadPool(
+        16 + Runtime.getRuntime().availableProcessors() * 2,
+        new RiceThreadFactory("fix_delay_schedule_thread"));
+    ;
     // 任务启动时间
     private Long bootTime = System.currentTimeMillis();
     private PullTaskService pullTaskService;
@@ -76,7 +80,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     private Balance balance = new RandomBalance();
     private final RiceExecuter riceExecuter;
     private final Repository repository = ExtensionLoader.getExtensionLoader(Repository.class)
-            .getExtension("mysql");
+        .getExtension("mysql");
 
     private Long nextTaskInstanceId = -1L;
 
@@ -85,12 +89,11 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     private Long timeoutMillis = 5 * 1000 * 60L;
 
     public TaskScheduleClient(RiceTaskInfo taskInfo,
-                              TaskScheduleManager taskScheduleManager) throws ParseException {
+        TaskScheduleManager taskScheduleManager) throws ParseException {
         buildClient(taskInfo);
         this.scheduleTimer = taskScheduleManager.getScheduleTimer();
         this.outApiWrapper = taskScheduleManager.getOutApiWrapper();
         this.pullTaskService = taskScheduleManager.getPullTaskService();
-        threadPool = Executors.newFixedThreadPool(executeThreads, new RiceThreadFactory(taskCode + "_thread"));
         if (ScheduleType.CRON.equals(scheduleType)) {
             cexpStart = new CronExpression(timeExpression);
         }
@@ -104,7 +107,8 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
             this.taskType = TaskType.getType(taskInfo.getTaskType());
             this.scheduleType = scheduleType.getType(taskInfo.getScheduleType());
         } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            log.error("build client error", e);
+            throw new DispatcherException(e);
         }
     }
 
@@ -136,6 +140,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
             Date firstStartTime = cexpStart.getNextValidTimeAfter(current);
             delay = firstStartTime.getTime() - current.getTime();
         }
+        // TODO 固定延迟是上一次任务执行完后延迟N 再执行（同步调用）    固定评率是每隔多长时间再执行 （异步调用）
         if (ScheduleType.FIXED_FREQUENCY.equals(scheduleType) || ScheduleType.FIX_DELAY.equals(scheduleType)) {
             delay = Long.parseLong(timeExpression);
         }
@@ -171,16 +176,17 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     public void startup() throws LifeCycleException {
         this.pullTaskService.executePullRequestImmediately(new PullRequest(this.bootTime, taskCode));
         Long delay = 0L;
+        // TODO 查询下一次触发时间 如果
         if (ScheduleType.FIX_DELAY.equals(scheduleType)) {
             // 固定延迟  则延迟调度
             delay = Long.parseLong(timeExpression);
         }
-        // TODO 如果发现有存在的等待状态或者运行状态的任务实例，则取消
+
         nextTaskInstanceId = repository.getTaskInstanceInfoDao().createTaskInstance(buildNewTaskInstance(delay));
         this.scheduleTimer.newTimeout(this, delay, TimeUnit.MILLISECONDS);
     }
 
-    private TaskInstanceInfo buildNewTaskInstance(Long delay) {
+    public TaskInstanceInfo buildNewTaskInstance(Long delay) {
         TaskInstanceInfo info = new TaskInstanceInfo();
         info.setStatus(TaskInstanceStatus.WAIT.getCode());
         info.setCreateTime(new Date());
@@ -188,13 +194,14 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
         info.setExpectedTriggerTime(new Date(delay + System.currentTimeMillis()));
         info.setInstanceParams(this.parameters);
         info.setType(taskType.name());
+        info.setRetryTimes(0);
         return info;
     }
 
     @Override
     public void shutdown() throws LifeCycleException {
         taskStatus.set(TaskStatus.OFFLINE);
-        threadPool.shutdown();
+        fixedDelayScheduleThreadPool.shutdown();
     }
 
     @Override
@@ -203,7 +210,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     }
 
     public ExecutorService getThreadPool() {
-        return threadPool;
+        return fixedDelayScheduleThreadPool;
     }
 
     public List<String> selectProcessores(ExecuteType type) {
@@ -231,8 +238,8 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     }
 
     public void invokeAsync(String processorAddr, final RiceRemoteContext remoteContext)
-            throws RemotingConnectException, RemotingSendRequestException, RemotingTimeoutException,
-            InterruptedException, RemotingTooMuchRequestException {
+        throws RemotingConnectException, RemotingSendRequestException, RemotingTimeoutException,
+        InterruptedException, RemotingTooMuchRequestException {
         InvokeCallback callback = new InvokeCallback() {
 
             @Override
@@ -242,15 +249,17 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
                 Long taskInstanceId = ((TaskInvokeRequestHeader) remoteContext.readCustomHeader()).getTaskInstanceId();
                 TaskInstanceInfo instanceInfo = repository.getTaskInstanceInfoDao().getInstance(taskInstanceId);
                 instanceInfo.setStatus(TaskInstanceStatus.FINISHED.getCode());
+                instanceInfo.setFinishedTime(new Date());
                 if (response != null) {
                     try {
                         TaskInvokerResponseHeader responseHeader = (TaskInvokerResponseHeader) response
-                                .decodeCommandCustomHeader(TaskInvokerResponseHeader.class);
+                            .decodeCommandCustomHeader(TaskInvokerResponseHeader.class);
                         TaskInvokerResponseBody body = TaskInvokerResponseBody.decode(response.getBody(),
-                                TaskInvokerResponseBody.class);
+                            TaskInvokerResponseBody.class);
                         // 更新实例状态
                         instanceInfo.setResult(body.toJson());
-
+                        instanceInfo.setFinishedTime(new Date(responseHeader.getFinishTime()));
+                        instanceInfo.setRetryTimes(responseHeader.getRetryTimes());
                     } catch (RemotingCommandException e) {
                         instanceInfo.setStatus(TaskInstanceStatus.EXCEPTION.getCode());
                     }
@@ -274,8 +283,8 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     }
 
     public RiceRemoteContext invokeSync(String processorAddr, final RiceRemoteContext remoteContext)
-            throws RemotingConnectException, RemotingSendRequestException, RemotingTimeoutException,
-            InterruptedException, RemotingTooMuchRequestException {
+        throws RemotingConnectException, RemotingSendRequestException, RemotingTimeoutException,
+        InterruptedException, RemotingTooMuchRequestException {
         return outApiWrapper.invokeTask(processorAddr, remoteContext, timeoutMillis, null, true);
     }
 
@@ -347,5 +356,29 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
 
     public void setInstanceRetryCount(int instanceRetryCount) {
         this.instanceRetryCount = instanceRetryCount;
+    }
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
+
+    public ScheduleType getScheduleType() {
+        return scheduleType;
+    }
+
+    public void setScheduleType(ScheduleType scheduleType) {
+        this.scheduleType = scheduleType;
+    }
+
+    public String getTimeExpression() {
+        return timeExpression;
+    }
+
+    public void setTimeExpression(String timeExpression) {
+        this.timeExpression = timeExpression;
     }
 }

@@ -17,8 +17,6 @@ public class TaskInvokerResponseHeader implements CommandCustomHeader {
 
     private Long finishTime;
 
-    private Long runningTime;
-
     /**
      * 重试次数
      */
@@ -49,14 +47,6 @@ public class TaskInvokerResponseHeader implements CommandCustomHeader {
 
     public void setFinishTime(Long finishTime) {
         this.finishTime = finishTime;
-    }
-
-    public Long getRunningTime() {
-        return runningTime;
-    }
-
-    public void setRunningTime(Long runningTime) {
-        this.runningTime = runningTime;
     }
 
     public int getRetryTimes() {

@@ -122,10 +122,12 @@ public class DispatcherAPIWrapper {
     }
 
     // 调度器第一次启动或者发生控制器重新选举的时候调用   控制器保存channel
-    public Boolean registerScheduler(String addresses) throws InterruptedException, TimeoutException,
+    public Boolean registerScheduler(String addresses,boolean isFirstRegister) throws InterruptedException, TimeoutException,
             RemotingConnectException, RemotingSendRequestException, RemotingTimeoutException {
-        // String mainController = this.riceDispatchScheduler.getElectionClient().getMasterController();
-        RiceRemoteContext request = RiceRemoteContext.createRequestCommand(RequestCode.SCHEDULER_REGISTER, new SchedulerRegisterRequestHeader());
+        SchedulerRegisterRequestHeader header = new SchedulerRegisterRequestHeader();
+        header.setFirstRegister(isFirstRegister);
+        header.setBootTime(System.currentTimeMillis());
+        RiceRemoteContext request = RiceRemoteContext.createRequestCommand(RequestCode.SCHEDULER_REGISTER,header) ;
         RiceRemoteContext response = this.transportClient.invokeSync(addresses, request, 1000 * 3);
         if (response != null && response.getCode() == ResponseCode.SUCCESS) {
             return Boolean.TRUE;

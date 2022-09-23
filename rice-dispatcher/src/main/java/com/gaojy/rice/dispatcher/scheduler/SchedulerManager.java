@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface SchedulerManager {
 
-    public void addTask(RiceTaskInfo info, List<ProcessorServerInfo> processorServerInfoList) throws ParseException;
+    public void addTask(String currentScheduler,RiceTaskInfo info, List<ProcessorServerInfo> processorServerInfoList) throws ParseException;
 
 
     public void taskReBalance(String currentScheduler, List<String> schedulerList);

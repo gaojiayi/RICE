@@ -12,7 +12,7 @@ public class TaskInstanceInfo{
 	private long parentInstanceId;
 	private Date actualTriggerTime;
 	private Date expectedTriggerTime;
-	private int runningTimes;
+	private int retryTimes;
 	private String taskTrackerAddress;
 	private String type;
 	private String result;
@@ -68,12 +68,12 @@ public class TaskInstanceInfo{
 		return expectedTriggerTime;
 	}
 
-	public void setRunningTimes(int runningTimes){
-		this.runningTimes=runningTimes;
+	public int getRetryTimes() {
+		return retryTimes;
 	}
 
-	public int getRunningTimes(){
-		return runningTimes;
+	public void setRetryTimes(int retryTimes) {
+		this.retryTimes = retryTimes;
 	}
 
 	public void setTaskTrackerAddress(String taskTrackerAddress){

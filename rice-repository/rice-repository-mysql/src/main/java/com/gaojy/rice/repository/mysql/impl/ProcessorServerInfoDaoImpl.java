@@ -23,13 +23,23 @@ public class ProcessorServerInfoDaoImpl implements ProcessorServerInfoDao {
     private final DataSource dataSource = DataSourceFactory.getDataSource();
 
     @Override
-    public List<ProcessorServerInfo> getInfosByServer(long appId, String address, int port) throws RepositoryException {
+    public List<ProcessorServerInfo> getInfosByServer(Long appId, String address, int port) throws RepositoryException {
         QueryRunner qr = new QueryRunner(dataSource);
-        String sql = "select * from processor_server_info where address = ? and port = ? and app_id = ? and status = 1";
+
+        String sql = "select * from processor_server_info where address = ? and port = ?  and status = 1";
+
         try {
-            List<ProcessorServerInfo> processorServerInfoList = qr.query(sql,
-                new BeanListHandler<ProcessorServerInfo>(ProcessorServerInfo.class,
-                    new BasicRowProcessor(new GenerousBeanProcessor())), address, port, appId);
+            List<ProcessorServerInfo> processorServerInfoList;
+            if (appId != null) {
+                sql = sql + "and app_id = ?";
+                processorServerInfoList = qr.query(sql,
+                    new BeanListHandler<ProcessorServerInfo>(ProcessorServerInfo.class,
+                        new BasicRowProcessor(new GenerousBeanProcessor())), address, port, appId);
+            } else {
+                processorServerInfoList = qr.query(sql,
+                    new BeanListHandler<ProcessorServerInfo>(ProcessorServerInfo.class,
+                        new BasicRowProcessor(new GenerousBeanProcessor())), address, port);
+            }
             return processorServerInfoList;
         } catch (SQLException e) {
             throw new RepositoryException(e);

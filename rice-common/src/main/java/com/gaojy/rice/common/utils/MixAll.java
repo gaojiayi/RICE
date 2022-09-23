@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 public class MixAll {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.COMMON_LOGGER_NAME);
     public static final String RICE_CONTROLLER_HOME_PROPERTY = "rice.controller.home.dir";
+    public static final String RICE_DISPATCHER_HOME_PROPERTY = "rice.dispatcher.home.dir";
+
     public static final String RICE_HOME_ENV = "RICE_HOME";
 
 
@@ -141,6 +143,7 @@ public class MixAll {
                     if (logger != null) {
                         logger.info(name + "=" + value);
                     } else {
+                        System.out.println(name + "=" + value);
                     }
                 }
             }

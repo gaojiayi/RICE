@@ -17,7 +17,6 @@ public class RiceTaskInfo{
 	private String scheduleType;
 	private String timeExpression;
 	private String executeType;
-	private int threads;
 	private int taskRetryCount;
 	private Date nextTriggerTime;
 	private Date createTime;
@@ -110,14 +109,6 @@ public class RiceTaskInfo{
 
 	public String getExecuteType(){
 		return executeType;
-	}
-
-	public void setThreads(int threads){
-		this.threads=threads;
-	}
-
-	public int getThreads(){
-		return threads;
 	}
 
 	public void setTaskRetryCount(int taskRetryCount){

@@ -11,7 +11,7 @@ import java.util.List;
  * @createTime 2022/01/27 21:24:00
  */
 public interface ProcessorServerInfoDao {
-    public List<ProcessorServerInfo> getInfosByServer(long appId,String address, int port) throws RepositoryException;
+    public List<ProcessorServerInfo> getInfosByServer(Long appId,String address, int port) throws RepositoryException;
 
     public int batchCreateOrUpdateInfo(List<ProcessorServerInfo> processorServerInfoList) throws RepositoryException;
 

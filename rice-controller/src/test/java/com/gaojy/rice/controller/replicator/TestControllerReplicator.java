@@ -111,7 +111,7 @@ public class TestControllerReplicator {
 //        LockSupport.park();
         // leader写入数据
         ControllerDataService leaderService = new ControllerDataServiceImpl(leaderServer);
-        leaderService.updateSchedulerData("1.1.1.1", new SchedulerData("1.1.1.1", 10, 20, 100), new ControllerClosure() {
+        leaderService.updateSchedulerData("1.1.1.1", new SchedulerData("1.1.1.1", 10D, 20D, 100), new ControllerClosure() {
             @Override
             public void run(Status status) {
                 // 一般会处理RPC的响应

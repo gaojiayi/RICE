@@ -4,6 +4,8 @@ import com.gaojy.rice.common.constants.LoggerName;
 import com.gaojy.rice.common.constants.ResponseCode;
 import com.gaojy.rice.common.protocol.body.controller.TaskCreateRequestBody;
 import com.gaojy.rice.dispatcher.scheduler.SchedulerManager;
+import com.gaojy.rice.remote.common.RemoteHelper;
+import com.gaojy.rice.remote.common.TransfUtil;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.RiceRequestProcessor;
 import io.netty.channel.ChannelHandlerContext;
@@ -29,11 +31,12 @@ public class TaskCreateProcessor implements RiceRequestProcessor {
         TaskCreateRequestBody requestBody = TaskCreateRequestBody.decode(request.getBody(), TaskCreateRequestBody.class);
         RiceRemoteContext response = RiceRemoteContext.createResponseCommand(null);
         try {
-            schedulerManager.addTask(requestBody.getTaskInfo(),requestBody.getProcessores());
+            schedulerManager.addTask(RemoteHelper.parseChannelRemoteAddr(ctx.channel()),
+                requestBody.getTaskInfo(), requestBody.getProcessores());
             response.setCode(ResponseCode.SUCCESS);
             response.setRemark(null);
         } catch (Exception e) {
-            log.error("Failed to add task，request:{}",request);
+            log.error("Failed to add task，request:{}", request);
             response.setCode(ResponseCode.RESPONSE_ERROR);
             response.setRemark(e.getMessage());
         }

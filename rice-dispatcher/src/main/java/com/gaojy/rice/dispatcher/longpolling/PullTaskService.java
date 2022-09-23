@@ -108,7 +108,7 @@ public class PullTaskService extends BackgroundThread {
             dispatcherAPIWrapper.pullTask(request, pullCallback);
         } catch (InterruptedException | TimeoutException | RemotingConnectException
             | RemotingSendRequestException | RemotingTimeoutException | RemotingTooMuchRequestException e) {
-            log.error("pull task change exception,will try,exception={}", e);
+            log.error("pull task change exception,will try", e);
             this.executePullRequestLater(request, 1000);
         }
     }

@@ -17,7 +17,7 @@ public interface RiceTaskInfoDao {
 
     public void updateTask(RiceTaskInfo riceTaskInfo);
 
-    public void taskStatusChange(int status);
+    public void taskStatusChange(String taskCode,int status);
 
     public List<String> getAllValidTaskCode();
 

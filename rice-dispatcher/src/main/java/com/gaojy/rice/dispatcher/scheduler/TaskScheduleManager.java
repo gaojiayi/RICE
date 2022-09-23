@@ -8,6 +8,7 @@ import com.gaojy.rice.common.constants.TaskStatus;
 import com.gaojy.rice.common.entity.ProcessorServerInfo;
 import com.gaojy.rice.common.entity.RiceTaskInfo;
 import com.gaojy.rice.common.entity.TaskChangeRecord;
+import com.gaojy.rice.common.exception.DispatcherException;
 import com.gaojy.rice.common.extension.ExtensionLoader;
 import com.gaojy.rice.common.timewheel.HashedWheelTimer;
 import com.gaojy.rice.dispatcher.allocation.AllocationType;
@@ -41,6 +42,7 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
 
     private final ScheduledExecutorService heartBeatTimer = Executors.newSingleThreadScheduledExecutor();
 
+    // 保存任务运行实例
     private Map<String/* taskCode */, TaskScheduleClient/*TaskScheduleClient*/> clients = new ConcurrentHashMap<>();
 
     private volatile boolean isStopped = true;
@@ -63,7 +65,7 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
     }
 
     @Override
-    public void addTask(RiceTaskInfo info, List<ProcessorServerInfo> processorServerInfoList) {
+    public void addTask(String currentScheduler, RiceTaskInfo info, List<ProcessorServerInfo> processorServerInfoList) {
         TaskScheduleClient client = null;
         try {
             client = new TaskScheduleClient(info, this);
@@ -74,10 +76,17 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
             }
             client.startup();
             // 写数据库
-            repository.getRiceTaskInfoDao().addTask(info);
-            repository.getProcessorServerInfoDao().batchCreateOrUpdateInfo(processorServerInfoList);
+            info.setSchedulerServer(currentScheduler);
+            info.setStatus(TaskStatus.ONLINE.getCode());
+            info.setUpdateTime(new Date());
+            if(info.getId() > 0) {
+                repository.getRiceTaskInfoDao().updateTask(info);
+            }else {
+                repository.getRiceTaskInfoDao().addTask(info);
+            }
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.error("add task error ,task code = " + info.getTaskCode(), e);
+            throw new DispatcherException(e);
         }
 
     }
@@ -85,6 +94,7 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
     public void taskStatusChange(String taskCode, TaskStatus status) {
         TaskScheduleClient client = clients.get(taskCode);
         if (client != null) {
+            log.info("task_code:{},task_name:{}, status will change to " + status.name(), taskCode, client.getTaskName());
             client.getTaskStatus().set(status);
             if (status == TaskStatus.OFFLINE) {
                 client.shutdown();
@@ -92,7 +102,7 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
             }
         }
 
-        repository.getRiceTaskInfoDao().taskStatusChange(status.getCode());
+        repository.getRiceTaskInfoDao().taskStatusChange(taskCode, status.getCode());
     }
 
     private void updateTaskInfo(String taskCode) {
@@ -122,7 +132,7 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
         if (taskIsRunning(record.getTaskCode())) {
             switch (type) {
                 case TASK_PROCESSOR_ONLINE:
-                case TASK_PROCESSOR_OFFLINE:
+                    //case  TASK_PROCESSOR_OFFLINE:
                     this.taskProcessorChange(record.getTaskCode());
                     break;
                 case TASK_DELETE:
@@ -131,9 +141,9 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
                 case TASK_PAUSE:
                     this.taskStatusChange(record.getTaskCode(), TaskStatus.PAUSE);
                     break;
-                case TASK_RUNNING:
-                    this.taskStatusChange(record.getTaskCode(), TaskStatus.ONLINE);
-                    break;
+//                case TASK_RUNNING:
+//                    this.taskStatusChange(record.getTaskCode(), TaskStatus.ONLINE);
+//                    break;
                 case TASK_UPDATE:
                     this.updateTaskInfo(record.getTaskCode());
                     break;
@@ -150,6 +160,23 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
         return clients.containsKey(taskCode) && clients.get(taskCode).isStarted();
     }
 
+    /**
+     * TODO
+     * <p> 如果是调度器上线 -> 那么找到新的调度器所在的hash环位置的下一个node
+     * 1 如果当前调度器集群只有一台机器 且当前的调度器就是上线的调度器，那么执行所有任务
+     * 2 如果当前调度器集群超过1台，那么当前的调度器分三种情况
+     * 2.1 currentNode = nextNode 需要将当前机器上的部分任务停止
+     * 2.2 currentNode != nextNode && currentNode != changeNode  不需要做任何处理
+     * 2.3 currentNode == changeNode  计算出nextNode上漂移到changeNode上的任务并启动
+     * </>
+     *
+     * <p> 如果是调度器下线   剩余的调度器会瓜分该调度器上的任务
+     * 1 查询该调度器的所有任务
+     * 2 一致性hash算法 计算出能获取哪些任务 并启动任务实例
+     * </>
+     * <p>
+     * 1.0.0版本对所有的任务做一致性hash
+     */
     @Override
     public void taskReBalance(String currentScheduler, List<String> schedulerList) {
         // 查询所有的非下线taskcode
@@ -158,7 +185,7 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
         // 根据一致性hash算法，获取落在当前调度器上的taskCode
 
         List<String> allocationTaskCodes = TaskAllocationFactory.getStrategy(taskAllocationStrategy)
-                .allocate(schedulerList, taskCodes).get(currentScheduler);
+            .allocate(schedulerList, taskCodes).get(currentScheduler);
 
         // 再次查询数据库，初始化这些task  已有的taskCode - 交
         Collection<String> deleteTaskCode = CollectionUtils.subtract(clients.keySet(), allocationTaskCodes);
@@ -173,7 +200,7 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
             List<RiceTaskInfo> infos = repository.getRiceTaskInfoDao().getInfoByCodes(tasks);
             List<ProcessorServerInfo> processores = repository.getProcessorServerInfoDao().getInfosByTask(taskCode);
             if (CollectionUtils.isNotEmpty(infos)) {
-                this.addTask(infos.get(0), processores);
+                this.addTask(currentScheduler, infos.get(0), processores);
             }
 
         });
@@ -201,6 +228,7 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
     }
 
     // 全局心跳
+    // 往执行器上面发送心跳  如果是第一次发送心跳，且发现无法连接上，那么修改db
     @Override
     public void run() {
         if (!clients.isEmpty()) {
@@ -258,7 +286,11 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
         return time == null ? 0L : time;
     }
 
-    public List<String> getManageTask(){
+    public List<String> getManageTask() {
         return new ArrayList<>(clients.keySet());
+    }
+
+    public Repository getRepository() {
+        return repository;
     }
 }

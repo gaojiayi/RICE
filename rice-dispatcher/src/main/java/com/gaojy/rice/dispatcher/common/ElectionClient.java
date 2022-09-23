@@ -24,7 +24,8 @@ public class ElectionClient {
     public ElectionClient(RiceDispatchScheduler riceDispatchScheduler) {
         this.riceDispatchScheduler = riceDispatchScheduler;
         groupId = riceDispatchScheduler.getDispatcherConfig().ELECTION_GROUP_ID;
-        confStr = riceDispatchScheduler.getDispatcherConfig().getAllControllerAddressStr();
+
+        confStr = riceDispatchScheduler.getDispatcherConfig().getAllControllerElectionAddressStr();
         if (!conf.parse(confStr)) {
             throw new IllegalArgumentException("Fail to parse conf:" + confStr);
         }
@@ -37,7 +38,7 @@ public class ElectionClient {
             throw new IllegalStateException("Refresh leader failed");
         }
         final PeerId leader = RouteTable.getInstance().selectLeader(groupId);
-        return leader.getEndpoint().getIp() + ":" + leader.getEndpoint().getPort();
+        return leader.getEndpoint().getIp() + ":" + (leader.getEndpoint().getPort() + 2);
     }
 
     public void close(){

@@ -18,9 +18,9 @@ public class SchedulerHeartBeatBody extends RemotingSerializable {
     // 调度器管理的任务
     List<String> taskCodes = new ArrayList<>();
 
-    private int CPURate;
+    private Double CPURate;
 
-    private int menRate;
+    private Double menRate;
 
     public static class ProcessorDetail {
         private String address;
@@ -73,19 +73,19 @@ public class SchedulerHeartBeatBody extends RemotingSerializable {
         this.taskCodes = taskCodes;
     }
 
-    public int getCPURate() {
+    public Double getCPURate() {
         return CPURate;
     }
 
-    public void setCPURate(int CPURate) {
+    public void setCPURate(Double CPURate) {
         this.CPURate = CPURate;
     }
 
-    public int getMenRate() {
+    public Double getMenRate() {
         return menRate;
     }
 
-    public void setMenRate(int menRate) {
+    public void setMenRate(Double menRate) {
         this.menRate = menRate;
     }
 }

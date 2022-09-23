@@ -15,9 +15,9 @@ public class SchedulerData implements Serializable {
 
     private String address;
     //private Channel channel;
-    private Integer CPUPercent;
+    private Double CPUPercent;
 
-    private Integer memoryPercent;
+    private Double memoryPercent;
 
     private Integer taskNum;
 
@@ -29,20 +29,20 @@ public class SchedulerData implements Serializable {
         this.address = address;
     }
 
-    public Integer getCPUPercent() {
+    public Double getCPUPercent() {
         return CPUPercent;
     }
 
-    public void setCPUPercent(Integer CPUPercent) {
+    public void setCPUPercent(Double CPUPercent) {
         this.CPUPercent = CPUPercent;
     }
 
-    public Integer getMemoryPercent() {
+    public Double getMemoryPercent() {
         return memoryPercent;
     }
 
-    public void setMemoryPercent(Integer memoryPercent) {
-        memoryPercent = memoryPercent;
+    public void setMemoryPercent(Double memoryPercent) {
+        this.memoryPercent = memoryPercent;
     }
 
     public Integer getTaskNum() {
@@ -62,7 +62,7 @@ public class SchedulerData implements Serializable {
         return map;
     }
 
-    public SchedulerData(String address, Integer CPUPercent, Integer memoryPercent, Integer taskNum) {
+    public SchedulerData(String address, Double CPUPercent, Double memoryPercent, Integer taskNum) {
         this.address = address;
         this.CPUPercent = CPUPercent;
         this.memoryPercent = memoryPercent;

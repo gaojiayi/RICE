@@ -37,7 +37,7 @@ public class TestProcessorServerInfoDao {
         }
         int i = dao.batchCreateOrUpdateInfo(infos);
         Assert.assertEquals(10, i);
-        List<ProcessorServerInfo> server = dao.getInfosByServer(0,"127.0.0.5", 1234);
+        List<ProcessorServerInfo> server = dao.getInfosByServer(0L,"127.0.0.5", 1234);
         server.get(0).setStatus(1);
         i = dao.batchCreateOrUpdateInfo(server);
         Assert.assertEquals(1, i);
