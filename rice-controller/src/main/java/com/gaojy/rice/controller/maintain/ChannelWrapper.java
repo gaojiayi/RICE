@@ -27,6 +27,9 @@ public class ChannelWrapper {
     public boolean isActive() {
         return this.channel != null && this.channel.isActive();
     }
+    public boolean isOpen() {
+        return this.channel != null && this.channel.isOpen();
+    }
 
     public Channel getChannel() {
         return this.channel;

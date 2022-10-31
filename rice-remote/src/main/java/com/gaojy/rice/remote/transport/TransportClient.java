@@ -238,6 +238,18 @@ public class TransportClient extends AbstractRemoteService implements IBaseRemot
     class NettyClientConnectManageHandler extends ChannelDuplexHandler {
 
         @Override
+        public void channelActive(ChannelHandlerContext ctx) throws Exception {
+            final String remoteAddress = RemoteHelper.parseChannelRemoteAddr(ctx.channel());
+            log.info("NETTY CLIENT PIPELINE: ACTIVE {}", remoteAddress);
+            super.channelActive(ctx);
+
+            if (TransportClient.this.channelEventListener != null) {
+                TransportClient.this.nettyEventExecutor.triggerNettyEvent(
+                    new NettyEvent(NettyEventType.ACTIVE, remoteAddress, ctx.channel()));
+            }
+        }
+
+        @Override
         public void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress,
             ChannelPromise future) throws Exception {
             final String local = localAddress == null ? "UNKNOWN" : RemoteHelper.parseSocketAddressAddr(localAddress);

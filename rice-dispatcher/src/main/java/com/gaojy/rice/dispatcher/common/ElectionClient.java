@@ -21,6 +21,7 @@ public class ElectionClient {
     final Configuration conf = new Configuration();
     final CliClientServiceImpl cliClientService = new CliClientServiceImpl();
 
+
     public ElectionClient(RiceDispatchScheduler riceDispatchScheduler) {
         this.riceDispatchScheduler = riceDispatchScheduler;
         groupId = riceDispatchScheduler.getDispatcherConfig().ELECTION_GROUP_ID;

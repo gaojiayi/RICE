@@ -170,7 +170,7 @@ public class SchedulerManager {
             if (cw != null && !cw.isActive()) {
                 schedulerNodes.remove(cw);
             } else {
-                logger.info("The scheduler {} is not found, and the corresponding channel exists",schedulerServer);
+                logger.info("The scheduler {} is not found, and the corresponding channel exists", schedulerServer);
             }
         } finally {
             w.unlock();

@@ -96,7 +96,9 @@ public class ControllerDataServiceImpl implements ControllerDataService {
         }
 
         try {
-            closure.setControllerOperation(op);
+            if(closure != null){
+                closure.setControllerOperation(op);
+            }
             final Task task = new Task();
             task.setData(ByteBuffer.wrap(SerializerManager.getSerializer(SerializerManager.Hessian2).serialize(op)));
             task.setDone(closure);

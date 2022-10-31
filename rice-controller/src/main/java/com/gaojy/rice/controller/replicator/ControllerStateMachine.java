@@ -1,5 +1,6 @@
 package com.gaojy.rice.controller.replicator;
 
+import com.alibaba.fastjson.JSON;
 import com.alipay.remoting.exception.CodecException;
 import com.alipay.remoting.serialization.SerializerManager;
 import com.alipay.sofa.jraft.Closure;
@@ -78,6 +79,8 @@ public class ControllerStateMachine extends StateMachineAdapter {
                     case UPDATE:
                         String schedulerAddress = controllerOperation.getSchedulerAddress();
                         SchedulerData schedulerData = controllerOperation.getSchedulerData();
+                        LOG.info("UPDATE schedulerAddress={},SchedulerData={}", schedulerAddress, JSON.toJSONString(schedulerData));
+
                         if (StringUtil.isNotEmpty(schedulerAddress) && schedulerData != null) {
                             this.data.put(schedulerAddress, schedulerData);
                         }
@@ -95,6 +98,7 @@ public class ControllerStateMachine extends StateMachineAdapter {
     public ConcurrentMap<String, SchedulerData> getData() {
         return data;
     }
+
     @Override
     public void onError(final RaftException e) {
         LOG.error("Raft error: {}", e, e);
@@ -105,7 +109,6 @@ public class ControllerStateMachine extends StateMachineAdapter {
         this.leaderTerm.set(term);
         super.onLeaderStart(term);
     }
-
 
     @Override
     public void onLeaderStop(Status status) {

@@ -103,15 +103,18 @@ public class SchedulerManagerProcessor implements RiceRequestProcessor {
             // 比如因为控制器集群发生了选举而导致的再次注册，但是这个时候是不需要通知的其他的调度器的
             if (requestHeader.getFirstRegister()) {
                 // 立即通知所有有效的调度器处理rebalance操作
-                RiceRemoteContext rebalceRequest = RiceRemoteContext.createRequestCommand(RequestCode.CONTROLLER_TASK_REBALANCE, null);
+                final RiceRemoteContext rebalceRequest = RiceRemoteContext.createRequestCommand(RequestCode.CONTROLLER_TASK_REBALANCE, null);
                 rebalceRequest.markOnewayRPC();
 
                 TaskRebalanceRequestBody body = new TaskRebalanceRequestBody();
                 body.setChangeScheduler(RemoteHelper.parseChannelRemoteAddr(ctx.channel()));
                 body.setSchedulerOpt(SchedulerChangeType.SCHEDULER_ONLINE);
 
+
                 List<ChannelWrapper> schedulers = schedulerManager.getActiveScheduler();
+
                 List<String> schedulerAddress = schedulers.stream().map(ChannelWrapper::getRemoteAddr).collect(Collectors.toList());
+                logger.info("^^^^^^^^^^^^^^^^^^^^^^^^^"+schedulerAddress);
                 body.setCurrentActiveSchedulers(schedulerAddress);
 
                 schedulers.forEach(cw -> {

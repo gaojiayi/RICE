@@ -134,7 +134,9 @@ public class RiceDispatchScheduler implements RiceDispatchSchedulerMBean, Channe
                 body.setTaskCodes(scheduleManager.getManageTask());
                 body.setMenRate(HardwareHelper.getMemoryRatio());
                 body.setCPURate(HardwareHelper.getProcessCpuLoad());
+                log.info("send heartbeat to master controller,addresss={}", address);
                 apiWrapper.heartBeatToController(address, body);
+
             } catch (InterruptedException | TimeoutException | RemotingConnectException
                 | RemotingSendRequestException | RemotingTimeoutException | RemotingTooMuchRequestException e) {
                 log.error("heartBeatToController occur exception" + e);

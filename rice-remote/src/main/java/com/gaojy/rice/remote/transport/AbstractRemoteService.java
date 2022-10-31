@@ -517,7 +517,6 @@ public abstract class AbstractRemoteService {
         }
     }
 
-
     public void invokeAsyncImpl(final Channel channel, final RiceRemoteContext request, final long timeoutMillis,
         final InvokeCallback invokeCallback)
         throws InterruptedException, RemotingTooMuchRequestException, RemotingTimeoutException, RemotingSendRequestException {
