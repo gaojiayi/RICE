@@ -35,6 +35,8 @@
                 <exclude>**/.mvn/**</exclude>
                 <exclude>**/*.jar</exclude>
                 <exclude>**/mvnw*</exclude>
+                <exclude>rice-manage-ui/**</exclude>
+                <exclude>rice-official/**</exclude>
             </excludes>
         </fileSet>
     </fileSets>

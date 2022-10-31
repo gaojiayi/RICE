@@ -18,80 +18,80 @@
     <!--rice 文件归档-->
 
     <!-- 执行   mvn -X clean package assembly:single -->
-        <dependencies>
-            <dependency>
-                <groupId>com.gaojy</groupId>
-                <artifactId>rice-common</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.gaojy</groupId>
-                <artifactId>rice-remote</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.gaojy</groupId>
-                <artifactId>rice-controller</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.gaojy</groupId>
-                <artifactId>rice-dispatcher</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.gaojy</groupId>
-                <artifactId>rice-processor-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.gaojy</groupId>
-                <artifactId>rice-processor-spring</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-<!--            <dependency>-->
-<!--                <groupId>com.gaojy</groupId>-->
-<!--                <artifactId>rice-distribution</artifactId>-->
-<!--                <version>${project.version}</version>-->
-<!--            </dependency>-->
-            <dependency>
-                <groupId>com.gaojy</groupId>
-                <artifactId>rice-repository-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.gaojy</groupId>
-                <artifactId>rice-repository-mysql</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.gaojy</groupId>
-                <artifactId>rice-protocol</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.gaojy</groupId>
-                <artifactId>rice-http-agent</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-<!--            <dependency>-->
-<!--                <groupId>com.gaojy</groupId>-->
-<!--                <artifactId>rice-parent</artifactId>-->
-<!--                <version>${project.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>com.gaojy</groupId>-->
-<!--                <artifactId>rice-bom</artifactId>-->
-<!--                <version>${project.version}</version>-->
-<!--            </dependency>-->
-        </dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-remote</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-controller</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-dispatcher</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-processor-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-processor-spring</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!--            <dependency>-->
+        <!--                <groupId>com.gaojy</groupId>-->
+        <!--                <artifactId>rice-distribution</artifactId>-->
+        <!--                <version>${project.version}</version>-->
+        <!--            </dependency>-->
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-repository-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-repository-mysql</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-protocol</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-http-agent</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!--            <dependency>-->
+        <!--                <groupId>com.gaojy</groupId>-->
+        <!--                <artifactId>rice-parent</artifactId>-->
+        <!--                <version>${project.version}</version>-->
+        <!--            </dependency>-->
+        <!--            <dependency>-->
+        <!--                <groupId>com.gaojy</groupId>-->
+        <!--                <artifactId>rice-bom</artifactId>-->
+        <!--                <version>${project.version}</version>-->
+        <!--            </dependency>-->
+    </dependencies>
 
 
     <build>
-        <finalName>rice-distribution</finalName>
+        <finalName>rice</finalName>
         <plugins>
             <plugin>
-                    <!--     项目归档           -->
+                <!--     项目归档           -->
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration><!-- 移动到plugin下 -->
@@ -102,7 +102,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>make-zip</id>
+                        <id>make-package</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>

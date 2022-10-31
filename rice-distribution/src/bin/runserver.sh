@@ -12,12 +12,14 @@ error_exit ()
 # JDK 需要安装在$HOME/jdk/java 或者 /usr/java
 [ ! -e "$JAVA_HOME/bin/java" ] && JAVA_HOME=$HOME/jdk/java
 [ ! -e "$JAVA_HOME/bin/java" ] && JAVA_HOME=/usr/java
+#[ ! -e "$JAVA_HOME/bin/java" ] && JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home
 [ ! -e "$JAVA_HOME/bin/java" ] && error_exit "Please set the JAVA_HOME variable in your environment, We need java(x64)!"
 
 export JAVA_HOME
 export JAVA="$JAVA_HOME/bin/java"
 export BASE_DIR=$(dirname $0)/..
-export CLASSPATH=.:${BASE_DIR}/conf:${CLASSPATH}
+export CLASSPATH=.:${BASE_DIR}/conf:${BASE_DIR}/*:${CLASSPATH}
+
 
 #===========================================================================================
 # JVM Configuration

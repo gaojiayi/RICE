@@ -1,13 +1,25 @@
-
 <assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
     <id>bin</id>
     <formats>
         <format>zip</format>
+        <!--        <format>dir</format>-->
+        <format>tar.gz</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
     <baseDirectory>${project.build.finalName}-bin</baseDirectory>
     <fileSets>
+
+        <fileSet>
+            <directory>src/conf</directory>
+            <outputDirectory>conf</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>src/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <fileMode>0755</fileMode>
+        </fileSet>
         <fileSet>
             <directory>../</directory>
             <includes>
@@ -20,14 +32,55 @@
 
     <dependencySets>
         <dependencySet>
+            <!--不使用项目的artifact，第三方jar不要解压，打包进zip文件的lib目录-->
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>lib</outputDirectory>
+            <unpack>false</unpack>
+
+            <excludes>
+                <exclude>com.gaojy:*</exclude>
+            </excludes>
+        </dependencySet>
+        <dependencySet>
             <useProjectArtifact>true</useProjectArtifact>
             <unpack>false</unpack>
-            <outputDirectory>/libs</outputDirectory>
+            <outputDirectory>/</outputDirectory>
             <scope>runtime</scope>
             <includes>
                 <include>com.gaojy:*</include>
             </includes>
-
         </dependencySet>
     </dependencySets>
+    <!--    <dependencySets>-->
+    <!--        <dependencySet>-->
+    <!--            <useProjectArtifact>true</useProjectArtifact>-->
+    <!--            <unpack>false</unpack>-->
+    <!--            <outputDirectory>/libs</outputDirectory>-->
+    <!--            <scope>runtime</scope>-->
+    <!--            <includes>-->
+    <!--                <include>com.gaojy:*</include>-->
+    <!--            </includes>-->
+
+    <!--        </dependencySet>-->
+    <!--    </dependencySets>-->
+
+    <!--    ************  -->
+    <!--    <moduleSets>-->
+    <!--        <moduleSet>-->
+    <!--            <useAllReactorProjects>true</useAllReactorProjects>-->
+    <!--            <includes>-->
+    <!--&lt;!&ndash;                <include>com.gaojy:rice-common</include>&ndash;&gt;-->
+    <!--                <include>com.gaojy:rice-common:jar:*:*</include>-->
+    <!--            </includes>-->
+    <!--            <binaries>-->
+    <!--                <outputDirectory>lib/</outputDirectory>-->
+    <!--                <unpack>false</unpack>-->
+    <!--                <dependencySets>-->
+    <!--                    <dependencySet>-->
+    <!--                        <outputDirectory>lib/</outputDirectory>-->
+    <!--                    </dependencySet>-->
+    <!--                </dependencySets>-->
+    <!--            </binaries>-->
+    <!--        </moduleSet>-->
+    <!--    </moduleSets>-->
 </assembly>
