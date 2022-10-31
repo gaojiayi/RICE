@@ -22,7 +22,7 @@ public class ControllerConfig extends ElectionConstants {
 
     private static final Logger log = LoggerFactory.getLogger(LoggerName.CONTROLLER_LOGGER_NAME);
 
-    private int controllerPort = 9876;
+    private int controllerPort = -1;
 
     private String configStorePath = System.getProperty("user.home") + File.separator + "rice" + File.separator + "rice-controller.properties";
 

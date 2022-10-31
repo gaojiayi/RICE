@@ -7,7 +7,7 @@ package com.gaojy.rice.processor.api.config;
  * @createTime 2022/01/06 21:27:00
  */
 public class ConfigConstants {
-    public static final String LISTEN_PORT = "rice.controller.port";
+    public static final String LISTEN_PORT = "rice.port";
 
     public static final String DEFAULT_LISTEN_PORT = "8888";
 

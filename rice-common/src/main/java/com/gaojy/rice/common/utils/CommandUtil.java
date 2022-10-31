@@ -20,7 +20,6 @@ public class CommandUtil {
         opt.setRequired(false);
         options.addOption(opt);
 
-
         return options;
     }
     public static CommandLine parseCmdLine(final String appName, String[] args, Options options,

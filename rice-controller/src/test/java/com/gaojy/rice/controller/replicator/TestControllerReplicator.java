@@ -68,6 +68,7 @@ public class TestControllerReplicator {
         server3 = new ReplicatorServer(dataPath3, groupId, serverId3, initNodeOptions());
         // 等待选举完成
         Thread.sleep(1000 * 10);
+        LockSupport.park();
         System.out.println("========================" + server1.getFsm().isLeader()
             + " " + server2.getFsm().isLeader() + " " + server3.getFsm().isLeader());
 

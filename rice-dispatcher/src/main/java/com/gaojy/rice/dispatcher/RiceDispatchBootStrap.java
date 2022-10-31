@@ -43,7 +43,6 @@ public class RiceDispatchBootStrap {
             System.exit(-1);
         }
         DispatcherConfig config = new DispatcherConfig();
-
         if (null == config.getRiceHome()) {
             System.out.printf("Please set the " + MixAll.RICE_HOME_ENV + " variable in your environment to match the location of the RocketMQ installation%n");
             System.exit(-2);
@@ -126,7 +125,7 @@ public class RiceDispatchBootStrap {
         opt.setRequired(false);
         options.addOption(opt);
 
-        // 业务IP+端口， 选举端口默认是业务端口 -2
+        // 业务IP+端口， 选举端口默认是业务端口 -2 暂时不使用JMX
         opt =
             new Option("j", "JMXManagePort", true,
                 "dispatcher jmx manager port, eg: 9090");

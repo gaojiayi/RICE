@@ -138,8 +138,8 @@ public class TestSchedulerManagerProcessor extends AbstractTestProcessor {
         processorDetail.setLatestActiveTime(System.currentTimeMillis());
         schedulerHeartBeatBody.addProcessorDetail(processorDetail);
 
-        schedulerHeartBeatBody.setCPURate(5);
-        schedulerHeartBeatBody.setMenRate(30);
+        schedulerHeartBeatBody.setCPURate(5D);
+        schedulerHeartBeatBody.setMenRate(30D);
 
         ArrayList<String> taskCodes = new ArrayList<>();
         taskCodes.add("TEST_TASK_CODE");

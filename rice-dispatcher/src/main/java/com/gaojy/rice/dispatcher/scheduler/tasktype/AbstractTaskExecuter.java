@@ -65,7 +65,7 @@ public abstract class AbstractTaskExecuter {
                     TaskInvokerResponseBody responseBody = TaskInvokerResponseBody.decode(response.getBody(), TaskInvokerResponseBody.class);
                     retMap = responseBody.getResultMap();
                     instanceInfo.setStatus(TaskInstanceStatus.FINISHED.getCode());
-                    instanceInfo.setRunningTimes(responseHeader.getRetryTimes());
+                    //instanceInfo.setRunningTimes(responseHeader.getRetryTimes());
                     instanceInfo.setResult(responseBody.toJson());
                     instanceInfo.setFinishedTime(new Date(responseHeader.getFinishTime()));
                     break;
@@ -74,7 +74,7 @@ public abstract class AbstractTaskExecuter {
                     errorMsg = e.getMessage();
                 }
             }
-            instanceInfo.setRunningTimes(retryCount - 1);
+            //instanceInfo.setRunningTimes(retryCount - 1);
             if (StringUtil.isNotEmpty(errorMsg)) {
                 instanceInfo.setResult(errorMsg);
                 instanceInfo.setStatus(TaskInstanceStatus.EXCEPTION.getCode());

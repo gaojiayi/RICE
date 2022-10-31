@@ -2,6 +2,7 @@ package com.gaojy.rice.dispatcher.config;
 
 import com.gaojy.rice.common.constants.ElectionConstants;
 import com.gaojy.rice.common.utils.MixAll;
+import com.gaojy.rice.common.utils.StringUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,12 +30,15 @@ public class DispatcherConfig extends ElectionConstants {
 
     public void setAllControllerAddressStr(String allControllerAddressStr) {
         this.allControllerAddressStr = allControllerAddressStr;
-        final List<String> confServerList = new ArrayList<>();
-        /* raft 端口默认是业务端口  -2 */
-        Arrays.asList(allControllerAddressStr.split(",")).stream().forEach(server -> {
-            confServerList.add(server.split(":")[0] + ":" + (Integer.parseInt(server.split(":")[1]) - 2));
-        });
-        this.allControllerElectionAddressStr = confServerList.stream().collect(Collectors.joining(","));
+        if (StringUtil.isEmpty(this.allControllerElectionAddressStr)) {
+            final List<String> confServerList = new ArrayList<>();
+            /* raft 端口默认是业务端口  -2 */
+            Arrays.asList(allControllerAddressStr.split(",")).stream().forEach(server -> {
+                confServerList.add(server.split(":")[0] + ":" + (Integer.parseInt(server.split(":")[1]) - 2));
+            });
+            this.allControllerElectionAddressStr = confServerList.stream().collect(Collectors.joining(","));
+        }
+
     }
 
     public int getJMXManagePort() {

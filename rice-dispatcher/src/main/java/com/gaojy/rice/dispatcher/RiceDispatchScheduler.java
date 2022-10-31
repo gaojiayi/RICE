@@ -81,7 +81,6 @@ public class RiceDispatchScheduler implements RiceDispatchSchedulerMBean, Channe
         transportClient = new TransportClient(this.transfClientConfig, this);
         apiWrapper = new DispatcherAPIWrapper(this);
         scheduleManager = new TaskScheduleManager(apiWrapper);
-        //pullTaskService = new PullTaskService(this);
 
     }
 
@@ -139,12 +138,12 @@ public class RiceDispatchScheduler implements RiceDispatchSchedulerMBean, Channe
             } catch (InterruptedException | TimeoutException | RemotingConnectException
                 | RemotingSendRequestException | RemotingTimeoutException | RemotingTooMuchRequestException e) {
                 log.error("heartBeatToController occur exception" + e);
+            } catch (IllegalStateException e) {
+                log.error("heartBeatToController occur exception" + e);
             }
 
         }, 1000, 1000 * 3, TimeUnit.MILLISECONDS);
 
-        // 打印banner
-        RiceBanner.show(7);
     }
 
     public void shutdown() throws Exception {
@@ -156,9 +155,6 @@ public class RiceDispatchScheduler implements RiceDispatchSchedulerMBean, Channe
         if (this.transportClient != null) {
             transportClient.shutdown();
         }
-//        if (jmxConnServer != null) {
-//            jmxConnServer.stop();
-//        }
     }
 
     public DispatcherConfig getDispatcherConfig() {
@@ -230,12 +226,12 @@ public class RiceDispatchScheduler implements RiceDispatchSchedulerMBean, Channe
         // 根据ip和端口查询确认
         List<ProcessorServerInfo> servers = scheduleManager.getRepository().getProcessorServerInfoDao().getInfosByServer(null, address, port);
 
-        if (servers != null && servers.size()>0) { // 断开的是处理器连接 update
+        if (servers != null && servers.size() > 0) { // 断开的是处理器连接 update
 
             scheduleManager.isolationProcessorForAllTasks(remoteAddr);
 
             // 修改数据库
-            servers.stream().forEach(server->{
+            servers.stream().forEach(server -> {
                 server.setStatus(0);
             });
             scheduleManager.getRepository().getProcessorServerInfoDao().batchCreateOrUpdateInfo(servers);

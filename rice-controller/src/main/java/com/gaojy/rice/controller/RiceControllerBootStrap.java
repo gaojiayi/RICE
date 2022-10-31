@@ -8,7 +8,6 @@ import com.gaojy.rice.common.constants.LoggerName;
 import com.gaojy.rice.common.utils.CommandUtil;
 import com.gaojy.rice.common.utils.MixAll;
 import com.gaojy.rice.common.utils.RiceBanner;
-import com.gaojy.rice.common.utils.StringUtil;
 import com.gaojy.rice.controller.config.ControllerConfig;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.TransfServerConfig;
@@ -20,7 +19,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.concurrent.Callable;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -64,7 +62,9 @@ public class RiceControllerBootStrap {
         ControllerConfig controllerConfig = new ControllerConfig();
         TransfServerConfig transfServerConfig = new TransfServerConfig();
         // 默认业务端口
-        // controllerConfig.setControllerPort(9876);
+//         controllerConfig.setControllerPort(9898);
+//        controllerConfig.setRiceHome("/Users/gaojiayi/RICE/rice-distribution/src");
+
         try {
             String file = controllerConfig.getRiceHome() + File.separator + "conf" + File.separator + "rice-controller.properties";
             //  优先级最低的配置是文件
@@ -101,7 +101,6 @@ public class RiceControllerBootStrap {
             }
             // 优先级其次是来自命令行的参数
             MixAll.properties2Object(CommandUtil.commandLine2Properties(commandLine), controllerConfig);
-
             if (null == controllerConfig.getRiceHome()) {
                 System.out.printf("Please set the " + MixAll.RICE_HOME_ENV + " variable in your environment to match the location of the RocketMQ installation%n");
                 System.exit(-2);
@@ -127,6 +126,7 @@ public class RiceControllerBootStrap {
                 log.info(tip);
                 System.out.printf(tip + "%n");
             } catch (Exception e) {
+                log.error("The RICE Controller boot failed",e);
                 controller.shutdown();
                 System.exit(-3);
             }
@@ -167,6 +167,14 @@ public class RiceControllerBootStrap {
         options.addOption(opt);
 
         // 业务IP+端口， 选举端口默认是业务端口 -2
+
+        opt = new Option("cp", "controllerPort", true, "controller port");
+        opt.setRequired(false);
+        options.addOption(opt);
+        opt = new Option("d", "dataPath", true, "jraft log data path");
+        opt.setRequired(false);
+        options.addOption(opt);
+
         opt =
             new Option("l", "localhost", true,
                 "controller local host address, eg: 192.168.0.1");

@@ -99,7 +99,7 @@ public class DefaultTaskScheduleProcessor implements RiceRequestProcessor {
                 // 包装响应数据
                 // SET header
                 responseHeader.setFinishTime(finishTime);
-                responseHeader.setRunningTime(finishTime - startTime);
+                //responseHeader.setRunningTime(finishTime - startTime);
                 responseHeader.setRetryTimes(requestHeader.getMaxRetryTimes() - retryTime);
                 // SET body
                 TaskInvokerResponseBody responseBody = new TaskInvokerResponseBody();

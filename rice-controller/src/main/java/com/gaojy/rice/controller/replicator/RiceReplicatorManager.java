@@ -1,5 +1,6 @@
 package com.gaojy.rice.controller.replicator;
 
+import com.alipay.sofa.jraft.RaftGroupService;
 import com.gaojy.rice.controller.config.ControllerConfig;
 
 /**

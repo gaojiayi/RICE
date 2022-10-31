@@ -3,6 +3,7 @@ package com.gaojy.rice.controller.replicator;
 import com.alipay.sofa.jraft.Lifecycle;
 import com.alipay.sofa.jraft.Node;
 import com.alipay.sofa.jraft.RaftGroupService;
+import com.alipay.sofa.jraft.conf.Configuration;
 import com.alipay.sofa.jraft.entity.PeerId;
 import com.alipay.sofa.jraft.option.NodeOptions;
 import com.alipay.sofa.jraft.rpc.RaftRpcServerFactory;
@@ -74,6 +75,7 @@ public class ReplicatorServer implements Lifecycle<ReplicatorNodeOptions> {
     public Node getNode() {
         return this.node;
     }
+
     public void addLeaderStateListener(final LeaderStateListener listener) {
         this.listeners.add(listener);
     }
@@ -93,6 +95,11 @@ public class ReplicatorServer implements Lifecycle<ReplicatorNodeOptions> {
             this.fsm = new ControllerStateMachine(this.listeners);
             // node options
             NodeOptions nodeOptions = opts.getNodeOptions();
+            Configuration initConf = new Configuration();
+            if (!initConf.parse(opts.getInitialServerAddressList())) {
+                throw new IllegalArgumentException("Fail to parse initConf:" + initConf);
+            }
+
             if (nodeOptions == null) {
                 nodeOptions = new NodeOptions();
             }
@@ -105,6 +112,7 @@ public class ReplicatorServer implements Lifecycle<ReplicatorNodeOptions> {
             nodeOptions.setRaftMetaUri(opts.getDataPath() + File.separator + "raft_meta");
             // snapshot, 可选, 一般都推荐
             nodeOptions.setSnapshotUri(opts.getDataPath() + File.separator + "snapshot");
+            nodeOptions.setInitialConf(initConf);
             // 初始化 raft group 服务框架
             this.raftGroupService = new RaftGroupService(opts.getGroupId(), serverId, nodeOptions, rpcServer);
             this.node = this.raftGroupService.start();

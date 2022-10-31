@@ -26,7 +26,7 @@ public enum TaskType {
     /**
      * JAVA内置任务
      */
-    JAVA_INTERNAL(3),
+    BASIC_JAVA_INTERNAL(3),
 
     /**
      * MAP 任务

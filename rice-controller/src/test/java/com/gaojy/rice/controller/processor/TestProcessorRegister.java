@@ -82,7 +82,7 @@ public class TestProcessorRegister extends AbstractTestProcessor {
                 riceTaskInfo.setTaskCode("TestTaskCode");
                 riceTaskInfo.setTaskName("TestTaskName");
                 riceTaskInfo.setAppId(1L);
-                riceTaskInfo.setTaskType(TaskType.JAVA_INTERNAL.getCode());
+                riceTaskInfo.setTaskType(TaskType.BASIC_JAVA_INTERNAL.getCode());
                 riceTaskInfo.setTaskDesc("test");
                 riceTaskInfo.setExecuteType(ExecuteType.STANDALONE.name());
                 riceTaskInfo.setCreateTime(new Date());

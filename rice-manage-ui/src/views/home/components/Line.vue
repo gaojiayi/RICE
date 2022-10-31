@@ -3,7 +3,6 @@ import { ECharts } from "echarts";
 import echarts from "/@/plugins/echarts";
 import { onBeforeMount, onMounted, nextTick, computed, PropType } from "vue";
 import { useEventListener, tryOnUnmounted, useTimeoutFn } from "@vueuse/core";
-import { it } from "element-plus/lib/locale";
 
 let echartInstance: ECharts;
 

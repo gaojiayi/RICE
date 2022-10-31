@@ -13,8 +13,8 @@ public class TaskExecuterFactory {
 
     public  static RiceExecuter getExecuter(TaskType taskType, TaskScheduleClient client) {
         switch (taskType) {
-//            case STANDALONE:
-//                return new RiceBasicTaskExecuter(client);
+            case BASIC_JAVA_INTERNAL:
+                return new RiceBasicTaskExecuter(client);
 //            case BROADCAST:
 //                return new RiceBroadCastTaskExecuter(client);
             case RICE_MAP:
