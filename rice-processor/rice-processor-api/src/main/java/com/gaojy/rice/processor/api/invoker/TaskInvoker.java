@@ -63,7 +63,7 @@ public abstract class TaskInvoker {
                                     TASK_CODE_INSTANCE_MAP.put(executer.taskCode(), clazz.newInstance());
                                     TaskInvoker invoker = getInvoker(clazz);
                                     boolean logEnable = false;
-                                    if (clazz.getAnnotation(LogEnable.class) != null) {
+                                    if (clazz.getDeclaredAnnotation(LogEnable.class) != null) {
                                         logEnable = true;
                                     }
                                     TaskDetailData data = new TaskDetailData(executer.taskCode(), executer.taskName(),

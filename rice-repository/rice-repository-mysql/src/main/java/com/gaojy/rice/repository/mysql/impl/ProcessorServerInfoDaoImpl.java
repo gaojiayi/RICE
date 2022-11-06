@@ -1,5 +1,6 @@
 package com.gaojy.rice.repository.mysql.impl;
 
+import com.gaojy.rice.common.constants.LoggerName;
 import com.gaojy.rice.common.exception.RepositoryException;
 import com.gaojy.rice.repository.api.dao.ProcessorServerInfoDao;
 import com.gaojy.rice.common.entity.ProcessorServerInfo;
@@ -12,6 +13,8 @@ import org.apache.commons.dbutils.BasicRowProcessor;
 import org.apache.commons.dbutils.GenerousBeanProcessor;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author gaojy
@@ -21,12 +24,14 @@ import org.apache.commons.dbutils.handlers.BeanListHandler;
  */
 public class ProcessorServerInfoDaoImpl implements ProcessorServerInfoDao {
     private final DataSource dataSource = DataSourceFactory.getDataSource();
+    private final QueryRunner qr = new QueryRunner(dataSource);
+    private static final Logger log = LoggerFactory.getLogger(LoggerName.REPOSITORY_LOGGER_NAME);
 
     @Override
     public List<ProcessorServerInfo> getInfosByServer(Long appId, String address, int port) throws RepositoryException {
         QueryRunner qr = new QueryRunner(dataSource);
 
-        String sql = "select * from processor_server_info where address = ? and port = ?  and status = 1";
+        String sql = "select * from processor_server_info where address = ? and port = ?  and status = 1 ";
 
         try {
             List<ProcessorServerInfo> processorServerInfoList;
@@ -103,7 +108,13 @@ public class ProcessorServerInfoDaoImpl implements ProcessorServerInfoDao {
 
     @Override
     public List<ProcessorServerInfo> getInfosByTask(String taskCode) {
-
-        return null;
+        String sql = "select * from processor_server_info where status = 1 and task_code ='" + taskCode + "'";
+        try {
+            return this.qr.query(sql, new BeanListHandler<>(ProcessorServerInfo.class,
+                new BasicRowProcessor(new GenerousBeanProcessor())));
+        } catch (SQLException e) {
+            log.error("get processor server info error");
+            throw new RepositoryException(e);
+        }
     }
 }

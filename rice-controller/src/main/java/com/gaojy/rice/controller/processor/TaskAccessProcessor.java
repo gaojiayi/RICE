@@ -7,10 +7,13 @@ import com.gaojy.rice.common.constants.TaskOptType;
 import com.gaojy.rice.common.entity.TaskChangeRecord;
 import com.gaojy.rice.common.exception.RemotingCommandException;
 import com.gaojy.rice.common.protocol.body.processor.ExportTaskRequestBody;
+import com.gaojy.rice.common.protocol.body.processor.ExportTaskResponseBody;
 import com.gaojy.rice.common.protocol.header.processor.ExportTaskRequestHeader;
 import com.gaojy.rice.common.protocol.header.processor.ExportTaskResponseHeader;
 import com.gaojy.rice.common.utils.StringUtil;
 import com.gaojy.rice.controller.RiceController;
+import com.gaojy.rice.remote.common.RemoteHelper;
+import com.gaojy.rice.remote.common.TransfUtil;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.RiceRequestProcessor;
 import com.gaojy.rice.common.entity.ProcessorServerInfo;
@@ -48,7 +51,7 @@ public class TaskAccessProcessor implements RiceRequestProcessor {
                     return this.registerProcessor(ctx, request);
 
             }
-        }else {
+        } else {
             LOG.error("The current controller is not the master node and does not process requests from the processor");
 
         }
@@ -61,24 +64,29 @@ public class TaskAccessProcessor implements RiceRequestProcessor {
         return false;
     }
 
+    // TODO: DB事务控制
     private RiceRemoteContext registerProcessor(ChannelHandlerContext ctx,
         RiceRemoteContext request) throws RemotingCommandException {
         int responseCode = ResponseCode.SYSTEM_ERROR;
         String remark = null;
         final RiceRemoteContext response =
             RiceRemoteContext.createResponseCommand(ExportTaskResponseHeader.class);
+        final  ExportTaskResponseBody responseBody = new ExportTaskResponseBody();
+
         ExportTaskRequestHeader requestHeader = (ExportTaskRequestHeader) request.decodeCommandCustomHeader(ExportTaskRequestHeader.class);
         ExportTaskRequestBody exportTaskRequestBody = ExportTaskRequestBody.decode(request.getBody(), ExportTaskRequestBody.class);
+        final String remote = RemoteHelper.parseChannelRemoteAddr(ctx.channel()).split(":")[0];
         if (requestHeader != null && exportTaskRequestBody != null) {
             LOG.info("Processor register to rice controller,appId:{},address:{},tasks:{}",
                 requestHeader.getAppId(),
-                requestHeader.getNetAddress() + ":" + requestHeader.getListenPort(),
+                remote + ":" + requestHeader.getListenPort(),
                 exportTaskRequestBody.getTasks());
             //check  根据appid 和 taskCode 查询数据库   检查是否已经配置好了任务
             List<String> taskCodes = exportTaskRequestBody.getTasks().stream().map(item -> item.getTaskCode()).collect(Collectors.toList());
             List<RiceTaskInfo> infoByCodes = riceController.getRepository().getRiceTaskInfoDao().getInfoByCodes(taskCodes);
             if (infoByCodes != null && infoByCodes.size() > 0) {
                 boolean allMatch = infoByCodes.stream().allMatch(item -> {
+                    responseBody.setTaskSchedulerInfo(item.getTaskCode(),item.getSchedulerServer());
                     return item.getAppId() == Long.parseLong(requestHeader.getAppId());
                 });
                 if (!allMatch) {
@@ -87,19 +95,21 @@ public class TaskAccessProcessor implements RiceRequestProcessor {
             } else {
                 remark = "No task information found on the controller, please create a task from the console";
             }
+
             if (StringUtil.isEmpty(remark)) {
                 try {
                     // 查询之前服务的注册信息  如果二次注册改变了端口 那么属于新注册
                     List<ProcessorServerInfo> serverInfos = riceController.getRepository().getProcessorServerInfoDao()
                         .getInfosByServer(Long.parseLong(requestHeader.getAppId()),
-                            requestHeader.getNetAddress(),
+//                            requestHeader.getNetAddress(),
+                            remote,
                             requestHeader.getListenPort());
                     Long currentTime = System.currentTimeMillis();
 
                     List<TaskChangeRecord> records = new ArrayList<>();
 
                     // 如果存在之前注册的taskcode在这次注册中没有，则需要在注册信息中下线该任务
-                    serverInfos.stream().forEach(info -> {
+                    serverInfos.forEach(info -> {
                         info.setStatus(0);
                         if (!taskCodes.contains(info.getTaskCode())) {
                             // 添加涉及到的任务下线记录
@@ -115,11 +125,12 @@ public class TaskAccessProcessor implements RiceRequestProcessor {
                         ProcessorServerInfo info = new ProcessorServerInfo();
                         info.setStatus(1);
                         info.setTaskCode(taskCode);
-                        info.setAddress(requestHeader.getNetAddress());
+                        info.setAddress(remote);
                         info.setPort(requestHeader.getListenPort());
                         info.setCreateTime(new Date());
                         info.setLatestActiveTime(new Date());
-//                        info.setVersion("");
+                        info.setAppId(Long.parseLong(requestHeader.getAppId()));
+//
                         serverInfos.add(info);
 
                         TaskChangeRecord record = new TaskChangeRecord();
@@ -141,7 +152,7 @@ public class TaskAccessProcessor implements RiceRequestProcessor {
                     responseCode = ResponseCode.SUCCESS;
                     LOG.info("Processor register to rice controller Successfully,appId:{},address:{},tasks:{}",
                         requestHeader.getAppId(),
-                        requestHeader.getNetAddress() + ":" + requestHeader.getListenPort(),
+                        remote + ":" + requestHeader.getListenPort(),
                         exportTaskRequestBody.getTasks());
                 } catch (Exception e) {
                     LOG.error("register processor occur error", e);
@@ -156,6 +167,7 @@ public class TaskAccessProcessor implements RiceRequestProcessor {
         if (remark != null) {
             LOG.error(remark);
         }
+        response.setBody(responseBody.encode());
         response.setCode(responseCode);
         response.setRemark(remark);
         return response;

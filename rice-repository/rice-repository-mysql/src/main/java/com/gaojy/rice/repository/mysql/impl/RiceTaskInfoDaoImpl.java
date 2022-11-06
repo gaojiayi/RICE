@@ -6,6 +6,7 @@ import com.gaojy.rice.repository.api.dao.RiceTaskInfoDao;
 import com.gaojy.rice.common.entity.RiceTaskInfo;
 import com.gaojy.rice.repository.mysql.DataSourceFactory;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -13,6 +14,7 @@ import javax.sql.DataSource;
 import org.apache.commons.dbutils.BasicRowProcessor;
 import org.apache.commons.dbutils.GenerousBeanProcessor;
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +47,7 @@ public class RiceTaskInfoDaoImpl implements RiceTaskInfoDao {
     @Override
     public void addTask(RiceTaskInfo riceTaskInfo) {
         QueryRunner qr = new QueryRunner(dataSource);
-        String sql = "inset into  rice_task_info" +
+        String sql = "insert into  rice_task_info" +
             "(task_name,task_desc,task_type,parameters,scheduler_server," +
             "schedule_type,time_expression,execute_type,task_retry_count,next_trigger_time,create_time,update_time,status)" +
             " values(?,?,?,?,?,?,?,?,?,?,?,?,?) ";
@@ -87,7 +89,7 @@ public class RiceTaskInfoDaoImpl implements RiceTaskInfoDao {
             "next_trigger_time = ?, " +
             "create_time = ?, " +
             "update_time = ?, " +
-            "status = ?, " +
+            "status = ? " +
             "where id = ?";
         try {
             qr.update(sql,
@@ -126,6 +128,19 @@ public class RiceTaskInfoDaoImpl implements RiceTaskInfoDao {
 
     @Override
     public List<String> getAllValidTaskCode() {
-        return null;
+        QueryRunner qr = new QueryRunner(dataSource);
+        final List<String> allTaskCodes = new ArrayList<>();
+        String sql = "select task_code from rice_task_info where status != 0";
+        try {
+            List<Object[]> riceTaskInfos = qr.query(sql, new ArrayListHandler());
+            if (riceTaskInfos != null && riceTaskInfos.size() > 0) {
+                riceTaskInfos.stream().forEach(taskCode -> {
+                    allTaskCodes.add((String) taskCode[0]);
+                });
+            }
+        } catch (SQLException e) {
+            throw new RepositoryException(e);
+        }
+        return allTaskCodes;
     }
 }

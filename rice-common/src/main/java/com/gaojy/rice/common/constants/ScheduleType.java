@@ -16,4 +16,4 @@ public enum ScheduleType {
     public static ScheduleType getType(String type) {
         return ScheduleType.valueOf(type.toUpperCase());
     }
-    }
+}

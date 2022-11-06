@@ -28,6 +28,11 @@
             <artifactId>rice-dispatcher</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.gaojy</groupId>
+            <artifactId>rice-processor-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 

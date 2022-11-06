@@ -58,7 +58,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     private String taskName;
     private TaskType taskType;
     private String parameters;
-    private ScheduleType scheduleType = ScheduleType.CRON;
+    private ScheduleType scheduleType ;
     private String timeExpression;
     private ExecuteType executeType;
     //    private int executeThreads = 1;
@@ -90,6 +90,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
 
     public TaskScheduleClient(RiceTaskInfo taskInfo,
         TaskScheduleManager taskScheduleManager) throws ParseException {
+        this.taskScheduleManager = taskScheduleManager;
         buildClient(taskInfo);
         this.scheduleTimer = taskScheduleManager.getScheduleTimer();
         this.outApiWrapper = taskScheduleManager.getOutApiWrapper();
@@ -105,7 +106,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
             BeanUtils.copyProperties(this, taskInfo);
             this.executeType = ExecuteType.getType(taskInfo.getExecuteType());
             this.taskType = TaskType.getType(taskInfo.getTaskType());
-            this.scheduleType = scheduleType.getType(taskInfo.getScheduleType());
+            this.scheduleType = ScheduleType.getType(taskInfo.getScheduleType());
         } catch (IllegalAccessException | InvocationTargetException e) {
             log.error("build client error", e);
             throw new DispatcherException(e);
@@ -330,8 +331,8 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
         return executeType;
     }
 
-    public void setExecuteType(ExecuteType executeType) {
-        this.executeType = executeType;
+    public void setExecuteType(String executeType) {
+        this.executeType = ExecuteType.getType(executeType);
     }
 
     public int getTaskRetryCount() {
@@ -340,6 +341,11 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
 
     public void setTaskRetryCount(int taskRetryCount) {
         this.taskRetryCount = taskRetryCount;
+    }
+
+    public void setTaskType(int taskType) {
+        this.taskType = TaskType.getType(taskType);
+
     }
 
     public String getParameters() {
@@ -370,8 +376,8 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
         return scheduleType;
     }
 
-    public void setScheduleType(ScheduleType scheduleType) {
-        this.scheduleType = scheduleType;
+    public void setScheduleType(String scheduleType) {
+        this.scheduleType = ScheduleType.getType(scheduleType);
     }
 
     public String getTimeExpression() {

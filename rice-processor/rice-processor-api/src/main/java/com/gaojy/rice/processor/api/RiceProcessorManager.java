@@ -82,7 +82,6 @@ public class RiceProcessorManager implements ChannelEventListener {
         this.server.start();
 
         this.client.start();
-        this.electionClient.close();
 
         RiceRemoteContext context = buildRegisterRequest();
         doRegister(context);
@@ -93,6 +92,8 @@ public class RiceProcessorManager implements ChannelEventListener {
     }
 
     public void close() {
+        this.electionClient.close();
+
         this.server.shutdown();
     }
 

@@ -17,9 +17,9 @@ public class TaskDetailData {
 
     private String className;
 
-    private boolean logEnable;
+    private Boolean logEnable;
 
-    public TaskDetailData(String taskCode, String taskName, String className, boolean logEnable) {
+    public TaskDetailData(String taskCode, String taskName, String className, Boolean logEnable) {
         this.taskCode = taskCode;
         this.taskName = taskName;
         this.className = className;
@@ -33,6 +33,13 @@ public class TaskDetailData {
         return logEnable;
     }
 
+    public Boolean getLogEnable() {
+        return logEnable;
+    }
+
+    public void setLogEnable(Boolean logEnable) {
+        this.logEnable = logEnable;
+    }
 
     public String getTaskCode() {
         return taskCode;
