@@ -29,7 +29,7 @@ public class TaskInvokeRequestHeader implements CommandCustomHeader {
     private int maxRetryTimes;
 
     @CFNotNull
-    private String appName;
+    private String appId;
 
     public String getTaskCode() {
         return taskCode;
@@ -79,16 +79,18 @@ public class TaskInvokeRequestHeader implements CommandCustomHeader {
         this.maxRetryTimes = maxRetryTimes;
     }
 
-    public String getAppName() {
-        return appName;
-    }
 
-    public void setAppName(String appName) {
-        this.appName = appName;
-    }
 
     @Override
     public void checkFields() throws RemotingCommandException {
 
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 }

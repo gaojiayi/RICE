@@ -58,7 +58,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     private String taskName;
     private TaskType taskType;
     private String parameters;
-    private ScheduleType scheduleType ;
+    private ScheduleType scheduleType;
     private String timeExpression;
     private ExecuteType executeType;
     //    private int executeThreads = 1;
@@ -84,7 +84,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
 
     private Long nextTaskInstanceId = -1L;
 
-    private String appName;
+    private String appId;
 
     private Long timeoutMillis = 5 * 1000 * 60L;
 
@@ -143,14 +143,14 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
         }
         // TODO 固定延迟是上一次任务执行完后延迟N 再执行（同步调用）    固定评率是每隔多长时间再执行 （异步调用）
         if (ScheduleType.FIXED_FREQUENCY.equals(scheduleType) || ScheduleType.FIX_DELAY.equals(scheduleType)) {
-            delay = Long.parseLong(timeExpression);
+            delay = Long.parseLong(timeExpression) * 1000;
         }
 
         if (taskStatus.get().equals(TaskStatus.ONLINE)) {
             nextTaskInstanceId = repository.getTaskInstanceInfoDao().createTaskInstance(buildNewTaskInstance(delay));
 
         }
-        scheduleTimer.newTimeout(this, delay, TimeUnit.MILLISECONDS);
+        triggerTask(delay);
 
     }
 
@@ -184,7 +184,19 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
         }
 
         nextTaskInstanceId = repository.getTaskInstanceInfoDao().createTaskInstance(buildNewTaskInstance(delay));
-        this.scheduleTimer.newTimeout(this, delay, TimeUnit.MILLISECONDS);
+        triggerTask(delay);
+    }
+
+    private void triggerTask(long delay) {
+        try {
+            repository.getRiceTaskInfoDao().updateNextTriggerTime(this.taskCode, new Date(System.currentTimeMillis() + delay));
+        } catch (Exception e) {
+            log.error("update next Trigger Time error ,taskcode={},triggerTime={}",
+                this.taskCode, new Date(System.currentTimeMillis() + delay));
+        } finally {
+            this.scheduleTimer.newTimeout(this, delay, TimeUnit.MILLISECONDS);
+        }
+
     }
 
     public TaskInstanceInfo buildNewTaskInstance(Long delay) {
@@ -251,6 +263,7 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
                 TaskInstanceInfo instanceInfo = repository.getTaskInstanceInfoDao().getInstance(taskInstanceId);
                 instanceInfo.setStatus(TaskInstanceStatus.FINISHED.getCode());
                 instanceInfo.setFinishedTime(new Date());
+                instanceInfo.setTaskTrackerAddress(processorAddr);
                 if (response != null) {
                     try {
                         TaskInvokerResponseHeader responseHeader = (TaskInvokerResponseHeader) response
@@ -311,12 +324,12 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
         }).collect(Collectors.toList()));
     }
 
-    public String getAppName() {
-        return appName;
+    public String getAppId() {
+        return appId;
     }
 
-    public void setAppName(String appName) {
-        this.appName = appName;
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
     public String getTaskCode() {

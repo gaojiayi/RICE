@@ -90,7 +90,7 @@ public abstract class AbstractTaskExecuter {
 
         private TaskInvokeRequestHeader buildRequest(String processor) {
             TaskInvokeRequestHeader requestHeader = new TaskInvokeRequestHeader();
-            requestHeader.setAppName(AbstractTaskExecuter.this.client.getAppName());
+            requestHeader.setAppId(AbstractTaskExecuter.this.client.getAppId());
             requestHeader.setTaskCode(instanceInfo.getTaskCode());
             requestHeader.setInstanceParameter(instanceInfo.getInstanceParams());
             requestHeader.setMethodName(instanceInfo.getType());

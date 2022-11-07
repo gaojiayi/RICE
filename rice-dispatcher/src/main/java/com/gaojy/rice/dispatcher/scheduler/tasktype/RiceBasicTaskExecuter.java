@@ -148,7 +148,7 @@ public class RiceBasicTaskExecuter implements RiceExecuter {
 
     private TaskInvokeRequestHeader buildRequest(String processor, Long taskInstanceId) {
         TaskInvokeRequestHeader requestHeader = new TaskInvokeRequestHeader();
-        requestHeader.setAppName(client.getAppName());
+        requestHeader.setAppId(client.getAppId());
         requestHeader.setTaskCode(client.getTaskCode());
         requestHeader.setInstanceParameter(client.getParameters());
         requestHeader.setMethodName(ExecuterMethodName.process.name());

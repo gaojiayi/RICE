@@ -28,10 +28,11 @@ import org.slf4j.LoggerFactory;
 public class RiceTaskInfoDaoImpl implements RiceTaskInfoDao {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.REPOSITORY_LOGGER_NAME);
     private final DataSource dataSource = DataSourceFactory.getDataSource();
+    private final QueryRunner qr = new QueryRunner(dataSource);
 
     @Override
     public List<RiceTaskInfo> getInfoByCodes(List<String> taskCodes) {
-        QueryRunner qr = new QueryRunner(dataSource);
+
         String condition = String.join(",", taskCodes);
         String sql = "select * from rice_task_info where task_code in ('" + condition + "') and status != 0";
         try {
@@ -46,7 +47,6 @@ public class RiceTaskInfoDaoImpl implements RiceTaskInfoDao {
 
     @Override
     public void addTask(RiceTaskInfo riceTaskInfo) {
-        QueryRunner qr = new QueryRunner(dataSource);
         String sql = "insert into  rice_task_info" +
             "(task_name,task_desc,task_type,parameters,scheduler_server," +
             "schedule_type,time_expression,execute_type,task_retry_count,next_trigger_time,create_time,update_time,status)" +
@@ -75,7 +75,6 @@ public class RiceTaskInfoDaoImpl implements RiceTaskInfoDao {
 
     @Override
     public void updateTask(RiceTaskInfo riceTaskInfo) {
-        QueryRunner qr = new QueryRunner(dataSource);
         String sql = "update rice_task_info set " +
             "task_name = ?, " +
             "task_desc = ?, " +
@@ -116,8 +115,17 @@ public class RiceTaskInfoDaoImpl implements RiceTaskInfoDao {
     }
 
     @Override
+    public void updateNextTriggerTime(String taskCode, Date nextTriggerTime) {
+        String sql = "update rice_task_info set next_trigger_time = ? , update_time = ? where task_code = ?";
+        try {
+            qr.update(sql, nextTriggerTime, new Date(), taskCode);
+        } catch (SQLException e) {
+            throw new RepositoryException(e);
+        }
+    }
+
+    @Override
     public void taskStatusChange(String taskCode, int status) {
-        QueryRunner qr = new QueryRunner(dataSource);
         String sql = "update rice_task_info set status = ? where task_code = ?";
         try {
             qr.update(sql, status, taskCode);

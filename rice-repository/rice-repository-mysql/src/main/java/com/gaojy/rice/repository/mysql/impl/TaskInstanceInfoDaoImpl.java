@@ -45,15 +45,16 @@ public class TaskInstanceInfoDaoImpl implements TaskInstanceInfoDao {
     public Long createTaskInstance(TaskInstanceInfo instanceInfo) {
         QueryRunner qr = new QueryRunner(dataSource);
         String sql = "insert into  task_instance_info " +
-            "(task_code,instance_params,parent_instance_id,actual_trigger_time,retry_times," +
+            "(task_code,instance_params,parent_instance_id,actual_trigger_time,expected_trigger_time,retry_times," +
             "task_tracker_address,type,result,finished_time,create_time,status)" +
-            " values(?,?,?,?,?,?,?,?,?,?,?) ";
+            " values(?,?,?,?,?,?,?,?,?,?,?,?) ";
         try {
             Long id = qr.insert(sql, new ScalarHandler<>(),
                 instanceInfo.getTaskCode(),
                 instanceInfo.getInstanceParams(),
                 instanceInfo.getParentInstanceId(),
                 instanceInfo.getActualTriggerTime(),
+                instanceInfo.getExpectedTriggerTime(),
                 instanceInfo.getRetryTimes(),
                 instanceInfo.getTaskTrackerAddress(),
                 instanceInfo.getType(),

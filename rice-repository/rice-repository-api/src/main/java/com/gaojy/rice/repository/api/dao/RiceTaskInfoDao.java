@@ -1,6 +1,7 @@
 package com.gaojy.rice.repository.api.dao;
 
 import com.gaojy.rice.common.entity.RiceTaskInfo;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,6 +17,8 @@ public interface RiceTaskInfoDao {
     public void addTask(RiceTaskInfo riceTaskInfo);
 
     public void updateTask(RiceTaskInfo riceTaskInfo);
+
+    public void updateNextTriggerTime(String taskCode,Date nextTriggerTime);
 
     public void taskStatusChange(String taskCode,int status);
 
