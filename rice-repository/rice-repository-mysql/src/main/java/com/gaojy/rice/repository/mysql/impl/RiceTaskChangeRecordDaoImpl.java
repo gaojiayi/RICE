@@ -20,10 +20,10 @@ public class RiceTaskChangeRecordDaoImpl implements RiceTaskChangeRecordDao {
     private static final Logger LOG = LoggerFactory.getLogger(LoggerName.REPOSITORY_LOGGER_NAME);
     private final DataSource dataSource = DataSourceFactory.getDataSource();
     private String baseSql = "select * from task_change_record";
-
+    QueryRunner queryRunner = new QueryRunner(dataSource);
     @Override
     public long getLatestRecord(String taskCode) {
-        QueryRunner queryRunner = new QueryRunner(dataSource);
+
         String sql = "select MAX(create_time) from task_change_record where task_code = ?";
         try {
             Date createTime = queryRunner.query(sql, new ScalarHandler<Timestamp>(),taskCode);
@@ -39,7 +39,6 @@ public class RiceTaskChangeRecordDaoImpl implements RiceTaskChangeRecordDao {
 
     @Override
     public List<TaskChangeRecord> getChanges(String taskCode, Long startTime) {
-        QueryRunner queryRunner = new QueryRunner(dataSource);
         String sql = "select * from task_change_record where task_code = ? and create_time >= ? ";
 
         Object[] params = {taskCode, new Timestamp(startTime)};
@@ -54,7 +53,7 @@ public class RiceTaskChangeRecordDaoImpl implements RiceTaskChangeRecordDao {
 
     @Override
     public void insert(List<TaskChangeRecord> taskChangeRecords) {
-        QueryRunner qr = new QueryRunner(dataSource);
+
         String sql = "insert into  task_change_record (task_code,opt_type,create_time) " +
             " values (?,?,?)";
 
@@ -66,7 +65,7 @@ public class RiceTaskChangeRecordDaoImpl implements RiceTaskChangeRecordDao {
             params[i][2] = new Timestamp(taskChangeRecord.getCreateTime().getTime());
         }
         try {
-            qr.batch(sql, params);
+            queryRunner.batch(sql, params);
         } catch (SQLException e) {
             LOG.error("insert taskChangeRecords SQLException", e);
             throw new RepositoryException("insert taskChangeRecords SQLException", e);

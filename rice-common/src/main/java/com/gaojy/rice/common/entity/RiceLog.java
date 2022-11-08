@@ -42,4 +42,12 @@ public class RiceLog{
 		return message;
 	}
 
+	@Override public String toString() {
+		return "RiceLog{" +
+			"taskInstanceId=" + taskInstanceId +
+			", processorAddr='" + processorAddr + '\'' +
+			", schedulerAddr='" + schedulerAddr + '\'' +
+			", message='" + message + '\'' +
+			'}';
+	}
 }

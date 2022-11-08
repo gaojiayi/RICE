@@ -6,6 +6,7 @@ import com.gaojy.rice.common.constants.LoggerName;
 import com.gaojy.rice.common.constants.TaskOptType;
 import com.gaojy.rice.common.constants.TaskStatus;
 import com.gaojy.rice.common.entity.ProcessorServerInfo;
+import com.gaojy.rice.common.entity.RiceLog;
 import com.gaojy.rice.common.entity.RiceTaskInfo;
 import com.gaojy.rice.common.entity.TaskChangeRecord;
 import com.gaojy.rice.common.exception.DispatcherException;
@@ -154,6 +155,16 @@ public class TaskScheduleManager implements SchedulerManager, Runnable, LifeCycl
             log.warn("The task:{} has stopped running", record.getTaskCode());
         }
 
+    }
+
+    /**
+     * @description  实时接收来自处理器的任务执行日志
+     * @param riceLog
+     * @throws
+     */
+    @Override
+    public void appendLog(RiceLog riceLog) {
+        repository.getRiceLogDao().append(riceLog);
     }
 
     private boolean taskIsRunning(String taskCode) {

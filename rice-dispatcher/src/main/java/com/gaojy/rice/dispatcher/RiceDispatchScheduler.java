@@ -17,6 +17,7 @@ import com.gaojy.rice.dispatcher.common.ElectionClient;
 import com.gaojy.rice.dispatcher.common.HardwareHelper;
 import com.gaojy.rice.dispatcher.config.DispatcherConfig;
 import com.gaojy.rice.dispatcher.processor.TaskCreateProcessor;
+import com.gaojy.rice.dispatcher.processor.TaskLogProcessor;
 import com.gaojy.rice.dispatcher.processor.TaskRebalanceProcessor;
 import com.gaojy.rice.dispatcher.scheduler.TaskScheduleManager;
 import com.gaojy.rice.remote.ChannelEventListener;
@@ -114,6 +115,9 @@ public class RiceDispatchScheduler implements RiceDispatchSchedulerMBean, Channe
             new TaskRebalanceProcessor(scheduleManager), null);
         transportClient.registerProcessor(RequestCode.CONTROLLER_TASK_CREATE,
             new TaskCreateProcessor(scheduleManager), null);
+        transportClient.registerProcessor(RequestCode.LOG_REPORT,
+            new TaskLogProcessor(scheduleManager), null);
+
         transportClient.start();
 
         scheduleManager.startup();

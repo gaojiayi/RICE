@@ -1,6 +1,7 @@
 package com.gaojy.rice.dispatcher.scheduler;
 
 import com.gaojy.rice.common.entity.ProcessorServerInfo;
+import com.gaojy.rice.common.entity.RiceLog;
 import com.gaojy.rice.common.entity.RiceTaskInfo;
 import com.gaojy.rice.common.entity.TaskChangeRecord;
 import java.text.ParseException;
@@ -37,4 +38,6 @@ public interface SchedulerManager {
 //    public void updateTask();
 
     public void onChange(TaskChangeRecord record);
+
+    public void  appendLog(RiceLog riceLog);
 }

@@ -29,7 +29,6 @@ public class ProcessorServerInfoDaoImpl implements ProcessorServerInfoDao {
 
     @Override
     public List<ProcessorServerInfo> getInfosByServer(Long appId, String address, int port) throws RepositoryException {
-        QueryRunner qr = new QueryRunner(dataSource);
 
         String sql = "select * from processor_server_info where address = ? and port = ?  and status = 1 ";
 
