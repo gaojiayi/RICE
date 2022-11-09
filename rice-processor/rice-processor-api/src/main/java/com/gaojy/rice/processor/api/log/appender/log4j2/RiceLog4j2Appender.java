@@ -51,7 +51,7 @@ class RiceLog4j2Appender extends AbstractAppender implements ILogHandler {
                 body.setLogMessage(log);
                 RiceRemoteContext requestBody = RiceRemoteContext.createRequestCommand(RequestCode.LOG_REPORT, null);
                 requestBody.setBody(body.encode());
-                channel.writeAndFlush(channel);
+                channel.writeAndFlush(requestBody);
             } catch (Exception e) {
                 e.printStackTrace();
             }

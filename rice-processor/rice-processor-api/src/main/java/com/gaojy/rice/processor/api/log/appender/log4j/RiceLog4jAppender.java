@@ -24,7 +24,7 @@ public class RiceLog4jAppender extends AppenderSkeleton implements ILogHandler {
                 body.setLogMessage(this.layout.format(event));
                 RiceRemoteContext requestBody = RiceRemoteContext.createRequestCommand(RequestCode.LOG_REPORT,null);
                 requestBody.setBody(body.encode());
-                channel.writeAndFlush(channel);
+                channel.writeAndFlush(requestBody);
             } catch (Exception e) {
                 e.printStackTrace();
             }

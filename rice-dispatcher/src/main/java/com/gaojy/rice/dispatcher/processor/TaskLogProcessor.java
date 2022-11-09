@@ -33,7 +33,7 @@ public class TaskLogProcessor implements RiceRequestProcessor {
         RiceLog riceLog = new RiceLog();
         riceLog.setTaskInstanceId(body.getTaskInstanceId());
         riceLog.setProcessorAddr(RemoteHelper.parseChannelRemoteAddr(ctx.channel()));
-        riceLog.setSchedulerAddr(ctx.channel().localAddress().toString());
+        riceLog.setSchedulerAddr(ctx.channel().localAddress().toString().replace("/",""));
         riceLog.setMessage(body.getLogMessage());
         this.schedulerManager.appendLog(riceLog);
         return null;

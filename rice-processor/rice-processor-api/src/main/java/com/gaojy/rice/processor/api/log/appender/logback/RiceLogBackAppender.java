@@ -32,7 +32,7 @@ public class RiceLogBackAppender extends AppenderBase<ILoggingEvent> implements 
                 body.setLogMessage(logStr);
                 RiceRemoteContext requestBody = RiceRemoteContext.createRequestCommand(RequestCode.LOG_REPORT, null);
                 requestBody.setBody(body.encode());
-                channel.writeAndFlush(channel);
+                channel.writeAndFlush(requestBody);
             } catch (Exception e) {
                 e.printStackTrace();
             }

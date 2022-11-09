@@ -70,9 +70,10 @@ public class DefaultTaskScheduleProcessor implements RiceRequestProcessor {
                     error = new ProcessorException("没有找到对应的任务执行器");
                 } else {
                     if (invoker.getTaskDetailData().isLogEnable()) {
+                        ILogHandler.schedulersOfLog.put(requestHeader.getTaskInstanceId(), ctx.channel());
+
                         log.info("任务：" + requestHeader.getTaskCode() + ",已开启实时日志,将传送日志至调度器:" +
                             RemoteHelper.parseChannelRemoteAddr(ctx.channel()));
-                        ILogHandler.schedulersOfLog.put(requestHeader.getTaskInstanceId(), ctx.channel());
                     }
 
                     TaskContext taskContext = new TaskContext();

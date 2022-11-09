@@ -18,6 +18,7 @@ import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.TransportServer;
 import com.gaojy.rice.repository.api.Repository;
 import com.gaojy.rice.repository.api.dao.ProcessorServerInfoDao;
+import com.gaojy.rice.repository.api.dao.RiceLogDao;
 import com.gaojy.rice.repository.api.dao.RiceTaskChangeRecordDao;
 import com.gaojy.rice.repository.api.dao.RiceTaskInfoDao;
 import com.gaojy.rice.repository.api.dao.TaskInstanceInfoDao;
@@ -98,6 +99,10 @@ public class TestSchedulerManagerProcessor extends AbstractTestProcessor {
             }
 
             @Override public TaskInstanceInfoDao getTaskInstanceInfoDao() {
+                return null;
+            }
+
+            @Override public RiceLogDao getRiceLogDao() {
                 return null;
             }
         };

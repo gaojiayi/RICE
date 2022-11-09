@@ -5,6 +5,8 @@ import com.gaojy.rice.common.entity.RiceLog;
 import com.gaojy.rice.common.exception.RepositoryException;
 import com.gaojy.rice.repository.api.dao.RiceLogDao;
 import com.gaojy.rice.repository.mysql.DataSourceFactory;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.apache.commons.dbutils.QueryRunner;
@@ -24,13 +26,13 @@ public class RiceLogDaoImpl implements RiceLogDao {
 
     @Override
     public void append(RiceLog log) {
-        String sql = "insert into rice_log (task_instance_id,processor_addr,scheduler_addr,message) values(?,?,?，？)";
+        String sql = "insert into rice_log (task_instance_id,processor_addr,scheduler_addr,message) values(?,?,?,?)";
         try {
-            qr.update(sql,
+                qr.update(sql,
                 log.getTaskInstanceId(),
                 log.getProcessorAddr(),
                 log.getSchedulerAddr(),
-                log.getMessage());
+                log.getMessage().getBytes(StandardCharsets.UTF_8));
         } catch (SQLException e) {
             LOG.error("append log error,log={}",log.toString());
         }
