@@ -1,6 +1,7 @@
 package com.gaojy.rice.remote.transport;
 
 import com.gaojy.rice.remote.common.RemoteHelper;
+import com.gaojy.rice.remote.common.TransfUtil;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
@@ -44,7 +45,7 @@ public class NettyDecoder extends LengthFieldBasedFrameDecoder {
             return RiceRemoteContext.decode(byteBuffer);
         } catch (Exception e) {
             log.error("decode exception, " + RemoteHelper.parseChannelRemoteAddr(ctx.channel()), e);
-            this.ars.closeChannel(ctx.channel());
+            TransfUtil.closeChannel(ctx.channel());
         } finally {
             if (null != frame) {
                 frame.release();

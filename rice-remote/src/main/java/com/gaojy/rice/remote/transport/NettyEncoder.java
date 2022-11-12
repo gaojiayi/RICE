@@ -1,6 +1,7 @@
 package com.gaojy.rice.remote.transport;
 
 import com.gaojy.rice.remote.common.RemoteHelper;
+import com.gaojy.rice.remote.common.TransfUtil;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
@@ -40,7 +41,7 @@ public class NettyEncoder extends MessageToByteEncoder<RiceRemoteContext> {
             if (riceRemoteContext != null) {
                 log.error(riceRemoteContext.toString());
             }
-            ars.closeChannel(context.channel());
+            TransfUtil.closeChannel(context.channel());
         }
     }
 }

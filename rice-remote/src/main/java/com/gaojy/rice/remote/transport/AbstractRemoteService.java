@@ -46,12 +46,12 @@ public abstract class AbstractRemoteService {
 
     private static final Logger log = LoggerFactory.getLogger(RemoteHelper.RICE_REMOTING);
 
-    private final Lock lockChannelTables = new ReentrantLock();
+    public final Lock lockChannelTables = new ReentrantLock();
     private static final long LOCK_TIMEOUT_MILLIS = 3000;
 
     public abstract ChannelEventListener getChannelEventListener();
 
-    private final ConcurrentMap<String /* addr */, ChannelWrapper> channelTables = new ConcurrentHashMap<String, ChannelWrapper>();
+    public final ConcurrentMap<String /* addr */, ChannelWrapper> channelTables = new ConcurrentHashMap<String, ChannelWrapper>();
     private final Timer timer = new Timer("RemoteHouseKeepingService", true);
     private ExecutorService publicExecutor;
 
@@ -412,57 +412,11 @@ public abstract class AbstractRemoteService {
         }
     }
 
-    public void closeChannel(final Channel channel) {
-        if (null == channel)
-            return;
-
-        try {
-            if (this.lockChannelTables.tryLock(LOCK_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {
-                try {
-                    boolean removeItemFromTable = true;
-                    ChannelWrapper prevCW = null;
-                    String addrRemote = null;
-                    for (Map.Entry<String, ChannelWrapper> entry : channelTables.entrySet()) {
-                        String key = entry.getKey();
-                        ChannelWrapper prev = entry.getValue();
-                        if (prev.getChannel() != null) {
-                            if (prev.getChannel() == channel) {
-                                prevCW = prev;
-                                addrRemote = key;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (null == prevCW) {
-                        log.info("eventCloseChannel: the channel[{}] has been removed from the channel table before", addrRemote);
-                        removeItemFromTable = false;
-                    }
-
-                    if (removeItemFromTable) {
-                        this.channelTables.remove(addrRemote);
-                        log.info("closeChannel: the channel[{}] was removed from channel table", addrRemote);
-                    }
-                    TransfUtil.closeChannel(channel);
-                } catch (Exception e) {
-                    log.error("closeChannel: close the channel exception", e);
-                } finally {
-                    this.lockChannelTables.unlock();
-                }
-            } else {
-                log.warn("closeChannel: try to lock channel table, but timeout, {}ms", LOCK_TIMEOUT_MILLIS);
-            }
-        } catch (InterruptedException e) {
-            log.error("closeChannel exception", e);
-        }
-    }
 
     public void shutdown() {
 
         this.timer.cancel();
-        for (ChannelWrapper cw : this.channelTables.values()) {
-            this.closeChannel(cw.getChannel());
-        }
+
         this.channelTables.clear();
 
         if (this.nettyEventExecutor != null) {

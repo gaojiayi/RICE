@@ -76,14 +76,19 @@ public class PullTaskService extends BackgroundThread {
                 @Override
                 public void onSuccess(PullResult pullResult) {
                     try {
-                        // 构建任务调度实例
-                        if (pullResult.getTaskChangeRecordList() != null && pullResult.getTaskChangeRecordList().size() > 0) {
-                            pullResult.getTaskChangeRecordList().forEach(record -> {
-                                PullTaskService.this.schedulerManager.onChange(record);
-                            });
+                        if (pullResult != null){
+                            // 构建任务调度实例
+                            if (pullResult.getTaskChangeRecordList() != null && pullResult.getTaskChangeRecordList().size() > 0) {
+                                pullResult.getTaskChangeRecordList().forEach(record -> {
+                                    PullTaskService.this.schedulerManager.onChange(record);
+                                });
+                            }
+                            // 将最新的一次更新记录时间戳赋值给 PullRequest
+                            request.setLastTaskChangeTimestamp(pullResult.getRecodeMaxTimeStamp());
+                        }else {
+                            log.info("taskCode = {} ,not found  any change and pullResult is none.", request.getTaskCode());
                         }
-                        // 将最新的一次更新记录时间戳赋值给 PullRequest
-                        request.setLastTaskChangeTimestamp(pullResult.getRecodeMaxTimeStamp());
+
                         PullTaskService.this.executePullRequestImmediately(request);
                     } catch (Exception e) {
                         log.error("Failed to process pullresult, taskcode:{},pullResult:{},error:{}", request.getTaskCode(), pullResult, e);

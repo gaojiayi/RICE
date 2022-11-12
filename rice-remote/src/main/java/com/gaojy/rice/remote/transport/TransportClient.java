@@ -9,6 +9,7 @@ import com.gaojy.rice.remote.ChannelEventListener;
 import com.gaojy.rice.remote.IBaseRemote;
 import com.gaojy.rice.remote.InvokeCallback;
 import com.gaojy.rice.remote.common.RemoteHelper;
+import com.gaojy.rice.remote.common.TransfUtil;
 import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -27,8 +28,10 @@ import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import java.net.SocketAddress;
+import java.util.Map;
 import java.util.TimerTask;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,18 +91,18 @@ public class TransportClient extends AbstractRemoteService implements IBaseRemot
                 return response;
             } catch (RemotingSendRequestException e) {
                 log.warn("invokeSync: send request exception, so close the channel[{}]", addr);
-                this.closeChannel(channel);
+                this.closeChannel(addr,channel);
                 throw e;
             } catch (RemotingTimeoutException e) {
                 if (transfClientConfig.isClientCloseSocketIfTimeout()) {
-                    this.closeChannel(channel);
+                    this.closeChannel(addr,channel);
                     log.warn("invokeSync: close socket because of timeout, {}ms, {}", timeoutMillis, addr);
                 }
                 log.warn("invokeSync: wait response timeout exception, the channel[{}]", addr);
                 throw e;
             }
         } else {
-            this.closeChannel(channel);
+            this.closeChannel(addr,channel);
             throw new RemotingConnectException(addr);
         }
 
@@ -116,11 +119,11 @@ public class TransportClient extends AbstractRemoteService implements IBaseRemot
                 this.invokeAsyncImpl(channel, request, timeoutMillis, invokeCallback);
             } catch (RemotingSendRequestException e) {
                 log.warn("invokeAsync: send request exception, so close the channel[{}]", addr);
-                this.closeChannel(channel);
+                this.closeChannel(addr,channel);
                 throw e;
             }
         } else {
-            this.closeChannel(channel);
+            this.closeChannel(addr,channel);
             throw new RemotingConnectException(addr);
         }
 
@@ -137,11 +140,11 @@ public class TransportClient extends AbstractRemoteService implements IBaseRemot
                 this.invokeOnewayImpl(channel, request, timeoutMillis);
             } catch (RemotingSendRequestException e) {
                 log.warn("invokeOneway: send request exception, so close the channel[{}]", addr);
-                this.closeChannel(channel);
+                this.closeChannel(addr,channel);
                 throw e;
             }
         } else {
-            this.closeChannel(channel);
+            this.closeChannel(addr,channel);
             throw new RemotingConnectException(addr);
         }
     }
@@ -213,14 +216,17 @@ public class TransportClient extends AbstractRemoteService implements IBaseRemot
 
     @Override
     public void shutdown() {
-
         try {
+            super.shutdown();
+            for (ChannelWrapper cw : this.channelTables.values()) {
+                this.closeChannel(null,cw.getChannel());
+            }
             this.eventLoopGroupWorker.shutdownGracefully();
 
             if (this.defaultEventExecutorGroup != null) {
                 this.defaultEventExecutorGroup.shutdownGracefully();
             }
-            super.shutdown();
+
 
         } catch (Exception e) {
             log.error("TransportClient shutdown exception, ", e);
@@ -230,6 +236,96 @@ public class TransportClient extends AbstractRemoteService implements IBaseRemot
     @Override
     public ChannelEventListener getChannelEventListener() {
         return channelEventListener;
+    }
+
+
+    public void closeChannel(final String addr, final Channel channel) {
+        if (null == channel)
+            return;
+
+        final String addrRemote = null == addr ? RemoteHelper.parseChannelRemoteAddr(channel) : addr;
+
+        try {
+            if (this.lockChannelTables.tryLock(LOCK_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {
+                try {
+                    boolean removeItemFromTable = true;
+                    final ChannelWrapper prevCW = this.channelTables.get(addrRemote);
+
+                    log.info("closeChannel: begin close the channel[{}] Found: {}", addrRemote, prevCW != null);
+
+                    if (null == prevCW) {
+                        log.info("closeChannel: the channel[{}] has been removed from the channel table before", addrRemote);
+                        removeItemFromTable = false;
+                    } else if (prevCW.getChannel() != channel) {
+                        log.info("closeChannel: the channel[{}] has been closed before, and has been created again, nothing to do.",
+                            addrRemote);
+                        removeItemFromTable = false;
+                    }
+
+                    if (removeItemFromTable) {
+                        this.channelTables.remove(addrRemote);
+                        log.info("closeChannel: the channel[{}] was removed from channel table", addrRemote);
+                    }
+
+                    TransfUtil.closeChannel(channel);
+                } catch (Exception e) {
+                    log.error("closeChannel: close the channel exception", e);
+                } finally {
+                    this.lockChannelTables.unlock();
+                }
+            } else {
+                log.warn("closeChannel: try to lock channel table, but timeout, {}ms", LOCK_TIMEOUT_MILLIS);
+            }
+        } catch (InterruptedException e) {
+            log.error("closeChannel exception", e);
+        }
+    }
+
+
+    public void closeChannel(final Channel channel) {
+        if (null == channel)
+            return;
+
+        try {
+            if (this.lockChannelTables.tryLock(LOCK_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {
+                try {
+                    boolean removeItemFromTable = true;
+                    ChannelWrapper prevCW = null;
+                    String addrRemote = null;
+                    for (Map.Entry<String, ChannelWrapper> entry : channelTables.entrySet()) {
+                        String key = entry.getKey();
+                        ChannelWrapper prev = entry.getValue();
+                        if (prev.getChannel() != null) {
+                            if (prev.getChannel() == channel) {
+                                prevCW = prev;
+                                addrRemote = key;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (null == prevCW) {
+                        log.info("eventCloseChannel: the channel[{}] has been removed from the channel table before", addrRemote);
+                        removeItemFromTable = false;
+                    }
+
+                    if (removeItemFromTable) {
+                        this.channelTables.remove(addrRemote);
+                        log.info("closeChannel: the channel[{}] was removed from channel table", addrRemote);
+                        TransfUtil.closeChannel(channel);
+                    }
+
+                } catch (Exception e) {
+                    log.error("closeChannel: close the channel exception", e);
+                } finally {
+                    this.lockChannelTables.unlock();
+                }
+            } else {
+                log.warn("closeChannel: try to lock channel table, but timeout, {}ms", LOCK_TIMEOUT_MILLIS);
+            }
+        } catch (InterruptedException e) {
+            log.error("closeChannel exception", e);
+        }
     }
 
     /**
@@ -262,7 +358,8 @@ public class TransportClient extends AbstractRemoteService implements IBaseRemot
             }
         }
 
-        @Override public void disconnect(ChannelHandlerContext ctx, ChannelPromise future) throws Exception {
+        @Override
+        public void disconnect(ChannelHandlerContext ctx, ChannelPromise future) throws Exception {
             final String remoteAddress = RemoteHelper.parseChannelRemoteAddr(ctx.channel());
             log.info("NETTY CLIENT PIPELINE: DISCONNECT {}", remoteAddress);
             closeChannel(ctx.channel());
@@ -274,7 +371,8 @@ public class TransportClient extends AbstractRemoteService implements IBaseRemot
             }
         }
 
-        @Override public void close(ChannelHandlerContext ctx, ChannelPromise future) throws Exception {
+        @Override
+        public void close(ChannelHandlerContext ctx, ChannelPromise future) throws Exception {
             final String remoteAddress = RemoteHelper.parseChannelRemoteAddr(ctx.channel());
             log.info("NETTY CLIENT PIPELINE: CLOSE {}", remoteAddress);
             closeChannel(ctx.channel());
@@ -286,7 +384,8 @@ public class TransportClient extends AbstractRemoteService implements IBaseRemot
             }
         }
 
-        @Override public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        @Override
+        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
             if (evt instanceof IdleStateEvent) {
                 IdleStateEvent event = (IdleStateEvent) evt;
                 if (event.state().equals(IdleState.ALL_IDLE)) {
@@ -303,7 +402,8 @@ public class TransportClient extends AbstractRemoteService implements IBaseRemot
             ctx.fireUserEventTriggered(evt);
         }
 
-        @Override public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
             final String remoteAddress = RemoteHelper.parseChannelRemoteAddr(ctx.channel());
             log.warn("NETTY CLIENT PIPELINE: exceptionCaught {}", remoteAddress);
             log.warn("NETTY CLIENT PIPELINE: exceptionCaught exception.", cause);

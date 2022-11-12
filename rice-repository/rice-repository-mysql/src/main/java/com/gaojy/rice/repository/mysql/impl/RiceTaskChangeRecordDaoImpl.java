@@ -10,6 +10,8 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import javax.sql.DataSource;
+import org.apache.commons.dbutils.BasicRowProcessor;
+import org.apache.commons.dbutils.GenerousBeanProcessor;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
@@ -21,12 +23,13 @@ public class RiceTaskChangeRecordDaoImpl implements RiceTaskChangeRecordDao {
     private final DataSource dataSource = DataSourceFactory.getDataSource();
     private String baseSql = "select * from task_change_record";
     QueryRunner queryRunner = new QueryRunner(dataSource);
+
     @Override
     public long getLatestRecord(String taskCode) {
 
         String sql = "select MAX(create_time) from task_change_record where task_code = ?";
         try {
-            Date createTime = queryRunner.query(sql, new ScalarHandler<Timestamp>(),taskCode);
+            Date createTime = queryRunner.query(sql, new ScalarHandler<Timestamp>(), taskCode);
             if (createTime != null) {
                 return createTime.getTime();
             }
@@ -41,9 +44,9 @@ public class RiceTaskChangeRecordDaoImpl implements RiceTaskChangeRecordDao {
     public List<TaskChangeRecord> getChanges(String taskCode, Long startTime) {
         String sql = "select * from task_change_record where task_code = ? and create_time >= ? ";
 
-        Object[] params = {taskCode, new Timestamp(startTime)};
         try {
-            List<TaskChangeRecord> rets = queryRunner.query(sql, new BeanListHandler<TaskChangeRecord>(TaskChangeRecord.class), params);
+            List<TaskChangeRecord> rets = queryRunner.query(sql, new BeanListHandler<TaskChangeRecord>(TaskChangeRecord.class,
+                new BasicRowProcessor(new GenerousBeanProcessor())), taskCode, new Timestamp(startTime));
             return rets;
         } catch (SQLException e) {
             LOG.error("getChanges SQLException", e);

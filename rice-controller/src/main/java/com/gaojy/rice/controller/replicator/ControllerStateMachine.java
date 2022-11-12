@@ -107,12 +107,18 @@ public class ControllerStateMachine extends StateMachineAdapter {
     @Override
     public void onLeaderStart(long term) {
         this.leaderTerm.set(term);
+        listeners.forEach(listener ->{
+            listener.onLeaderStart(term);
+        });
         super.onLeaderStart(term);
     }
 
     @Override
     public void onLeaderStop(Status status) {
         this.leaderTerm.set(-1);
+        listeners.forEach(listener ->{
+            listener.onLeaderStop(-1);
+        });
         super.onLeaderStop(status);
     }
 

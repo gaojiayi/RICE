@@ -192,7 +192,7 @@ public class TransportServer extends AbstractRemoteService implements RemoteServ
     @Override
     public void shutdown() {
         try {
-
+            super.shutdown();
             this.eventLoopGroupBoss.shutdownGracefully();
 
             this.eventLoopGroupSelector.shutdownGracefully();
@@ -200,7 +200,7 @@ public class TransportServer extends AbstractRemoteService implements RemoteServ
             if (this.defaultEventExecutorGroup != null) {
                 this.defaultEventExecutorGroup.shutdownGracefully();
             }
-            super.shutdown();
+
         } catch (Exception e) {
             log.error("TransportServer shutdown exception, ", e);
         }
@@ -254,7 +254,7 @@ public class TransportServer extends AbstractRemoteService implements RemoteServ
                 if (event.state().equals(IdleState.ALL_IDLE)) {
                     final String remoteAddress = RemoteHelper.parseChannelRemoteAddr(ctx.channel());
                     log.warn("NETTY SERVER PIPELINE: IDLE exception [{}]", remoteAddress);
-                    closeChannel(ctx.channel());
+                    TransfUtil.closeChannel(ctx.channel());
                     if (TransportServer.this.channelEventListener != null) {
                         TransportServer.this.nettyEventExecutor.triggerNettyEvent(
                             new NettyEvent(NettyEventType.IDLE, remoteAddress, ctx.channel()));
@@ -275,7 +275,7 @@ public class TransportServer extends AbstractRemoteService implements RemoteServ
                     new NettyEvent(NettyEventType.EXCEPTION, remoteAddress, ctx.channel()));
             }
 
-            closeChannel(ctx.channel());
+            TransfUtil.closeChannel(ctx.channel());
         }
     }
 }

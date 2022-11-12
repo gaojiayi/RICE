@@ -51,7 +51,7 @@ public class DispatcherAPIWrapper {
         header.setLastTaskChangeTimestamp(pullRequest.getLastTaskChangeTimestamp());
         header.setTaskCode(pullRequest.getTaskCode());
         RiceRemoteContext requestCommand = RiceRemoteContext.createRequestCommand(RequestCode.SCHEDULER_PULL_TASK, header);
-        int timeoutMillis = 1000 * 10;
+        int timeoutMillis = 1000 * 6 * 2;
         this.transportClient.invokeAsync(addr, requestCommand, timeoutMillis, new InvokeCallback() {
             @Override
             public void operationComplete(ResponseFuture responseFuture) {

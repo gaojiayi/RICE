@@ -240,6 +240,7 @@ public class RiceDispatchScheduler implements RiceDispatchSchedulerMBean, Channe
             servers.stream().forEach(server -> {
                 server.setStatus(0);
             });
+            log.info("in processor server {} , and all task  will down", remoteAddr);
             scheduleManager.getRepository().getProcessorServerInfoDao().batchCreateOrUpdateInfo(servers);
         } else {
             log.info("disconnection detected, address:{}", remoteAddr);

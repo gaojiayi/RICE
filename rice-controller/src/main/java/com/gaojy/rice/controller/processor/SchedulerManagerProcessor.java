@@ -114,7 +114,6 @@ public class SchedulerManagerProcessor implements RiceRequestProcessor {
                 List<ChannelWrapper> schedulers = schedulerManager.getActiveScheduler();
 
                 List<String> schedulerAddress = schedulers.stream().map(ChannelWrapper::getRemoteAddr).collect(Collectors.toList());
-                logger.info("^^^^^^^^^^^^^^^^^^^^^^^^^"+schedulerAddress);
                 body.setCurrentActiveSchedulers(schedulerAddress);
 
                 schedulers.forEach(cw -> {
@@ -229,7 +228,7 @@ public class SchedulerManagerProcessor implements RiceRequestProcessor {
             riceController.getPullTaskRequestHoldService().suspendPullRequest(header.getTaskCode(), pullRequest);
         }
 
-        return null;
+       return null;
     }
 
 }
