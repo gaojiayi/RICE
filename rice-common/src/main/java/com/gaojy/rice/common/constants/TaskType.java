@@ -19,9 +19,14 @@ public enum TaskType {
     PYTHON(1),
 
     /**
-     * Http 任务
+     * Http Get任务
      */
-    HTTP(2),
+    HTTP_GET(2),
+
+    /**
+     * Http Post任务
+     */
+    HTTP_POST(7),
 
     /**
      * JAVA内置任务

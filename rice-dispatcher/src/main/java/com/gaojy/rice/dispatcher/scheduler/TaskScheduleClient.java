@@ -56,9 +56,11 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
     private final HashedWheelTimer scheduleTimer;
     private String taskCode;
     private String taskName;
+    private String taskDesc;
     private TaskType taskType;
     private String parameters;
     private ScheduleType scheduleType;
+    private Long timeOutSec;
     private String timeExpression;
     private ExecuteType executeType;
     //    private int executeThreads = 1;
@@ -391,6 +393,26 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
 
     public void setScheduleType(String scheduleType) {
         this.scheduleType = ScheduleType.getType(scheduleType);
+    }
+
+    public Repository getRepository() {
+        return repository;
+    }
+
+    public Long getTimeOutSec() {
+        return timeOutSec;
+    }
+
+    public void setTimeOutSec(Long timeOutSec) {
+        this.timeOutSec = timeOutSec;
+    }
+
+    public String getTaskDesc() {
+        return taskDesc;
+    }
+
+    public void setTaskDesc(String taskDesc) {
+        this.taskDesc = taskDesc;
     }
 
     public String getTimeExpression() {
