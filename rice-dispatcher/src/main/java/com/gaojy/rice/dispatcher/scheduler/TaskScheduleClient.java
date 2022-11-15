@@ -363,6 +363,10 @@ public class TaskScheduleClient implements TimerTask, LifeCycle {
 
     }
 
+    public TaskType getTaskType() {
+        return taskType;
+    }
+
     public String getParameters() {
         return parameters;
     }

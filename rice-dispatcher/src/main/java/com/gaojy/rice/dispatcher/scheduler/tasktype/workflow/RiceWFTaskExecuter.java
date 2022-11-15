@@ -1,4 +1,4 @@
-package com.gaojy.rice.dispatcher.scheduler.tasktype;
+package com.gaojy.rice.dispatcher.scheduler.tasktype.workflow;
 
 /**
  * @author gaojy
@@ -7,4 +7,6 @@ package com.gaojy.rice.dispatcher.scheduler.tasktype;
  * @createTime 2022/11/13 22:12:00
  */
 public class RiceWFTaskExecuter {
+    //https://www.jianshu.com/p/d334a66e4050
+
 }

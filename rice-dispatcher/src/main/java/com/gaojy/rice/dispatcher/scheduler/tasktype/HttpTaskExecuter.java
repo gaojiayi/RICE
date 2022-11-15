@@ -2,6 +2,7 @@ package com.gaojy.rice.dispatcher.scheduler.tasktype;
 
 import com.gaojy.rice.common.constants.ScheduleType;
 import com.gaojy.rice.common.constants.TaskInstanceStatus;
+import com.gaojy.rice.common.constants.TaskType;
 import com.gaojy.rice.common.entity.TaskInstanceInfo;
 import com.gaojy.rice.dispatcher.scheduler.TaskScheduleClient;
 import java.io.IOException;
@@ -26,14 +27,10 @@ import org.apache.http.util.EntityUtils;
  * @createTime 2022/11/13 22:11:00
  */
 public class HttpTaskExecuter implements RiceExecuter {
-    public static final String METHOD_GET = "GET";
-    public static final String METHOD_POST = "POST";
     private final TaskScheduleClient client;
-    private final String method;
 
-    public HttpTaskExecuter(TaskScheduleClient client, String method) {
+    public HttpTaskExecuter(TaskScheduleClient client) {
         this.client = client;
-        this.method = method;
     }
 
     @Override
@@ -70,14 +67,14 @@ public class HttpTaskExecuter implements RiceExecuter {
         while (retryCount <= client.getTaskRetryCount()) {
             try {
                 // GET
-                if (this.method.equalsIgnoreCase(METHOD_GET)) {
+                if (this.client.getTaskType().equals(TaskType.HTTP_GET)) {
 
                     HttpGet httpGet = new HttpGet(this.client.getTaskDesc());
                     // 将上面的配置信息 运用到这个Get请求里
                     httpGet.setConfig(requestConfig);
                     response = httpClient.execute(httpGet);
 
-                } else if (this.method.equalsIgnoreCase(METHOD_POST)) { // POST
+                } else if (this.client.getTaskType().equals(TaskType.HTTP_POST)) { // POST
                     HttpPost httpPost = new HttpPost("http://localhost:12345/index.html/");
                     httpPost.setConfig(requestConfig);
                     StringEntity entity = new StringEntity(client.getParameters(), "UTF-8");

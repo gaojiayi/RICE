@@ -23,9 +23,8 @@ public class TaskExecuterFactory {
             case RICE_MAPREDUCE:
                 return new RiceMapReduceTaskExecuter(client);
             case HTTP_GET:
-                return new HttpTaskExecuter(client, "GET");
             case HTTP_POST:
-                return new HttpTaskExecuter(client, "POST");
+                return new HttpTaskExecuter(client);
             case SHELL:
                 return null;
             case PYTHON:
