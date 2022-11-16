@@ -5,6 +5,7 @@ import com.gaojy.rice.common.constants.LoggerName;
 import com.gaojy.rice.common.constants.RequestCode;
 import com.gaojy.rice.common.extension.ExtensionLoader;
 import com.gaojy.rice.controller.config.ControllerConfig;
+import com.gaojy.rice.controller.handler.HttpRouter;
 import com.gaojy.rice.controller.longpolling.PullTaskRequestHoldService;
 import com.gaojy.rice.controller.maintain.SchedulerManager;
 import com.gaojy.rice.controller.processor.SchedulerManagerProcessor;
@@ -138,6 +139,7 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
 
     // http handler处理器注册
     private void doHttpHandlers() {
+        HttpRouter.addHandlers(httpBinder);
         // httpBinder.addHttpHandler();
 
     }

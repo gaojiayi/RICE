@@ -1,4 +1,4 @@
-package com.gaojy.rice.controller.handler;
+package com.gaojy.rice.controller.handler.task;
 
 import com.gaojy.rice.http.api.HttpHandler;
 import com.gaojy.rice.http.api.HttpRequest;
