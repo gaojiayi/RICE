@@ -5,13 +5,13 @@ import com.gaojy.rice.common.entity.TaskInstanceInfo;
 import com.gaojy.rice.common.exception.RepositoryException;
 import com.gaojy.rice.repository.api.dao.TaskInstanceInfoDao;
 import com.gaojy.rice.repository.mysql.DataSourceFactory;
-import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.List;
 import javax.sql.DataSource;
 import org.apache.commons.dbutils.BasicRowProcessor;
 import org.apache.commons.dbutils.GenerousBeanProcessor;
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.slf4j.Logger;
@@ -22,13 +22,14 @@ public class TaskInstanceInfoDaoImpl implements TaskInstanceInfoDao {
 
     private final DataSource dataSource = DataSourceFactory.getDataSource();
 
+    QueryRunner qr = new QueryRunner(dataSource);
+
     @Override
     public TaskInstanceInfo getInstance(Long id) {
-        QueryRunner qr = new QueryRunner(dataSource);
         String sql = "select * from task_instance_info where id=" + id;
         try {
             TaskInstanceInfo instanceInfo = qr.query(sql, new BeanHandler<TaskInstanceInfo>(TaskInstanceInfo.class,
-                    new BasicRowProcessor(new GenerousBeanProcessor())));
+                new BasicRowProcessor(new GenerousBeanProcessor())));
             return instanceInfo;
         } catch (SQLException e) {
             log.error("get task instance exception" + e);
@@ -43,7 +44,6 @@ public class TaskInstanceInfoDaoImpl implements TaskInstanceInfoDao {
 
     @Override
     public Long createTaskInstance(TaskInstanceInfo instanceInfo) {
-        QueryRunner qr = new QueryRunner(dataSource);
         String sql = "insert into  task_instance_info " +
             "(task_code,instance_params,parent_instance_id,actual_trigger_time,expected_trigger_time,retry_times," +
             "task_tracker_address,type,result,finished_time,create_time,status)" +
@@ -72,7 +72,7 @@ public class TaskInstanceInfoDaoImpl implements TaskInstanceInfoDao {
 
     @Override
     public void updateTaskInstance(TaskInstanceInfo instanceInfo) {
-        QueryRunner qr = new QueryRunner(dataSource);
+
         String sql = "update task_instance_info set " +
             "task_code = ?, " +
             "instance_params = ?, " +
@@ -106,5 +106,16 @@ public class TaskInstanceInfoDaoImpl implements TaskInstanceInfoDao {
             throw new RepositoryException(e);
         }
 
+    }
+
+    @Override
+    public Integer getCountValidInstance() {
+        String sql = "select count(id) from task_instance_info where status != 0";
+        try {
+            return ((Long) qr.query(sql, new ScalarHandler())).intValue();
+        } catch (SQLException e) {
+            log.error("get valid  instance count exception," + e);
+            throw new RepositoryException(e);
+        }
     }
 }

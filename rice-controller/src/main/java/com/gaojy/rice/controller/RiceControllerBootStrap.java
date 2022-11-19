@@ -41,6 +41,8 @@ public class RiceControllerBootStrap {
     public static Properties properties = null;
     public static CommandLine commandLine = null;
 
+    private  static RiceController controller = null;
+
     public static void main(String[] args) {
         main0(args);
     }
@@ -116,7 +118,7 @@ public class RiceControllerBootStrap {
 
             MixAll.printObjectProperties(log, controllerConfig);
             MixAll.printObjectProperties(log, transfServerConfig);
-            final RiceController controller = new RiceController(controllerConfig, transfServerConfig);
+            controller = new RiceController(controllerConfig, transfServerConfig);
             // TODO: 后面再接入配置持久化方案
             try {
                 controller.start();
@@ -181,5 +183,9 @@ public class RiceControllerBootStrap {
         opt.setRequired(false);
         options.addOption(opt);
         return options;
+    }
+
+    public static RiceController getController() {
+        return controller;
     }
 }

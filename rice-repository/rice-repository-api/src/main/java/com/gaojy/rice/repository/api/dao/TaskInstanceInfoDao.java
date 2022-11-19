@@ -12,4 +12,6 @@ public interface TaskInstanceInfoDao {
     public Long createTaskInstance(TaskInstanceInfo instanceInfo);
 
     public void updateTaskInstance(TaskInstanceInfo instanceInfo);
+
+    public Integer getCountValidInstance();
 }

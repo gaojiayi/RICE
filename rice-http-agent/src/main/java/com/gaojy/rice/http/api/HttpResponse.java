@@ -12,11 +12,11 @@ import java.util.Map;
  * @createTime 2022/01/18 00:05:00
  */
 public class HttpResponse {
-    private Map<String, Object> data = new HashMap<>();
+    private Map<String, ?> data = new HashMap<>();
     private int respCode;
     private String errorMessae="";
 
-    public HttpResponse(Map<String, Object> data) {
+    public HttpResponse(Map<String, ?> data) {
         this.data = data;
     }
 
@@ -25,11 +25,11 @@ public class HttpResponse {
         this.errorMessae = errorMessae;
     }
 
-    public Map<String, Object> getData() {
+    public Map<String, ?> getData() {
         return data;
     }
 
-    public void setData(Map<String, Object> data) {
+    public void setData(Map<String, ?> data) {
         this.data = data;
     }
 

@@ -39,6 +39,7 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
     private final Repository repository = ExtensionLoader.getExtensionLoader(Repository.class)
         .getExtension(System.getProperty(Repository.REPOSITORY_TYPE_KEY, "mysql"));
 
+    private Long bootTime = 0L;
     private final HttpBinder httpBinder = ExtensionLoader.getExtensionLoader(HttpBinder.class).getExtension("jetty");
 
     private final ControllerConfig controllerConfig;
@@ -100,6 +101,8 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
         this.remotingServer.start();
         // 启动管理员控制台
         httpServer = this.httpBinder.bind(this.controllerConfig.getManagePort());
+
+        bootTime = System.currentTimeMillis();
     }
 
     public void shutdown() {
@@ -206,5 +209,17 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
 
     public ControllerDataService getControllerDataService() {
         return controllerDataService;
+    }
+
+    public Long getBootTime() {
+        return bootTime;
+    }
+
+    public RiceReplicatorManager getReplicatorManager() {
+        return replicatorManager;
+    }
+
+    public ControllerConfig getControllerConfig() {
+        return controllerConfig;
     }
 }

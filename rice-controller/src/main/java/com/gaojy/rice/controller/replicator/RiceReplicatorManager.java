@@ -21,12 +21,18 @@ public class RiceReplicatorManager {
         opts.setInitialServerAddressList(config.getAllElectionAddressStr());
         opts.setServerAddress(config.getLocalHost() + ":" + (config.getControllerPort() - 2));
     }
+
     public void start() {
         server.init(opts);
     }
 
     public Boolean isLeader() {
         return server.getNode().isLeader();
+    }
+
+    public String getLeader() {
+        return server.getNode().getLeaderId().getIp() + ":" +
+            (server.getNode().getLeaderId().getPort() + 2);
     }
 
     public void stop() {
