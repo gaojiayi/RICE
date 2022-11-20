@@ -11,8 +11,8 @@ import javax.sql.DataSource;
 import org.apache.commons.dbutils.BasicRowProcessor;
 import org.apache.commons.dbutils.GenerousBeanProcessor;
 import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
+import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,6 +115,33 @@ public class TaskInstanceInfoDaoImpl implements TaskInstanceInfoDao {
             return ((Long) qr.query(sql, new ScalarHandler())).intValue();
         } catch (SQLException e) {
             log.error("get valid  instance count exception," + e);
+            throw new RepositoryException(e);
+        }
+    }
+
+    @Override
+    public List<TaskInstanceInfo> getLatestInstance(Integer limit) {
+        String sql = "select * from task_instance_info where" +
+            " status != 0 and parent_instance_id != null " +
+            "order by create_time desc limit ?";
+        try {
+            return qr.query(sql, new BeanListHandler<TaskInstanceInfo>(TaskInstanceInfo.class,
+                new BasicRowProcessor(new GenerousBeanProcessor())), limit);
+
+        } catch (SQLException e) {
+            log.error("get latest instance exception," + e);
+            throw new RepositoryException(e);
+        }
+    }
+
+    @Override
+    public Integer getNumByStatus(Integer status) {
+        String sql = "select count(id) from task_instance_info where status = ? ";
+
+        try {
+            return ((Long) qr.query(sql, new ScalarHandler())).intValue();
+        } catch (SQLException e) {
+            log.error("get   instance num by status exception," + e);
             throw new RepositoryException(e);
         }
     }

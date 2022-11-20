@@ -2,6 +2,7 @@ package com.gaojy.rice.repository.api.dao;
 
 import com.gaojy.rice.common.exception.RepositoryException;
 import com.gaojy.rice.common.entity.ProcessorServerInfo;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,5 +17,7 @@ public interface ProcessorServerInfoDao {
     public int batchCreateOrUpdateInfo(List<ProcessorServerInfo> processorServerInfoList) throws RepositoryException;
 
     public List<ProcessorServerInfo>  getInfosByTask(String taskCode);
+
+    public Integer getNumOfProcessorInDate(Date startTime,Date endTime);
 
 }

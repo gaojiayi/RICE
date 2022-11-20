@@ -6,6 +6,7 @@ import com.gaojy.rice.repository.api.dao.ProcessorServerInfoDao;
 import com.gaojy.rice.common.entity.ProcessorServerInfo;
 import com.gaojy.rice.repository.mysql.DataSourceFactory;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
@@ -13,6 +14,7 @@ import org.apache.commons.dbutils.BasicRowProcessor;
 import org.apache.commons.dbutils.GenerousBeanProcessor;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,6 +115,18 @@ public class ProcessorServerInfoDaoImpl implements ProcessorServerInfoDao {
                 new BasicRowProcessor(new GenerousBeanProcessor())));
         } catch (SQLException e) {
             log.error("get processor server info error");
+            throw new RepositoryException(e);
+        }
+    }
+
+    @Override
+    public Integer getNumOfProcessorInDate(Date startTime, Date endTime) {
+        String sql = "select count(id) from processor_server_info " +
+            "where create_time >= ? and create_time  <= ? group by address";
+        try {
+            return ((Long) qr.query(sql, new ScalarHandler())).intValue();
+        } catch (SQLException e) {
+            log.error("get num of processor  exception," + e);
             throw new RepositoryException(e);
         }
     }

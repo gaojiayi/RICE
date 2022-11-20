@@ -14,4 +14,8 @@ public interface TaskInstanceInfoDao {
     public void updateTaskInstance(TaskInstanceInfo instanceInfo);
 
     public Integer getCountValidInstance();
+
+    public List<TaskInstanceInfo>  getLatestInstance(Integer limit);
+
+    public Integer getNumByStatus(Integer status);
 }
