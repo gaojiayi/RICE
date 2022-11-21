@@ -32,15 +32,16 @@ module.exports = {
     sidebar: [
       {
         title: '介绍',
-        collapsable: false, // 能否折叠
+        collapsable: true, // 能否折叠
         children: [
-          ['/介绍/foo/','我的foo'],
-          ['/介绍/bar/','我的bar']
+          ['/introduce/ability/','What RICE can do?'],
+          ['/introduce/architecture/','架构设计'],
+          ['/introduce/fetures/','关键特性']
           
         ]
       },
       {
-        title: 'Group 2',
+        title: '编译部署',
         children: [ /* ... */ ]
       }
     ],
