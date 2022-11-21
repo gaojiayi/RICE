@@ -908,3 +908,11 @@ h4 {
         display: none;
     }
 }
+
+#beian {
+   left:50%;
+   bottom:0;
+   color: #686b75;
+   font-size: small;
+   text-align :center;
+ }
