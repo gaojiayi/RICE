@@ -18,6 +18,7 @@ import com.gaojy.rice.remote.protocol.RiceRemoteContext;
 import com.gaojy.rice.remote.transport.TransportServer;
 import com.gaojy.rice.repository.api.Repository;
 import com.gaojy.rice.repository.api.dao.ProcessorServerInfoDao;
+import com.gaojy.rice.repository.api.dao.RiceAppInfoDao;
 import com.gaojy.rice.repository.api.dao.RiceLogDao;
 import com.gaojy.rice.repository.api.dao.RiceTaskChangeRecordDao;
 import com.gaojy.rice.repository.api.dao.RiceTaskInfoDao;
@@ -34,11 +35,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
@@ -103,6 +101,10 @@ public class TestSchedulerManagerProcessor extends AbstractTestProcessor {
             }
 
             @Override public RiceLogDao getRiceLogDao() {
+                return null;
+            }
+
+            @Override public RiceAppInfoDao getRiceAppInfoDao() {
                 return null;
             }
         };

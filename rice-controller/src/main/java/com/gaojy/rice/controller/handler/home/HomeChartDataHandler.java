@@ -123,6 +123,9 @@ public class HomeChartDataHandler extends AbstractHttpHandler {
         return result;
     }
 
+
+
+
     private Date parseDateByStr(String date) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
