@@ -9,47 +9,61 @@ module.exports = {
     lineNumbers: false // 代码块显示行号
   },
   themeConfig: {
-    nav:[ // 导航栏配置
-      {text: '快速入门', link: '/介绍/' },
-      {text: 'API', link: '/algorithm/'},
-      {text: 'GitHub', link: 'https://github.com/gaojiayi/RICE'}      
+    nav: [ // 导航栏配置
+      { text: '快速入门', link: '/start/' },
+      { text: 'API', link: '/api/' },
+      { text: 'GitHub', link: 'https://github.com/gaojiayi/RICE' }
     ],
-    // sidebar: {
-    //   // 侧边栏在 /foo/ 上
-    //   '/foo/': [
-    //     '',
-    //     'one',
-    //     'two'
-    //   ],
-    //   // 侧边栏在 /bar/ 上
-    //   '/bar/': [
-    //     '',
-    //     'three',
-    //     'four'
-    //   ],
-    //   "/":["/bar/","/foo/"]
-    // },
     sidebar: [
       {
         title: '介绍',
         collapsable: true, // 能否折叠
         children: [
-          ['/introduce/ability/','What RICE can do?'],
-          ['/introduce/architecture/','架构设计'],
-          ['/introduce/fetures/','关键特性']
-          
+          ['/introduce/ability/', 'What RICE can do?'],
+          ['/introduce/architecture/', '架构设计'],
+          ['/introduce/fetures/', '关键特性']
+
         ]
       },
       {
-        title: '编译部署',
-        children: [ /* ... */ ]
-      }
+        title: '安装',
+        collapsable: true, // 能否折叠
+        children: [
+          ['/install/build/', '编译'],
+          ['/install/deploy/', '部署']
+        ]
+      },
+      {
+        title: 'Quick Start',
+        collapsable: true, // 能否折叠
+        path:'/start/',
+        children: [
+          ['/start/config/', '配置'],
+          ['/start/basic/', 'JAVA基本任务']
+
+        ]
+      },
+      { title: '控制器',
+       path: '/controller/' 
+      },
+      { title: '处理器',
+       path: '/processor/' 
+      },
+      { title: '调度器',
+       path: '/scheduler/' 
+      },
+      { title: '控制台管理',
+       path: '/manage/' 
+      },
+      { title: 'API文档',
+       path: '/api/' 
+      },
+      { title: '关于',
+      path: '/about/' 
+     }
     ],
     //sidebar: 'auto', // 侧边栏配置
     sidebarDepth: 2, // 侧边栏显示2级
-
- 
-
   },
   port: 8180,
   dest: './dist'
