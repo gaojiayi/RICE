@@ -1,4 +1,4 @@
-![rice_logo](../rice_logo.jpg)
+![rice_logo](../assets/rice_logo.jpg)
 
 RICE 是一个基于MIT开源协议非云原生的分布式集群调度中间件，目前面向业务而不是数据的分布式调度框架有阿里云的SchedulerX2.0，但是并不是开源的。也有社区大牛基于SchedulerX2.0研发了PowerJob，但是power-job作者在集群容错方面并不是做的很友好，在多个调度server下，没有办法做到server均衡负载任务，也就是说任务在多个server上均衡分布，导致某一个调度服务器负载很高。 (具体细节查看我给powerJob的[issue](https://github.com/PowerJob/PowerJob/issues/360))
 

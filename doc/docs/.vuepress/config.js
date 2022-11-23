@@ -10,7 +10,7 @@ module.exports = {
   },
   themeConfig: {
     nav: [ // 导航栏配置
-      { text: '快速入门', link: '/start/' },
+      { text: '🎉快速入门', link: '/start/' },
       { text: 'API', link: '/api/' },
       { text: 'GitHub', link: 'https://github.com/gaojiayi/RICE' }
     ],
@@ -38,8 +38,12 @@ module.exports = {
         collapsable: true, // 能否折叠
         path:'/start/',
         children: [
-          ['/start/config/', '配置'],
-          ['/start/basic/', 'JAVA基本任务']
+          ['/start/basic/', 'JAVA基本任务'],
+          ['/start/map/', 'MAP任务'],
+          ['/start/mapreduce/', 'MapReduce任务'],
+          ['/start/http/', 'HTTP任务'],
+          ['/start/script/', '脚本任务'],
+          ['/start/workflow/', '工作流任务'],
 
         ]
       },
@@ -59,8 +63,8 @@ module.exports = {
        path: '/api/' 
       },
       { title: '关于',
-      path: '/about/' 
-     }
+       path: '/about/' 
+      }
     ],
     //sidebar: 'auto', // 侧边栏配置
     sidebarDepth: 2, // 侧边栏显示2级
