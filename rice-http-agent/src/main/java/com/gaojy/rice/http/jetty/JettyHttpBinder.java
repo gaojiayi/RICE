@@ -98,7 +98,7 @@ public class JettyHttpBinder implements HttpBinder {
             resp.setCharacterEncoding("UTF-8");
             resp.setContentType("application/json");
             try {
-                response = h.handler(request, req.getRequestURI());
+                response = h.handler(request, req.getRequestURI(),req.getMethod());
                 resp.setStatus(response.getRespCode());
 
                 resp.getWriter().print(response.toJsonString());

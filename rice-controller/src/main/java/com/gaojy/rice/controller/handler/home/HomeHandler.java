@@ -23,14 +23,15 @@ import java.util.Map;
 /**
  * @author gaojy
  * @ClassName HomeHandler.java
- * @Description
+ * @Description 首页
  * @createTime 2022/12/04 23:34:00
  */
 public class HomeHandler extends AbstractHttpHandler {
     public HomeHandler(String rootPath) {
         super(rootPath);
     }
-    @RequestMapping(value = "/chart")
+
+    @RequestMapping(value = "/chart", method = "GET")
     public HttpResponse chart(HttpRequest request) throws Exception {
         Map<String, Object> responseMap = new HashMap<>();
 
@@ -61,7 +62,7 @@ public class HomeHandler extends AbstractHttpHandler {
         return new HttpResponse(responseMap);
     }
 
-    @RequestMapping(value = "/controller/info")
+    @RequestMapping(value = "/controller/info", method = "GET")
     public HttpResponse controllerInfo(HttpRequest request) throws Exception {
         Map<String, Object> responseMap = new HashMap<>();
         final List<HomeHandler.ControllerInfo> controllerInfoList = new ArrayList<>();
@@ -89,8 +90,7 @@ public class HomeHandler extends AbstractHttpHandler {
         return new HttpResponse(responseMap);
     }
 
-
-    @RequestMapping(value = "/metrics")
+    @RequestMapping(value = "/metrics", method = "GET")
     public HttpResponse metrics(HttpRequest request) throws Exception {
         Map<String, Integer> responseMap = new HashMap<>();
         List<String> allValidTaskCode = repository.getRiceTaskInfoDao().getAllValidTaskCode();
@@ -102,7 +102,7 @@ public class HomeHandler extends AbstractHttpHandler {
             .addResponse("scheduler_num", schedulerServerNum);
     }
 
-    @RequestMapping(value = "/scrollBar")
+    @RequestMapping(value = "/scrollBar", method = "GET")
     public HttpResponse scrollBar(HttpRequest request) throws Exception {
         HashMap<String, List<TaskInstanceInfo>> responseMap = new HashMap<>();
         Object limit = request.getParamMap().get("limit");
@@ -153,8 +153,6 @@ public class HomeHandler extends AbstractHttpHandler {
             this.status = status;
         }
     }
-
-
 
     private String getPastDateStr(int past) {
         Calendar calendar = Calendar.getInstance();

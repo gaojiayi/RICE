@@ -51,10 +51,11 @@ public abstract class AbstractHttpHandler implements HttpHandler {
     }
 
     @Override
-    public HttpResponse handler(HttpRequest request, String url) throws Exception {
+    public HttpResponse handler(HttpRequest request, String url, String httpMethod) throws Exception {
         Method method = routerMethods.get(url);
-        if (method == null) {
-            log.error("Not found Router,url=" + url);
+        if (method == null || !method.getAnnotation(RequestMapping.class).method()
+            .equalsIgnoreCase(httpMethod)) {
+            log.error("Not found Router,please check url or method. url=" + url);
             return new HttpResponse(404, "Not found Router");
         }
         Object ret = method.invoke(this, request);

@@ -12,7 +12,7 @@ import java.util.Date;
 /**
  * @author gaojy
  * @ClassName AppHandler.java
- * @Description
+ * @Description 应用管理
  * @createTime 2022/12/04 23:28:00
  */
 public class AppHandler extends AbstractHttpHandler {
@@ -20,7 +20,7 @@ public class AppHandler extends AbstractHttpHandler {
         super(rootPath);
     }
 
-    @RequestMapping(value = "/create")
+    @RequestMapping(value = "/create", method = "POST")
     public HttpResponse create(HttpRequest request) throws Exception {
         String appName = (String) request.getParamMap().get("appName");
         String appDesc = (String) request.getParamMap().get("appDesc");
@@ -36,7 +36,7 @@ public class AppHandler extends AbstractHttpHandler {
         return new HttpResponse();
     }
 
-    @RequestMapping(value = "/fetch")
+    @RequestMapping(value = "/fetch", method = "GET")
     public HttpResponse fetch(HttpRequest request) throws Exception {
 
         String appName = (String) request.getParamMap().get("appName");
@@ -46,13 +46,8 @@ public class AppHandler extends AbstractHttpHandler {
             .addResponse(
                 "data",
                 repository.getRiceAppInfoDao().queryApps(appName, pageIndex, limit))
-            .addResponse("page",new PageSpec(pageIndex,limit,
+            .addResponse("page", new PageSpec(pageIndex, limit,
                 repository.getRiceAppInfoDao().queryAppsCount(appName)));
     }
 
-    @RequestMapping(value = "/processor/info")
-    public HttpResponse processorInfo(HttpRequest request) throws Exception {
-
-        return null;
-    }
 }

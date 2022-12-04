@@ -17,7 +17,7 @@ public class TaskHandler extends AbstractHttpHandler {
         super(rootPath);
     }
 
-    @RequestMapping(value = "/query")
+    @RequestMapping(value = "/query",method = "GET")
     public HttpResponse query(HttpRequest request) {
         // 应用ID  任务编码  分页
         String taskCode = (String) request.getParamMap().get("taskCode");
@@ -32,4 +32,22 @@ public class TaskHandler extends AbstractHttpHandler {
                 "page", new PageSpec(pageIndex, limit,
                     repository.getRiceTaskInfoDao().queryTasksCount(taskCode, appId, pageIndex, limit)));
     }
+
+
+    @RequestMapping(value = "/create",method = "POST")
+    public HttpResponse create(HttpRequest request) {
+        return null;
+    }
+
+    @RequestMapping(value = "/update",method = "POST")
+    public HttpResponse update(HttpRequest request) {
+        return null;
+    }
+
+    @RequestMapping(value = "/operation",method = "POST")
+    public HttpResponse operation(HttpRequest request) {
+        return null;
+    }
+
+
 }

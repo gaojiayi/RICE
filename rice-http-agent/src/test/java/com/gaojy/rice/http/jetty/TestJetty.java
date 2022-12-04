@@ -23,7 +23,7 @@ public class TestJetty {
     @BeforeClass
     public static void startServer() {
         JettyHttpBinder jettyHttpBinder = new JettyHttpBinder();
-        jettyHttpBinder.addHttpHandler("/A", (request,url) -> {
+        jettyHttpBinder.addHttpHandler("/A", (request, url, method) -> {
             Map<String, Object> paramMap = request.getParamMap();
             paramMap.forEach((k, v) -> {
                 v = v + url;
@@ -33,7 +33,7 @@ public class TestJetty {
             return httpResponse;
         });
 
-        jettyHttpBinder.addHttpHandler("/A/B", (request,url) -> {
+        jettyHttpBinder.addHttpHandler("/A/B", (request, url, method) -> {
             Map<String, Object> paramMap = request.getParamMap();
             paramMap.forEach((k, v) -> {
                 v = v + url;
@@ -42,7 +42,7 @@ public class TestJetty {
             HttpResponse httpResponse = new HttpResponse(paramMap);
             return httpResponse;
         });
-        jettyHttpBinder.addHttpHandler("/C", (request,url) -> {
+        jettyHttpBinder.addHttpHandler("/C", (request, url, method) -> {
             Map<String, Object> paramMap = request.getParamMap();
             paramMap.forEach((k, v) -> {
                 v = v + url;
@@ -52,7 +52,7 @@ public class TestJetty {
             return httpResponse;
         });
 
-        jettyHttpBinder.addHttpHandler("/exception", (request,url) -> {
+        jettyHttpBinder.addHttpHandler("/exception", (request, url, method) -> {
             throw new RuntimeException();
         });
 
