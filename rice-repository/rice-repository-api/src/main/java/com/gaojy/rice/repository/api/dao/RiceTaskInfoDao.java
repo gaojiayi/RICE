@@ -24,4 +24,8 @@ public interface RiceTaskInfoDao {
 
     public List<String> getAllValidTaskCode();
 
+    public List<RiceTaskInfo> queryTasks(String taskCode,Long appId,Integer pageIndex,Integer pageSize);
+
+    public Integer queryTasksCount(String taskCode,Long appId,Integer pageIndex,Integer pageSize);
+
 }

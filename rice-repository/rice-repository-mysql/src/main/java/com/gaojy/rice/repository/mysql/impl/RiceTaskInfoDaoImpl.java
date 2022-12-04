@@ -1,7 +1,9 @@
 package com.gaojy.rice.repository.mysql.impl;
 
 import com.gaojy.rice.common.constants.LoggerName;
+import com.gaojy.rice.common.entity.RiceAppInfo;
 import com.gaojy.rice.common.exception.RepositoryException;
+import com.gaojy.rice.common.utils.StringUtil;
 import com.gaojy.rice.repository.api.dao.RiceTaskInfoDao;
 import com.gaojy.rice.common.entity.RiceTaskInfo;
 import com.gaojy.rice.repository.mysql.DataSourceFactory;
@@ -16,6 +18,7 @@ import org.apache.commons.dbutils.GenerousBeanProcessor;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,5 +153,32 @@ public class RiceTaskInfoDaoImpl implements RiceTaskInfoDao {
             throw new RepositoryException(e);
         }
         return allTaskCodes;
+    }
+
+    @Override
+    public List<RiceTaskInfo> queryTasks(String taskCode, Long appId, Integer pageIndex, Integer pageSize) {
+        String appIdFilter = appId != null ? " and app_id = " + appId : "";
+        String taskCodeFilter = StringUtil.isNotEmpty(taskCode) ? " and taskCode = " + taskCode : "";
+        String sql = "select * from rice_task_info t " +
+            "INNER  JOIN (select id from rice_task_info where status != 0 " + appIdFilter + taskCodeFilter + " limit ?,?)  as k ON t.id=k.id;";
+        try {
+            return qr.query(sql, new BeanListHandler<RiceTaskInfo>(RiceTaskInfo.class,
+                new BasicRowProcessor(new GenerousBeanProcessor())), (pageIndex - 1) * pageSize, pageSize);
+        } catch (SQLException e) {
+            throw new RepositoryException(e);
+        }
+    }
+
+    @Override
+    public Integer queryTasksCount(String taskCode, Long appId, Integer pageIndex, Integer pageSize) {
+        String appIdFilter = appId != null ? " and app_id = " + appId : "";
+        String taskCodeFilter = StringUtil.isNotEmpty(taskCode) ? " and taskCode = " + taskCode : "";
+        String sql = "select count(id) from rice_task_info status != 0 " + appIdFilter + taskCodeFilter;
+        try {
+            return ((Long) qr.query(sql, new ScalarHandler())).intValue();
+        } catch (SQLException e) {
+            log.error("query valid  task count exception," + e);
+            throw new RepositoryException(e);
+        }
     }
 }

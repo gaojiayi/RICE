@@ -15,6 +15,12 @@ public class PageSpec {
         return pageIndex;
     }
 
+    public PageSpec(Integer pageIndex, Integer pageLimit, Integer totalPage) {
+        this.pageIndex = pageIndex;
+        this.pageLimit = pageLimit;
+        this.totalPage = totalPage;
+    }
+
     public void setPageIndex(Integer pageIndex) {
         this.pageIndex = pageIndex;
     }

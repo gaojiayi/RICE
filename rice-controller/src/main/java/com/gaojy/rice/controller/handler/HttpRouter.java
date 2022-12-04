@@ -1,7 +1,9 @@
 package com.gaojy.rice.controller.handler;
 
-import com.gaojy.rice.controller.handler.app.AppCreateHandler;
+import com.gaojy.rice.controller.handler.app.AppHandler;
+import com.gaojy.rice.controller.handler.home.HomeHandler;
 import com.gaojy.rice.controller.handler.task.TaskCreateHandler;
+import com.gaojy.rice.controller.handler.task.TaskHandler;
 import com.gaojy.rice.http.api.HttpBinder;
 
 /**
@@ -17,22 +19,8 @@ public class HttpRouter {
     public static final String APP_PATH = RICE_PATH + "/app";
 
     public static void addHandlers(HttpBinder binder) {
-        addAppRouter(binder);
-        addTaskRouter(binder);
-    }
-
-    private static void addAppRouter(HttpBinder binder) {
-        // app
-        new AppCreateHandler(APP_PATH + "/create").registerHandler(binder);
-    }
-
-    private static void addTaskRouter(HttpBinder binder) {
-        // task
-        new TaskCreateHandler(TASK_PATH + "/create").registerHandler(binder);
-    }
-
-    private static void addHomeRouter(HttpBinder binder) {
-        new TaskCreateHandler(HOME_PATH + "/metrics").registerHandler(binder);
-
+        new AppHandler(APP_PATH).registerHandler(binder);
+        new HomeHandler(HOME_PATH).registerHandler(binder);
+        new TaskHandler(TASK_PATH).registerHandler(binder);
     }
 }

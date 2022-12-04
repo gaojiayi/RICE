@@ -16,8 +16,14 @@ public class TaskCreateHandler extends AbstractHttpHandler  {
         super(path);
     }
 
-    @Override
     public HttpResponse handler(HttpRequest request) throws Exception {
+        // 获取参数
+
+        // 插入db
+
+        // 一致性hash  获取 调度器地址
+
+        // 通知调度器 任务创建
         return null;
     }
 

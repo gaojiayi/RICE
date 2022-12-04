@@ -7,6 +7,7 @@ import com.gaojy.rice.common.exception.RepositoryException;
 import com.gaojy.rice.common.utils.StringUtil;
 import com.gaojy.rice.repository.api.dao.RiceAppInfoDao;
 import com.gaojy.rice.repository.mysql.DataSourceFactory;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
 import javax.sql.DataSource;
@@ -14,6 +15,7 @@ import org.apache.commons.dbutils.BasicRowProcessor;
 import org.apache.commons.dbutils.GenerousBeanProcessor;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,5 +55,33 @@ public class RiceAppInfoDaoImpl implements RiceAppInfoDao {
         } catch (SQLException e) {
             throw new RepositoryException(e);
         }
+    }
+
+    @Override
+    public Integer queryAppsCount(String appName) {
+        String appNameFilter = StringUtil.isNotEmpty(appName) ? " and app_name like %" + appName + "%" : "";
+        String sql = "select count(id) from rice_app_info where status != 0"+appNameFilter;
+        try {
+            return ((Long) qr.query(sql, new ScalarHandler())).intValue();
+        } catch (SQLException e) {
+            log.error("query valid  app count exception," + e);
+            throw new RepositoryException(e);
+        }
+    }
+
+    @Override
+    public void createApp(RiceAppInfo appInfo) {
+        String sql = "insert into rice_app_info (app_name,app_desc,create_time,status) values (?,?,?,?) ";
+        try {
+            qr.update(sql,
+                appInfo.getAppName(),
+                appInfo.getAppDesc(),
+                appInfo.getCreateTime(),
+                appInfo.getStatus());
+        } catch (SQLException e) {
+            log.error("append log error,log={}", log.toString());
+            throw new RepositoryException(e);
+        }
+
     }
 }

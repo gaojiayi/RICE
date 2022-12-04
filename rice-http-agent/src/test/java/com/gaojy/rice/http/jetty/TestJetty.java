@@ -23,36 +23,36 @@ public class TestJetty {
     @BeforeClass
     public static void startServer() {
         JettyHttpBinder jettyHttpBinder = new JettyHttpBinder();
-        jettyHttpBinder.addHttpHandler("/A", (request) -> {
+        jettyHttpBinder.addHttpHandler("/A", (request,url) -> {
             Map<String, Object> paramMap = request.getParamMap();
             paramMap.forEach((k, v) -> {
-                v = v + "/A";
+                v = v + url;
                 paramMap.put(k, v);
             });
             HttpResponse httpResponse = new HttpResponse(paramMap);
             return httpResponse;
         });
 
-        jettyHttpBinder.addHttpHandler("/A/B", (request) -> {
+        jettyHttpBinder.addHttpHandler("/A/B", (request,url) -> {
             Map<String, Object> paramMap = request.getParamMap();
             paramMap.forEach((k, v) -> {
-                v = v + "/A/B";
+                v = v + url;
                 paramMap.put(k, v);
             });
             HttpResponse httpResponse = new HttpResponse(paramMap);
             return httpResponse;
         });
-        jettyHttpBinder.addHttpHandler("/C", (request) -> {
+        jettyHttpBinder.addHttpHandler("/C", (request,url) -> {
             Map<String, Object> paramMap = request.getParamMap();
             paramMap.forEach((k, v) -> {
-                v = v + "/C";
+                v = v + url;
                 paramMap.put(k, v);
             });
             HttpResponse httpResponse = new HttpResponse(paramMap);
             return httpResponse;
         });
 
-        jettyHttpBinder.addHttpHandler("/exception", (request) -> {
+        jettyHttpBinder.addHttpHandler("/exception", (request,url) -> {
             throw new RuntimeException();
         });
 
@@ -64,16 +64,16 @@ public class TestJetty {
         String response = Request.Post("http://localhost:8091/rice/A")
             .bodyForm(Form.form().add("data", "data").build())
             .execute().returnContent().asString(Consts.UTF_8);
-        Assert.assertEquals(response, JSON.parseObject(response).get("data").toString(), "{\"data\":\"data/A\"}");
+        Assert.assertEquals(response, JSON.parseObject(response).get("data").toString(), "{\"data\":\"data/rice/A\"}");
 
         response = Request.Get("http://localhost:8091/rice/A/B?data=data")
             .execute().returnContent().asString(Consts.UTF_8);
-        Assert.assertEquals(response, JSON.parseObject(response).get("data").toString(), "{\"data\":\"data/A/B\"}");
+        Assert.assertEquals(response, JSON.parseObject(response).get("data").toString(), "{\"data\":\"data/rice/A/B\"}");
 
         response = Request.Post("http://localhost:8091/rice/C")
             .bodyString("{\"data\":\"data\"}", ContentType.APPLICATION_JSON)
             .execute().returnContent().asString(Consts.UTF_8);
-        Assert.assertEquals(response, JSON.parseObject(response).get("data").toString(), "{\"data\":\"data/C\"}");
+        Assert.assertEquals(response, JSON.parseObject(response).get("data").toString(), "{\"data\":\"data/rice/C\"}");
 
     }
 

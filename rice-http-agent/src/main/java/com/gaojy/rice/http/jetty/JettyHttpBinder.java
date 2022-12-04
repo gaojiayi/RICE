@@ -98,9 +98,11 @@ public class JettyHttpBinder implements HttpBinder {
             resp.setCharacterEncoding("UTF-8");
             resp.setContentType("application/json");
             try {
-                response = h.handler(request);
-                resp.setStatus(HttpServletResponse.SC_OK);
+                response = h.handler(request, req.getRequestURI());
+                resp.setStatus(response.getRespCode());
+
                 resp.getWriter().print(response.toJsonString());
+
             } catch (Exception e) {
                 log.error("Api = {}, request param = {} , occur error:{},", this.path, paramMap, e);
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());

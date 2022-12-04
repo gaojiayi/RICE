@@ -8,16 +8,23 @@ import java.util.Map;
 /**
  * @author gaojy
  * @ClassName HttpResponse.java
- * @Description 
+ * @Description
  * @createTime 2022/01/18 00:05:00
  */
 public class HttpResponse {
-    private Map<String, ?> data = new HashMap<>();
-    private int respCode;
-    private String errorMessae="";
+    private Map<String, Object> data = new HashMap<>();
+    private int respCode = 200;
+    private String errorMessae = "";
 
-    public HttpResponse(Map<String, ?> data) {
+    public HttpResponse() {
+    }
+
+    public HttpResponse(Map<String, Object> data) {
         this.data = data;
+    }
+
+    public HttpResponse(String key, Object value) {
+        this.data.put(key, value);
     }
 
     public HttpResponse(int respCode, String errorMessae) {
@@ -25,14 +32,18 @@ public class HttpResponse {
         this.errorMessae = errorMessae;
     }
 
+    public HttpResponse addResponse(String key, Object value) {
+        this.data.put(key, value);
+        return this;
+    }
+
     public Map<String, ?> getData() {
         return data;
     }
 
-    public void setData(Map<String, ?> data) {
+    public void setData(Map<String, Object> data) {
         this.data = data;
     }
-
 
     public int getRespCode() {
         return respCode;
@@ -57,9 +68,5 @@ public class HttpResponse {
         resp.put("data", data);
         return JSON.toJSONString(resp);
     }
-
-
-
-
 
 }
