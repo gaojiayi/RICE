@@ -10,6 +10,15 @@ public class TaskChangeRecord{
 	private String taskCode;
 	private int optType;
 	private Date createTime;
+	private String optDesc;
+
+	public String getOptDesc() {
+		return optDesc;
+	}
+
+	public void setOptDesc(String optDesc) {
+		this.optDesc = optDesc;
+	}
 
 	public void setId(long id){
 		this.id=id;
@@ -43,7 +52,8 @@ public class TaskChangeRecord{
 		return createTime;
 	}
 
-	@Override public String toString() {
+	@Override
+	public String toString() {
 		return "TaskChangeRecord{" +
 			"id=" + id +
 			", taskCode='" + taskCode + '\'' +

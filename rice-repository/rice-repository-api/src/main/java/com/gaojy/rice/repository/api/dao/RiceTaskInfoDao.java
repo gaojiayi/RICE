@@ -14,6 +14,8 @@ public interface RiceTaskInfoDao {
 
     List<RiceTaskInfo> getInfoByCodes(List<String> taskCodes);
 
+    RiceTaskInfo  getInfoByCode(String taskCode);
+
     public void addTask(RiceTaskInfo riceTaskInfo);
 
     public void updateTask(RiceTaskInfo riceTaskInfo);

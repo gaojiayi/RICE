@@ -1,4 +1,4 @@
-package com.gaojy.rice.controller.allocation;
+package com.gaojy.rice.common.allocation;
 
 import java.util.*;
 
@@ -12,25 +12,31 @@ import java.util.*;
  */
 public class ConsistentHashingStrategy implements Strategy {
     @Override
-    public Map<String, List<Long>> allocate(List<String> activeSchedulerServers, List<Long> taskIds) {
-        Map<String, List<Long>> retMap = new HashMap<>();
+    public Map<String, List<String>> allocate(List<String> activeSchedulerServers, List<String> taskCodes) {
+        Map<String, List<String>> retMap = new HashMap<>();
         SortedMap<Integer, String> sortedMap = generateSortedMap(activeSchedulerServers);
-        taskIds.forEach(id -> {
-            String server = getServer(sortedMap, id);
-            List<Long> newIds = retMap.computeIfAbsent(server, key -> new LinkedList<>());
-            newIds.add(id);
-
+        taskCodes.forEach(code -> {
+            String server = getServer(sortedMap, code);
+            List<String> newIds = retMap.computeIfAbsent(server, key -> new LinkedList<>());
+            newIds.add(code);
         });
 
         return retMap;
     }
 
-    private static String getServer(SortedMap<Integer, String> sortedMap, Long taskId) {
+    @Override
+    public String allocateServer(List<String> activeSchedulerServers, String taskCode) {
+        SortedMap<Integer, String> sortedMap = generateSortedMap(activeSchedulerServers);
+
+        return getServer(sortedMap, taskCode);
+    }
+
+    private static String getServer(SortedMap<Integer, String> sortedMap, String taskCode) {
         // 得到带路由的结点的Hash值
-        int hash = getHash(String.valueOf(taskId));
+        int hash = getHash(taskCode);
         // 得到大于该Hash值的所有Map
         SortedMap<Integer, String> subMap =
-                sortedMap.tailMap(hash);
+            sortedMap.tailMap(hash);
         // 第一个Key就是顺时针过去离node最近的那个结点
         // Integer i = subMap.firstKey();
         // 并得到第一个大于此key的项目的key,也就是距离最近的key
@@ -47,7 +53,7 @@ public class ConsistentHashingStrategy implements Strategy {
      */
     public String getNextSchedulerServer(List<String> currentSchedulerServers, String newServer) {
         Integer hash = getHash(newServer);
-        if(currentSchedulerServers.contains(newServer)){
+        if (currentSchedulerServers.contains(newServer)) {
             hash++;
         }
         SortedMap<Integer, String> sortedMap = generateSortedMap(currentSchedulerServers);

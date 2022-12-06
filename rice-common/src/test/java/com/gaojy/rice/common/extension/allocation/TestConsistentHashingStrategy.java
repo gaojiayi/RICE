@@ -1,5 +1,6 @@
-package com.gaojy.rice.controller.allocation;
+package com.gaojy.rice.common.extension.allocation;
 
+import com.gaojy.rice.common.allocation.ConsistentHashingStrategy;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -13,9 +14,9 @@ import java.util.*;
 public class TestConsistentHashingStrategy {
 
     static java.util.List<String> activeSchedulerServers;
-    static List<Long> taskIds;
+    static List<String> taskIds;
     static ConsistentHashingStrategy strategy = new ConsistentHashingStrategy();
-    static Map<String, List<Long>> initRetMap;
+    static Map<String, List<String>> initRetMap;
 
     @Before
     public  void init() {
@@ -26,7 +27,7 @@ public class TestConsistentHashingStrategy {
         activeSchedulerServers.add("192.169.0.3");
         activeSchedulerServers.add("192.169.0.4");
         for (Long i = 0L; i < 50L; i++) {
-            taskIds.add(i);
+            taskIds.add(i+"");
         }
         initRetMap = strategy.allocate(activeSchedulerServers, taskIds);
     }
@@ -34,12 +35,12 @@ public class TestConsistentHashingStrategy {
     @Test
     public void registerServerTest() {
         String nextServer = strategy.getNextSchedulerServer(activeSchedulerServers, "192.169.0.5");
-        List<Long> idsOfnextServer = initRetMap.get(nextServer);
+        List<String> idsOfnextServer = initRetMap.get(nextServer);
         Collections.sort(idsOfnextServer);
 
         activeSchedulerServers.add("192.169.0.5");
-        Map<String, List<Long>> newInitRetMap = strategy.allocate(activeSchedulerServers, idsOfnextServer);
-        List<Long> combina = newInitRetMap.get("192.169.0.5");
+        Map<String, List<String>> newInitRetMap = strategy.allocate(activeSchedulerServers, idsOfnextServer);
+        List<String> combina = newInitRetMap.get("192.169.0.5");
         combina.addAll(newInitRetMap.get(nextServer));
         Collections.sort(combina);
         /**
@@ -54,15 +55,15 @@ public class TestConsistentHashingStrategy {
     public void downServerTest() {
         String nextServer = strategy.getNextSchedulerServer(activeSchedulerServers, "192.169.0.3");
         // "192.169.0.3" 下一个节点上的任务
-        List<Long> oldIdsOfnextServer = initRetMap.get(nextServer);
+        List<String> oldIdsOfnextServer = initRetMap.get(nextServer);
         Collections.sort(oldIdsOfnextServer);
 
-        List<Long> idsOfRemoveServer = initRetMap.get("192.169.0.3");
+        List<String> idsOfRemoveServer = initRetMap.get("192.169.0.3");
 
         activeSchedulerServers.remove("192.169.0.3");
 
-        Map<String, List<Long>> newInitRetMap = strategy.allocate(activeSchedulerServers,taskIds);
-        List<Long> newIds = newInitRetMap.get(nextServer);
+        Map<String, List<String>> newInitRetMap = strategy.allocate(activeSchedulerServers,taskIds);
+        List<String> newIds = newInitRetMap.get(nextServer);
         newIds.removeAll(idsOfRemoveServer);
         Collections.sort(newIds);
 

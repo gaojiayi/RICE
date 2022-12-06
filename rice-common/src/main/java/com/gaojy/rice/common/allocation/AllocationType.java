@@ -1,4 +1,4 @@
-package com.gaojy.rice.dispatcher.allocation;
+package com.gaojy.rice.common.allocation;
 
 /**
  * 任务分配类型

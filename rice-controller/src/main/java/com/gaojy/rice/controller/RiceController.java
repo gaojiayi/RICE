@@ -222,4 +222,8 @@ public class RiceController implements LeaderStateListener, ChannelEventListener
     public ControllerConfig getControllerConfig() {
         return controllerConfig;
     }
+
+    public TransportServer getRemotingServer() {
+        return remotingServer;
+    }
 }

@@ -1,4 +1,4 @@
-package com.gaojy.rice.dispatcher.allocation;
+package com.gaojy.rice.common.allocation;
 
 import com.gaojy.rice.common.exception.DispatcherException;
 

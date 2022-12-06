@@ -20,4 +20,6 @@ public interface RiceTaskChangeRecordDao {
     public List<TaskChangeRecord> getChanges(String taskCode, Long startTime);
 
     public void  insert(List<TaskChangeRecord> taskChangeRecords);
+
+    public void  insert(TaskChangeRecord record);
 }

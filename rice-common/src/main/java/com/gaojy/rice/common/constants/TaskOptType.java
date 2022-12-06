@@ -42,6 +42,10 @@ public enum TaskOptType {
         return code;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public static TaskOptType getTaskOptType(int optType) {
         return Arrays.stream(TaskOptType.values()).filter(type -> {
             return type.getCode() == optType;

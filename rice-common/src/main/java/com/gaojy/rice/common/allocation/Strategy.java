@@ -1,4 +1,4 @@
-package com.gaojy.rice.dispatcher.allocation;
+package com.gaojy.rice.common.allocation;
 
 import java.util.List;
 import java.util.Map;
@@ -12,5 +12,7 @@ import java.util.Map;
 public interface Strategy {
 
     Map<String, List<String>> allocate(List<String> activeSchedulerServers, List<String> taskCodes);
+
+    String allocateServer(List<String> activeSchedulerServers, String taskCode);
 
 }

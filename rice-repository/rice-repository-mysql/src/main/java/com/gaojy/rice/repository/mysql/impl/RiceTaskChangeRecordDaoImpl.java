@@ -7,6 +7,7 @@ import com.gaojy.rice.repository.api.dao.RiceTaskChangeRecordDao;
 import com.gaojy.rice.repository.mysql.DataSourceFactory;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.sql.DataSource;
@@ -74,5 +75,12 @@ public class RiceTaskChangeRecordDaoImpl implements RiceTaskChangeRecordDao {
             throw new RepositoryException("insert taskChangeRecords SQLException", e);
         }
 
+    }
+
+    @Override
+    public void insert(TaskChangeRecord record) {
+        List<TaskChangeRecord> records = new ArrayList<>();
+        records.add(record);
+        insert(records);
     }
 }

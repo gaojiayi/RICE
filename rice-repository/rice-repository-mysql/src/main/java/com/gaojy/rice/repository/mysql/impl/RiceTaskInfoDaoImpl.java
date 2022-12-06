@@ -49,6 +49,17 @@ public class RiceTaskInfoDaoImpl implements RiceTaskInfoDao {
     }
 
     @Override
+    public RiceTaskInfo getInfoByCode(String taskCode) {
+        List<String> codes = new ArrayList<>();
+        codes.add(taskCode);
+        List<RiceTaskInfo> infoByCodes = this.getInfoByCodes(codes);
+        if (infoByCodes != null && infoByCodes.size() > 0) {
+            return infoByCodes.get(0);
+        }
+        return null;
+    }
+
+    @Override
     public void addTask(RiceTaskInfo riceTaskInfo) {
         String sql = "insert into  rice_task_info" +
             "(task_name,task_desc,task_type,parameters,scheduler_server," +
