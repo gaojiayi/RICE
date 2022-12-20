@@ -35,7 +35,7 @@ public abstract class AbstractHttpHandler implements HttpHandler {
 
     public void registerHandler(HttpBinder binder) {
         // 找到当前handler中所有的url   再依次注册
-        Method[] methods = AbstractHttpHandler.this.getClass().getMethods();
+        Method[] methods = this.getClass().getMethods();
         Arrays.stream(methods).forEach(method -> {
             if (method.getAnnotation(RequestMapping.class) != null) {
                 RequestMapping rm = method.getAnnotation(RequestMapping.class);

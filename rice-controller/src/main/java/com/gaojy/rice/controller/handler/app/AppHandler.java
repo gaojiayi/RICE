@@ -40,11 +40,11 @@ public class AppHandler extends AbstractHttpHandler {
     public HttpResponse fetch(HttpRequest request) throws Exception {
 
         String appName = (String) request.getParamMap().get("appName");
-        Integer pageIndex = (Integer) request.getParamMap().get("pageIndex");
-        Integer limit = (Integer) request.getParamMap().get("pageLimit");
+        Integer pageIndex = Integer.parseInt((String) request.getParamMap().get("pageIndex"));
+        Integer limit = Integer.parseInt((String) request.getParamMap().get("pageLimit"));
         return new HttpResponse()
             .addResponse(
-                "data",
+                "appList",
                 repository.getRiceAppInfoDao().queryApps(appName, pageIndex, limit))
             .addResponse("page", new PageSpec(pageIndex, limit,
                 repository.getRiceAppInfoDao().queryAppsCount(appName)));

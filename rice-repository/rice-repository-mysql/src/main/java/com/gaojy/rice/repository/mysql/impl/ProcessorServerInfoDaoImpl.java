@@ -124,8 +124,9 @@ public class ProcessorServerInfoDaoImpl implements ProcessorServerInfoDao {
         String sql = "select count(id) from processor_server_info " +
             "where create_time >= ? and create_time  <= ? group by address";
         try {
-            return ((Long) qr.query(sql, new ScalarHandler())).intValue();
-        } catch (SQLException e) {
+            Object query = qr.query(sql, new ScalarHandler(), startTime, endTime);
+            return query == null? 0: ((Long) query).intValue();
+        } catch (Exception e) {
             log.error("get num of processor  exception," + e);
             throw new RepositoryException(e);
         }

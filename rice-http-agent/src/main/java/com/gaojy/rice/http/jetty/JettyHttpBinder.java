@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 public class JettyHttpBinder implements HttpBinder {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.HTTP_AGENT_LOGGER_NAME);
     private final int DEFAULT_THREADS = 200;
-    private final String ROOT_PATH = "/rice";
+    private final String ROOT_PATH = "";
     private final Server server;
     private Map<String, HttpHandler> handlers = new HashMap<>();
     private final ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);

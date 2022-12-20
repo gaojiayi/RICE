@@ -15,7 +15,7 @@ public interface RiceAppInfoDao {
     public List<RiceAppGroupInfo> getCountByName(Integer limit);
 
     public List<RiceAppInfo> queryApps(String appName, Integer pageIndex, Integer pageSize);
-
+    public List<RiceAppInfo> queryAppsByIds(List<Long> ids);
     public Integer queryAppsCount(String appName);
 
     public void createApp(RiceAppInfo appInfo);

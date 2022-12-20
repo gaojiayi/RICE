@@ -10,6 +10,7 @@ import com.gaojy.rice.repository.mysql.DataSourceFactory;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.apache.commons.dbutils.BasicRowProcessor;
 import org.apache.commons.dbutils.GenerousBeanProcessor;
@@ -46,12 +47,27 @@ public class RiceAppInfoDaoImpl implements RiceAppInfoDao {
 
     @Override
     public List<RiceAppInfo> queryApps(String appName, Integer pageIndex, Integer pageSize) {
-        String appNameFilter = StringUtil.isNotEmpty(appName) ? " and app_name like %" + appName + "%" : "";
+        String appNameFilter = StringUtil.isNotEmpty(appName) ? " and app_name like '%" + appName + "%'" : "";
         String sql = "select t.id,app_name,app_desc,t.create_time,t.status  from rice_app_info t " +
             "INNER  JOIN (select id from rice_app_info where status != 0 " + appNameFilter + " limit ?,?)  as k ON t.id=k.id;";
         try {
-            return qr.query(sql, new BeanListHandler<RiceAppInfo>(RiceAppInfo.class,
+            List<RiceAppInfo> res = qr.query(sql, new BeanListHandler<RiceAppInfo>(RiceAppInfo.class,
                 new BasicRowProcessor(new GenerousBeanProcessor())), (pageIndex - 1) * pageSize, pageSize);
+            return res;
+        } catch (SQLException e) {
+            throw new RepositoryException(e);
+        }
+    }
+
+    @Override
+    public List<RiceAppInfo> queryAppsByIds(List<Long> ids) {
+        List<String> appIds = ids.stream().map(String::valueOf).collect(Collectors.toList());
+        String idsStr = String.join(",", appIds);
+        String sql = "select * from rice_app_info where id in (" + idsStr + ")";
+        try {
+            List<RiceAppInfo> res = qr.query(sql, new BeanListHandler<RiceAppInfo>(RiceAppInfo.class,
+                new BasicRowProcessor(new GenerousBeanProcessor())));
+            return res;
         } catch (SQLException e) {
             throw new RepositoryException(e);
         }
@@ -59,8 +75,8 @@ public class RiceAppInfoDaoImpl implements RiceAppInfoDao {
 
     @Override
     public Integer queryAppsCount(String appName) {
-        String appNameFilter = StringUtil.isNotEmpty(appName) ? " and app_name like %" + appName + "%" : "";
-        String sql = "select count(id) from rice_app_info where status != 0"+appNameFilter;
+        String appNameFilter = StringUtil.isNotEmpty(appName) ? " and app_name like '%" + appName + "%'" : "";
+        String sql = "select count(id) from rice_app_info where status != 0" + appNameFilter;
         try {
             return ((Long) qr.query(sql, new ScalarHandler())).intValue();
         } catch (SQLException e) {

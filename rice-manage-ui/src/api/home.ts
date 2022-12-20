@@ -9,18 +9,18 @@ interface LastestTaskInstanceReponseType extends Promise<any> {
 }
 
 export const getStatisticsinfo = (): ReponseType => {
-  return http.request("get", "/admin/statistics");
+  return http.request("get", "/home/metrics");
 };
 
 ;
 export const getCollectorInfo = (): ReponseType => {
-  return http.request("get", "/admin/collector/info");
+  return http.request("get", "/home/controller/info");
 };
 
 export const getLastestTaskInstance = (): LastestTaskInstanceReponseType => {
-  return http.request("get", "/admin/latest/task/schedule");
+  return http.request("get", "/home/latest/task");
 };
 
 export const getChartData = (): ReponseType => {
-  return http.request("get", "/admin/chart/info");
+  return http.request("get", "/home/chart");
 };

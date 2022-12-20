@@ -51,14 +51,14 @@ export const useHomeStore = defineStore({
       let otherCollectors: OtherCollectorType[] = [];
       this.current_controller_info.start_time = data.start_time;
       for (let index in data.collectors) {
-        if (data.collectors[index].isCurrent) {
+        if (data.collectors[index].current) {
           this.current_controller_info.current_address =
             data.collectors[index].address;
           this.current_controller_info.isMaster =
-            data.collectors[index].isMaster;
+            data.collectors[index].master;
         } else {
           otherCollectors.push({
-            isMaster: data.collectors[index].isMaster,
+            isMaster: data.collectors[index].master,
             address: data.collectors[index].address
           });
         }
@@ -66,12 +66,36 @@ export const useHomeStore = defineStore({
       this.current_controller_info.other_collectors = otherCollectors;
     },
     async getLastestTaskInstance() {
-      let { data } = await getLastestTaskInstance();
-      this.task_info_intime = data;
+      let { data, resp_code } = await getLastestTaskInstance();
+      if (resp_code===200) {
+        this.task_info_intime = data.instances;
+      }
+
     },
     async getChartInfo() {
       let { data } = await getChartData();
-      this.chart_data = data
+      this.chart_data.task_success_rate = data.taskSuccessRate;
+      let appProcessorNumRanks = []
+      for (var i in data.appProcessorNumRank) {
+        let appProcessorNumRank = {}
+        appProcessorNumRank["app_name"] = data.appProcessorNumRank[i]['appName']
+        appProcessorNumRank["num"] = data.appProcessorNumRank[i]['num']
+        appProcessorNumRanks.push(appProcessorNumRank)
+      }
+      this.chart_data.app_processor_num_rank = appProcessorNumRanks;
+
+      let scheduleNumForWeeks = [];
+      for (var i in data.scheduleNumForWeek) {
+        let scheduleNumForWeek = {};
+        for (let key in data.scheduleNumForWeek[i]) {
+          scheduleNumForWeek["date"] = key;
+          scheduleNumForWeek["num"] = data.scheduleNumForWeek[i][key];
+        }
+
+        scheduleNumForWeeks.push(scheduleNumForWeek);
+      }
+      this.chart_data.schedule_num_for_week = scheduleNumForWeeks;
+      console.log(this.chart_data)
     }
   }
 });

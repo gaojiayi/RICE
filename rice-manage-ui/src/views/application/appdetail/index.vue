@@ -1,9 +1,11 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref ,onMounted} from "vue";
 import { useRenderIcon } from "/@/components/ReIcon/src/hooks";
 import { ElMessage, ElMessageBox } from "element-plus";
 import CreateAppDialog from "./components/CreateAppDialog.vue";
 import { useRouter, RouteParamsRaw } from "vue-router";
+import { appStore } from "/@/store";
+
 const router = useRouter();
 
 const skipToTaskCreate = (val: RouteParamsRaw) => {
@@ -23,8 +25,23 @@ defineOptions({
 });
 
 const formDialogVisible = ref(false);
-const searchValue = ref("");
 const formData = ref({ ...INITIAL_DATA });
+const pageTotal = ref(0);
+
+const appInfoList = async () => {
+  try {
+    const { data } = await appStore.applicationStore.GET_APP_INFOS();
+    console.log(data)
+    //productList.value = data.list;
+    pageTotal.value = data.list.length;
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+onMounted(() => {
+  appInfoList();
+});
 
 const handleDeleteItem = product => {
   ElMessageBox.confirm(
@@ -54,14 +71,14 @@ const handleDeleteItem = product => {
       </el-button>
       <el-input
         style="width: 300px; margin-right: 100px"
-        v-model="searchValue"
+        v-model="appStore.applicationStore.appName"
         placeholder="请输入应用名称"
         clearable
       >
         <template #suffix>
           <el-icon class="el-input__icon">
             <IconifyIconOffline
-              v-show="searchValue.length === 0"
+              v-show="appStore.applicationStore.appName.length === 0"
               icon="search"
             />
           </el-icon>
@@ -112,7 +129,9 @@ const handleDeleteItem = product => {
         <el-pagination
           background
           layout="prev, pager, next"
-          :total="1000"
+          :page-size="appStore.applicationStore.pageSize"
+          :current-page="appStore.applicationStore.pageIndex"
+          :total="pageTotal"
           class="app-page"
         />
       </el-row>

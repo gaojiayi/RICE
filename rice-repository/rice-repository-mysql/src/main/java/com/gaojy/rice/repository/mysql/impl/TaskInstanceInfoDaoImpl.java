@@ -122,7 +122,7 @@ public class TaskInstanceInfoDaoImpl implements TaskInstanceInfoDao {
     @Override
     public List<TaskInstanceInfo> getLatestInstance(Integer limit) {
         String sql = "select * from task_instance_info where" +
-            " status != 0 and parent_instance_id != null " +
+            " status != 0 and parent_instance_id = 0 " +
             "order by create_time desc limit ?";
         try {
             return qr.query(sql, new BeanListHandler<TaskInstanceInfo>(TaskInstanceInfo.class,
@@ -136,7 +136,7 @@ public class TaskInstanceInfoDaoImpl implements TaskInstanceInfoDao {
 
     @Override
     public Integer getNumByStatus(Integer status) {
-        String sql = "select count(id) from task_instance_info where status = ? ";
+        String sql = "select count(id) from task_instance_info where status = " + status;
 
         try {
             return ((Long) qr.query(sql, new ScalarHandler())).intValue();

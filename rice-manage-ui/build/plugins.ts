@@ -15,6 +15,7 @@ import { genScssMultipleScopeVars } from "/@/layout/theme";
 import DefineOptions from "unplugin-vue-define-options/vite";
 
 export function getPluginsList(command, VITE_LEGACY) {
+  // mock 开关
   const prodMock = true;
   const lifecycle = process.env.npm_lifecycle_event;
   return [
@@ -52,7 +53,7 @@ export function getPluginsList(command, VITE_LEGACY) {
     // mock支持
     viteMockServe({
       mockPath: "mock",
-      localEnabled: command === "serve",
+      localEnabled: command === "serve" && false,
       prodEnabled: command !== "serve" && prodMock,
       injectCode: `
           import { setupProdMockServer } from './mockProdServer';

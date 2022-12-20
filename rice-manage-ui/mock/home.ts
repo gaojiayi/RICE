@@ -7,9 +7,9 @@ export default [
     response: () => {
       return {
         data: {
-          task_num: 1234,
-          total_schedule_times: 5257,
-          scheduler_num: 320
+          scheduler_num: 0,
+          total_schedule_times: 14,
+          task_num: 1
         }
       };
     }
@@ -20,33 +20,27 @@ export default [
     response: () => {
       return {
         data: {
+          start_time: "2022-12-19 23:13:37",
           collectors: [
             {
-              address: "150.23.10.1:8080",
-              isMaster: true,
-              isCurrent: false,
+              address: "127.0.0.1:9500",
+              current: true,
+              master: false,
               status: 0
             },
             {
-              address: "150.23.10.2:8080",
-              isMaster: false,
-              isCurrent: true,
+              address: "127.0.0.1:9600",
+              current: false,
+              master: false,
               status: 0
             },
             {
-              address: "150.23.10.3:8080",
-              isMaster: false,
-              isCurrent: false,
-              status: 0
-            },
-            {
-              address: "150.23.10.4:8080",
-              isMaster: false,
-              isCurrent: false,
+              address: "127.0.0.1:9700",
+              current: false,
+              master: false,
               status: 0
             }
-          ],
-          start_time: "2022-01-23 12:45:16"
+          ]
         }
       };
     }
@@ -123,60 +117,41 @@ export default [
     response: () => {
       return {
         data: {
-          task_success_rate: {
-            timeout: 3,
-            failed: 204,
-            success: 1079,
-            execption: 79
-          },
-          app_processor_num_rank: [
+          appProcessorNumRank: [
             {
-              app_name: "订单系统",
-              processor_num: 10
-            },
-            {
-              app_name: "商品系统",
-              processor_num: 15
-            },
-            {
-              app_name: "检索系统",
-              processor_num: 8
-            },
-            {
-              app_name: "营销系统",
-              processor_num: 5
+              appName: "testApp",
+              num: 1
             }
           ],
-          schedule_num_for_week: [
+          scheduleNumForWeek: [
             {
-              date: "2022-07-13",
-              num: 421
+              "2022-12-13": 0
             },
             {
-              date: "2022-07-14",
-              num: 521
+              "2022-12-14": 0
             },
             {
-              date: "2022-07-15",
-              num: 201
+              "2022-12-15": 0
             },
             {
-              date: "2022-07-16",
-              num: 840
+              "2022-12-16": 0
             },
             {
-              date: "2022-07-17",
-              num: 1200
+              "2022-12-17": 0
             },
             {
-              date: "2022-07-18",
-              num: 612
+              "2022-12-18": 0
             },
             {
-              date: "2022-07-19",
-              num: 752
+              "2022-12-19": 0
             }
-          ]
+          ],
+          taskSuccessRate: {
+            execption: 5,
+            success: 6,
+            failed: 3,
+            timeout: 0
+          }
         }
       };
     }

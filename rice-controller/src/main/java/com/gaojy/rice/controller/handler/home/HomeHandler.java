@@ -2,6 +2,8 @@ package com.gaojy.rice.controller.handler.home;
 
 import com.gaojy.rice.common.constants.TaskInstanceStatus;
 import com.gaojy.rice.common.entity.RiceAppGroupInfo;
+import com.gaojy.rice.common.entity.RiceAppInfo;
+import com.gaojy.rice.common.entity.RiceTaskInfo;
 import com.gaojy.rice.common.entity.TaskInstanceInfo;
 import com.gaojy.rice.common.exception.ControllerException;
 import com.gaojy.rice.controller.RiceControllerBootStrap;
@@ -19,6 +21,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author gaojy
@@ -27,6 +31,7 @@ import java.util.Map;
  * @createTime 2022/12/04 23:34:00
  */
 public class HomeHandler extends AbstractHttpHandler {
+
     public HomeHandler(String rootPath) {
         super(rootPath);
     }
@@ -39,9 +44,12 @@ public class HomeHandler extends AbstractHttpHandler {
         taskRateMap.put("timeout",
             repository.getTaskInstanceInfoDao().getNumByStatus(TaskInstanceStatus.TIMEOUT.getCode())
         );
-        repository.getTaskInstanceInfoDao().getNumByStatus(TaskInstanceStatus.FINISHED.getCode());
-        repository.getTaskInstanceInfoDao().getNumByStatus(TaskInstanceStatus.EXCEPTION.getCode());
-        repository.getTaskInstanceInfoDao().getNumByStatus(TaskInstanceStatus.RUNNING.getCode());
+        taskRateMap.put("success",
+            repository.getTaskInstanceInfoDao().getNumByStatus(TaskInstanceStatus.FINISHED.getCode()));
+        taskRateMap.put("execption",
+            repository.getTaskInstanceInfoDao().getNumByStatus(TaskInstanceStatus.EXCEPTION.getCode()));
+        taskRateMap.put("failed",
+            repository.getTaskInstanceInfoDao().getNumByStatus(TaskInstanceStatus.RUNNING.getCode()));
         responseMap.put("taskSuccessRate", taskRateMap);
 
         List<RiceAppGroupInfo> appGroups = repository.getRiceAppInfoDao().getCountByName(10);
@@ -66,11 +74,19 @@ public class HomeHandler extends AbstractHttpHandler {
     public HttpResponse controllerInfo(HttpRequest request) throws Exception {
         Map<String, Object> responseMap = new HashMap<>();
         final List<HomeHandler.ControllerInfo> controllerInfoList = new ArrayList<>();
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        String leader = RiceControllerBootStrap.getController().getReplicatorManager().getLeader();
+        String leader = "NO_LEADER";
+        try {
+            leader = RiceControllerBootStrap.getController().getReplicatorManager().getLeader();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+        final String leaderInfo = String.valueOf(leader);
 
         Long bootTime = RiceControllerBootStrap.getController().getBootTime();
+        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         String time = formatDate.format(bootTime);
         responseMap.put("start_time", time);
 
@@ -82,7 +98,7 @@ public class HomeHandler extends AbstractHttpHandler {
             HomeHandler.ControllerInfo controllerInfo = new HomeHandler.ControllerInfo();
             controllerInfo.setAddress(endpoint);
             controllerInfo.setCurrent((localHost + ":" + localPort).equals(endpoint));
-            controllerInfo.setMaster(leader.equals(endpoint));
+            controllerInfo.setMaster(leaderInfo.equals(endpoint));
             controllerInfo.setStatus(0);
             controllerInfoList.add(controllerInfo);
         });
@@ -92,7 +108,6 @@ public class HomeHandler extends AbstractHttpHandler {
 
     @RequestMapping(value = "/metrics", method = "GET")
     public HttpResponse metrics(HttpRequest request) throws Exception {
-        Map<String, Integer> responseMap = new HashMap<>();
         List<String> allValidTaskCode = repository.getRiceTaskInfoDao().getAllValidTaskCode();
         Integer countValidInstance = repository.getTaskInstanceInfoDao().getCountValidInstance();
         int schedulerServerNum = SchedulerManager.getManager().getActiveScheduler().size();
@@ -102,16 +117,45 @@ public class HomeHandler extends AbstractHttpHandler {
             .addResponse("scheduler_num", schedulerServerNum);
     }
 
-    @RequestMapping(value = "/scrollBar", method = "GET")
+    @RequestMapping(value = "/latest/task", method = "GET")
     public HttpResponse scrollBar(HttpRequest request) throws Exception {
-        HashMap<String, List<TaskInstanceInfo>> responseMap = new HashMap<>();
+        final List<Map> instanceList = new ArrayList<>();
         Object limit = request.getParamMap().get("limit");
         if (limit == null) {
             limit = 10;
         }
         List<TaskInstanceInfo> latestInstances = repository.getTaskInstanceInfoDao()
             .getLatestInstance(Integer.parseInt(limit.toString()));
-        return new HttpResponse("instances", latestInstances);
+
+        // 查询task
+        List<String> taskCodes = latestInstances.stream().map(TaskInstanceInfo::getTaskCode).distinct().collect(Collectors.toList());
+        List<RiceTaskInfo> taskInfos = repository.getRiceTaskInfoDao().getInfoByCodes(taskCodes);
+        final Map<String, RiceTaskInfo> taskInfoMap = new HashMap<>();
+        taskInfos.forEach(info -> {
+            taskInfoMap.put(info.getTaskCode(), info);
+        });
+        // app
+        List<Long> appIds = taskInfos.stream().map(RiceTaskInfo::getAppId).distinct().collect(Collectors.toList());
+        List<RiceAppInfo> riceAppInfos = repository.getRiceAppInfoDao().queryAppsByIds(appIds);
+        final Map<Long, String> appNameMap = new HashMap<>();
+
+        riceAppInfos.forEach(app -> {
+            appNameMap.put(app.getId(), app.getAppName());
+        });
+        SimpleDateFormat formatDate = new SimpleDateFormat("HH:mm:ss MM-dd-MM-yyyy ");
+
+        latestInstances.forEach(instanceInfo -> {
+            HashMap<String, Object> item = new HashMap<>();
+            item.put("trigger_time", formatDate.format(instanceInfo.getActualTriggerTime()));
+            item.put("task_name", taskInfoMap.get(instanceInfo.getTaskCode()).getTaskName());
+            item.put("app_name", appNameMap.get(taskInfoMap.get(instanceInfo.getTaskCode()).getAppId()));
+            item.put("processor_address", instanceInfo.getTaskTrackerAddress() == null ?
+                "" : instanceInfo.getTaskTrackerAddress());
+            item.put("scheduler_address", taskInfoMap.get(instanceInfo.getTaskCode()).getSchedulerServer());
+            item.put("status", instanceInfo.getStatus());
+            instanceList.add(item);
+        });
+        return new HttpResponse("instances", instanceList);
     }
 
     class ControllerInfo {

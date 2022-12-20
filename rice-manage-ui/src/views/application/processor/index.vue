@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { getProcessorinfo } from "/@/api/application";
 import { appStore } from "/@/store";
 import Card from "/@/views/application/components/Card.vue";
 import { ref, onMounted, nextTick } from "vue";

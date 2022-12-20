@@ -47,7 +47,7 @@ const onLogin = async (formEl: FormInstance | undefined) => {
         initRouter("admin").then(() => {});
         message.success("登陆成功");
         router.push("/");
-      }, 2000);
+      }, 1000);
     } else {
       loading.value = false;
       return fields;
