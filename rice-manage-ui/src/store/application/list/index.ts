@@ -1,5 +1,6 @@
+import { useAppStore } from "./../../modules/app";
 import { defineStore } from "pinia";
-import { fetchAppInfos } from "/@/api/application";
+import { fetchAppInfos, createApp, deleteApp } from "/@/api/application";
 import { AppListParamType } from "./type";
 
 export const useAppListStore = defineStore({
@@ -11,7 +12,17 @@ export const useAppListStore = defineStore({
   }),
   actions: {
     async GET_APP_INFOS() {
-      return await fetchAppInfos(this.state);
+      return await fetchAppInfos({
+        appName: this.appName,
+        pageIndex: this.pageIndex,
+        pageLimit: this.pageSize
+      });
+    },
+    async CREATE_APP(appName, appDesc) {
+      return await createApp({ appName, appDesc });
+    },
+    async DELETE_APP(appId) {
+      return await deleteApp(appId);
     }
   }
 });

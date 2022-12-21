@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, watch, toRefs } from "vue";
 import { ElMessage, FormInstance } from "element-plus";
-import type { UploadProps } from "element-plus";
-
+import { appStore } from "/@/store";
+import { tr } from "element-plus/lib/locale";
 defineOptions({
   name: "CreateAppDialog"
 });
@@ -20,36 +20,35 @@ const props = defineProps({
   }
 });
 const ruleFormRef = ref<FormInstance>();
-const imageUrl = ref("");
 // dialog 显示开关
 const formVisible = ref(false);
 const formData = ref(props.data);
-const textareaValue = ref("");
-
-const beforeAvatarUpload: UploadProps["beforeUpload"] = rawFile => {
-  if (rawFile.type !== "image/jpeg") {
-    ElMessage.error("Avatar picture must be JPG format!");
-    return false;
-  } else if (rawFile.size / 1024 / 1024 > 2) {
-    ElMessage.error("Avatar picture size can not exceed 2MB!");
-    return false;
-  }
-  return true;
-};
-const handleAvatarSuccess: UploadProps["onSuccess"] = (
-  response,
-  uploadFile
-) => {
-  imageUrl.value = URL.createObjectURL(uploadFile.raw!);
-};
+const loading = ref(false);
 
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
+  loading.value = true;
   await formEl.validate(valid => {
     if (valid) {
-      ElMessage.success("提交成功");
-      formVisible.value = false;
-      resetForm(formEl);
+      appStore.applicationStore
+        .CREATE_APP(formData.value.name, formData.value.description)
+        .then(resp => {
+          loading.value = false;
+          if (resp["resp_code"] === 200) {
+            ElMessage.success("创建应用成功");
+            reload()
+            formVisible.value = false;
+            resetForm(formEl);
+          } else {
+            ElMessage.error("创建应用失败");
+          }
+        })
+        .catch(err => {
+          loading.value = false;
+          ElMessage.error("创建应用失败");
+        });
+    } else {
+      ElMessage.error("验证参数失败");
     }
   });
 };
@@ -59,7 +58,11 @@ const closeDialog = () => {
   resetForm(ruleFormRef.value);
 };
 // 这边是更新父组件的visible
-const emit = defineEmits(["update:visible"]);
+const emit = defineEmits(["update:visible","reload"]);
+
+const reload = () => {
+  emit("reload");
+};
 
 //监听formVisible值的变化
 watch(
@@ -99,6 +102,7 @@ const rules = {
     :width="680"
     draggable
     :before-close="closeDialog"
+    v-loading="loading"
   >
     <!-- 表单 -->
     <el-form
@@ -107,22 +111,22 @@ const rules = {
       :rules="rules"
       label-width="100px"
     >
-      <el-form-item label="应用图片" prop="">
-        <!-- 应用图片 -->
-        <el-upload
+      <!-- <el-form-item label="应用图片" prop=""> -->
+      <!-- 应用图片 -->
+      <!-- <el-upload
           class="avatar-uploader"
           action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
           :show-file-list="false"
           :on-success="handleAvatarSuccess"
           :before-upload="beforeAvatarUpload"
         >
-          <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-          <!-- <Plus /> -->
-          <el-icon v-else class="avatar-uploader-icon">
+          <img v-if="imageUrl" :src="imageUrl" class="avatar" /> -->
+      <!-- <Plus /> -->
+      <!-- <el-icon v-else class="avatar-uploader-icon">
             <iconify-icon-offline icon="plus"
           /></el-icon>
         </el-upload>
-      </el-form-item>
+      </el-form-item> -->
       <!-- 应用名称 -->
 
       <el-form-item label="应用名称" prop="name">
@@ -136,7 +140,7 @@ const rules = {
       <!-- text 应用描述 -->
       <el-form-item label="描述" prop="mark">
         <el-input
-          v-model="textareaValue"
+          v-model="formData.description"
           type="textarea"
           :style="{ width: '480px' }"
           placeholder="请输入内容"
@@ -164,12 +168,12 @@ const rules = {
 
 .avatar-uploader {
   // .el-upload {
-    border: 1px dashed var(--el-border-color);
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: var(--el-transition-duration-fast);
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: var(--el-transition-duration-fast);
   // }
 }
 

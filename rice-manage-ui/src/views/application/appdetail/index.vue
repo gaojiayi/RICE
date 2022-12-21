@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref ,onMounted} from "vue";
+import { ref, onMounted } from "vue";
 import { useRenderIcon } from "/@/components/ReIcon/src/hooks";
 import { ElMessage, ElMessageBox } from "element-plus";
 import CreateAppDialog from "./components/CreateAppDialog.vue";
@@ -11,7 +11,13 @@ const router = useRouter();
 const skipToTaskCreate = (val: RouteParamsRaw) => {
   router.push({ name: "taskcreate", params: val });
 };
-
+type AppList = {
+  appDesc: string;
+  // "createTime": 1643049256753,
+  appName: string;
+  id: number;
+  status: number;
+};
 const INITIAL_DATA = {
   name: "",
   status: "",
@@ -27,13 +33,13 @@ defineOptions({
 const formDialogVisible = ref(false);
 const formData = ref({ ...INITIAL_DATA });
 const pageTotal = ref(0);
+const appInfos = ref<AppList[]>([]);
 
 const appInfoList = async () => {
   try {
     const { data } = await appStore.applicationStore.GET_APP_INFOS();
-    console.log(data)
-    //productList.value = data.list;
-    pageTotal.value = data.list.length;
+    appInfos.value = data.appList;
+    pageTotal.value = data.page.total;
   } catch (e) {
     console.log(e);
   }
@@ -43,21 +49,32 @@ onMounted(() => {
   appInfoList();
 });
 
-const handleDeleteItem = product => {
+const handleDeleteItem = appInfo => {
   ElMessageBox.confirm(
-    product
-      ? `确认删除后${product.name}的所有产品信息将被清空, 且无法恢复`
-      : "",
+    appInfo ? `确认将${appInfo.appName}的所有应用信息清空, 且无法恢复` : "",
     "提示",
     {
       type: "warning"
     }
   )
     .then(() => {
-      ElMessage({
-        type: "success",
-        message: "删除成功"
-      });
+      appStore.applicationStore
+        .DELETE_APP(appInfo.id)
+        .then(resp => {
+          if (resp["resp_code"] === 200) {
+            ElMessage({
+              type: "success",
+              message: "删除成功"
+            });
+            appInfoList();
+          } else {
+            ElMessage({
+              type: "error",
+              message: "删除失败"
+            });
+          }
+        })
+        .catch();
     })
     .catch(() => {});
 };
@@ -74,6 +91,7 @@ const handleDeleteItem = product => {
         v-model="appStore.applicationStore.appName"
         placeholder="请输入应用名称"
         clearable
+        @keyup.enter.native="appInfoList"
       >
         <template #suffix>
           <el-icon class="el-input__icon">
@@ -89,28 +107,30 @@ const handleDeleteItem = product => {
     <div>
       <el-row class="row-app-card-data">
         <el-col
-          v-for="(o, index) in 6"
-          :key="o"
+          v-for="(appInfo, index) in appInfos"
+          :key="index"
           :span="4"
           style="margin: 20px"
           class="card-app-info"
         >
           <el-card :body-style="{ padding: '5px', height: '250px' }">
             <div class="app-header">
-              <img
-                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-                class="image"
-              />
+              <img src="/@/assets/app_image.png" class="image" />
               <div class="app-title">
                 <iconify-icon-offline
                   icon="close-circle-fill"
-                  @click="handleDeleteItem"
+                  @click="handleDeleteItem(appInfo)"
                   class="icon-remove-app"
                 />
-                <div class="app-title-name">订单系统</div>
-                <div class="app-title-id">ID:34455</div>
+                <div class="app-title-name">{{ appInfo.appName }}</div>
+                <div class="app-title-id">ID:{{ appInfo.id }}</div>
                 <el-button
-                  @click="skipToTaskCreate({ appid: 111, appName: '订单系统' })"
+                  @click="
+                    skipToTaskCreate({
+                      appid: appInfo.id,
+                      appName: appInfo.appName
+                    })
+                  "
                 >
                   新增任务
                 </el-button>
@@ -119,9 +139,7 @@ const handleDeleteItem = product => {
 
             <div style="">
               <div class="bottom-app-info">
-                <span class=""
-                  >订单系统收集了来自h5,小程序,客户端的订单请求,作为支付的重要重要凭证,订单系统努力打造订单中台,为公司提供统一的订单解决方案.</span
-                >
+                <span class="">{{ appInfo.appDesc }}</span>
               </div>
             </div>
           </el-card>
@@ -129,15 +147,19 @@ const handleDeleteItem = product => {
         <el-pagination
           background
           layout="prev, pager, next"
-          :page-size="appStore.applicationStore.pageSize"
-          :current-page="appStore.applicationStore.pageIndex"
+          v-model:page-size="appStore.applicationStore.pageSize"
+          v-model:current-page="appStore.applicationStore.pageIndex"
           :total="pageTotal"
           class="app-page"
         />
       </el-row>
     </div>
 
-    <CreateAppDialog v-model:visible="formDialogVisible" :data="formData" />
+    <CreateAppDialog
+      v-model:visible="formDialogVisible"
+      :data="formData"
+      @reload="appInfoList"
+    />
   </div>
 </template>
 
@@ -162,6 +184,12 @@ const handleDeleteItem = product => {
 .app-title {
   width: 50%;
   /* display: inline; */
+}
+.image {
+  -webkit-filter: drop-shadow(
+    10px 10px 10px rgba(0, 0, 0, 0.5)
+  ); /*考虑浏览器兼容性：兼容 Chrome, Safari, Opera */
+  filter: drop-shadow(10px 10px 10px rgba(0, 0, 0, 0.5));
 }
 .app-title {
   font-size: 16px;

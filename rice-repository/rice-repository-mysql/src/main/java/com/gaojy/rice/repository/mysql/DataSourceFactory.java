@@ -33,7 +33,7 @@ public class DataSourceFactory {
                     try {
                         dataSource = new ComboPooledDataSource();
                         dataSource.setDriverClass(MYSQL_DRIVER);
-                        dataSource.setJdbcUrl(System.getProperty(Repository.REPOSITORY_URL_KEY, "jdbc:mysql://localhost:3306/rice"));
+                        dataSource.setJdbcUrl(System.getProperty(Repository.REPOSITORY_URL_KEY, "jdbc:mysql://localhost:3306/rice?useUnicode=true&characterEncoding=utf8"));
                         dataSource.setUser(System.getProperty(Repository.REPOSITORY_USERNAME_KEY, "root"));
                         dataSource.setPassword(System.getProperty(Repository.REPOSITORY_PASSWORD_KEY, "root"));
                         dataSource.setInitialPoolSize(3);

@@ -34,12 +34,34 @@ export default [
               server_status: 1,
               address: "168.127.30.12",
               port: 2345,
-              task: [
-                { task_code: "product_serche_sync", task_status: 1 }
-              ]
+              task: [{ task_code: "product_serche_sync", task_status: 1 }]
             }
           ],
           total: 3
+        }
+      };
+    }
+  },
+  {
+    url: "/app/fetch",
+    method: "get",
+    response: () => {
+      return {
+        data: {
+          appList: [
+            {
+              appDesc: "testApp",
+              appName: "testApp",
+              createTime: 1643049256753,
+              id: 101,
+              status: 1
+            }
+          ],
+          page: {
+            pageIndex: 1,
+            pageSize: 20,
+            total: 1
+          }
         }
       };
     }

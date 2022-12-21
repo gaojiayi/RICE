@@ -19,4 +19,6 @@ public interface RiceAppInfoDao {
     public Integer queryAppsCount(String appName);
 
     public void createApp(RiceAppInfo appInfo);
+
+    public void deleteAppById(Long id);
 }

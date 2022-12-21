@@ -95,9 +95,22 @@ public class RiceAppInfoDaoImpl implements RiceAppInfoDao {
                 appInfo.getCreateTime(),
                 appInfo.getStatus());
         } catch (SQLException e) {
-            log.error("append log error,log={}", log.toString());
+            log.error("append log error,log={}", e.toString());
             throw new RepositoryException(e);
         }
+
+    }
+
+    @Override
+    public void deleteAppById(Long id) {
+        String sql = "delete from  rice_app_info where id = ?";
+        try {
+            qr.update(sql,id);
+        } catch (SQLException e) {
+            log.error("delete app info  error,log={}", e.toString());
+            throw new RepositoryException(e);
+        }
+
 
     }
 }

@@ -22,18 +22,40 @@ public class AppHandler extends AbstractHttpHandler {
 
     @RequestMapping(value = "/create", method = "POST")
     public HttpResponse create(HttpRequest request) throws Exception {
-        String appName = (String) request.getParamMap().get("appName");
-        String appDesc = (String) request.getParamMap().get("appDesc");
-        if (StringUtil.isEmpty(appName)) {
-            return new HttpResponse(400, "param error,missing appName");
+        try {
+            String appName = (String) request.getParamMap().get("appName");
+            String appDesc = (String) request.getParamMap().get("appDesc");
+            if (StringUtil.isEmpty(appName)) {
+                return new HttpResponse(400, "param error,missing appName");
+            }
+            RiceAppInfo appInfo = new RiceAppInfo();
+            appInfo.setAppName(appName);
+            appInfo.setAppDesc(appDesc);
+            appInfo.setCreateTime(new Date());
+            appInfo.setStatus(1);
+            repository.getRiceAppInfoDao().createApp(appInfo);
+            return new HttpResponse();
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
         }
-        RiceAppInfo appInfo = new RiceAppInfo();
-        appInfo.setAppName(appName);
-        appInfo.setAppDesc(appDesc);
-        appInfo.setCreateTime(new Date());
-        appInfo.setStatus(1);
-        repository.getRiceAppInfoDao().createApp(appInfo);
-        return new HttpResponse();
+    }
+
+    @RequestMapping(value = "/delete", method = "POST")
+    public HttpResponse delete(HttpRequest request) throws Exception {
+        try {
+            String appId = String.valueOf(request.getParamMap().get("appId"));
+            if (StringUtil.isEmpty(appId)) {
+                return new HttpResponse(400, "param error,missing appId");
+            }
+            repository.getRiceAppInfoDao().deleteAppById(Long.valueOf(appId));
+            return new HttpResponse();
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
     }
 
     @RequestMapping(value = "/fetch", method = "GET")

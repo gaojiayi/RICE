@@ -77,7 +77,14 @@ public class JettyHttpBinder implements HttpBinder {
             HttpRequest request = new HttpRequest(paramMap);
 
             if (null != req.getContentType() && req.getContentType().toLowerCase().indexOf("json") > 0) {
-                String body = req.getReader().readLine();
+                String body = "";
+                String line = req.getReader().readLine();
+                while (StringUtil.isNotBlank(line)){
+                    body = body + line;
+                    line = req.getReader().readLine();
+                }
+
+                //String body = req.getReader().readLine();
                 if (StringUtil.isNotBlank(body)) {
                     JSONObject jsonBody = JSON.parseObject(body);
                     jsonBody.forEach((k, v) -> {
