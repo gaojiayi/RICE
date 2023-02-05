@@ -20,4 +20,6 @@ public interface ProcessorServerInfoDao {
 
     public Integer getNumOfProcessorInDate(Date startTime,Date endTime);
 
+    public List<ProcessorServerInfo> queryProcessorServers(Long appId);
+
 }

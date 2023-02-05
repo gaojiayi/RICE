@@ -131,4 +131,26 @@ public class ProcessorServerInfoDaoImpl implements ProcessorServerInfoDao {
             throw new RepositoryException(e);
         }
     }
+
+    @Override
+    public List<ProcessorServerInfo> queryProcessorServers(Long appId) {
+        String sql = "select * from processor_server_info where status  != 0 ";
+
+        try {
+            List<ProcessorServerInfo> processorServerInfoList;
+            if (appId != null) {
+                sql = sql + "and app_id = ?";
+                processorServerInfoList = qr.query(sql,
+                    new BeanListHandler<ProcessorServerInfo>(ProcessorServerInfo.class,
+                        new BasicRowProcessor(new GenerousBeanProcessor())),  appId);
+            } else {
+                processorServerInfoList = qr.query(sql,
+                    new BeanListHandler<ProcessorServerInfo>(ProcessorServerInfo.class,
+                        new BasicRowProcessor(new GenerousBeanProcessor())));
+            }
+            return processorServerInfoList;
+        } catch (SQLException e) {
+            throw new RepositoryException(e);
+        }
+    }
 }

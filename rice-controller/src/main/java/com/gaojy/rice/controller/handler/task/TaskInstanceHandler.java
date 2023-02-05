@@ -1,7 +1,9 @@
 package com.gaojy.rice.controller.handler.task;
 
 import com.gaojy.rice.common.entity.RiceLog;
+import com.gaojy.rice.common.entity.TaskInstanceInfo;
 import com.gaojy.rice.controller.handler.AbstractHttpHandler;
+import com.gaojy.rice.controller.handler.PageSpec;
 import com.gaojy.rice.http.api.HttpRequest;
 import com.gaojy.rice.http.api.HttpResponse;
 import com.gaojy.rice.http.api.RequestMapping;
@@ -21,7 +23,18 @@ public class TaskInstanceHandler extends AbstractHttpHandler {
 
     @RequestMapping(value = "/query", method = "GET")
     public HttpResponse query(HttpRequest request) {
-        return null;
+        String taskCode = null;
+        if (request.getParamMap().get("taskCode") != null) {
+            taskCode = (String) request.getParamMap().get("taskCode");
+        }
+        Integer pageIndex = Integer.parseInt((String) request.getParamMap().get("pageIndex"));
+        Integer limit = Integer.parseInt((String) request.getParamMap().get("pageSize"));
+        Integer total = repository.getTaskInstanceInfoDao().queryInstanceNum(taskCode);
+        List<TaskInstanceInfo> taskInstanceInfos
+            = repository.getTaskInstanceInfoDao().queryInstances(taskCode, pageIndex, limit);
+
+        return new HttpResponse("page", new PageSpec(pageIndex, limit, total))
+            .addResponse("list", taskInstanceInfos);
     }
 
     @RequestMapping(value = "/logs", method = "GET")

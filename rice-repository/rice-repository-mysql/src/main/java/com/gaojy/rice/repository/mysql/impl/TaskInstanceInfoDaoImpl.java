@@ -3,6 +3,7 @@ package com.gaojy.rice.repository.mysql.impl;
 import com.gaojy.rice.common.constants.LoggerName;
 import com.gaojy.rice.common.entity.TaskInstanceInfo;
 import com.gaojy.rice.common.exception.RepositoryException;
+import com.gaojy.rice.common.utils.StringUtil;
 import com.gaojy.rice.repository.api.dao.TaskInstanceInfoDao;
 import com.gaojy.rice.repository.mysql.DataSourceFactory;
 import java.sql.SQLException;
@@ -142,6 +143,40 @@ public class TaskInstanceInfoDaoImpl implements TaskInstanceInfoDao {
             return ((Long) qr.query(sql, new ScalarHandler())).intValue();
         } catch (SQLException e) {
             log.error("get   instance num by status exception," + e);
+            throw new RepositoryException(e);
+        }
+    }
+
+    @Override
+    public Integer queryInstanceNum(String taskCode) {
+        String sql = "select count(id) from task_instance_info where parent_instance_id = null ";
+        try {
+            if (StringUtil.isNotEmpty(taskCode)) {
+                sql = "and task_code = ? ";
+                return ((Long) qr.query(sql, new ScalarHandler(), taskCode)).intValue();
+            } else {
+                return ((Long) qr.query(sql, new ScalarHandler())).intValue();
+
+            }
+        } catch (SQLException e) {
+            log.error("query  instance num exception," + e);
+            throw new RepositoryException(e);
+        }
+    }
+
+    @Override
+    public List<TaskInstanceInfo> queryInstances(String taskCode, Integer pageIndex, Integer pageSize) {
+        String taskCodeFilter = StringUtil.isNotEmpty(taskCode) ? " and task_code = " + taskCode : "";
+        String sql = "select t.id,task_code,instance_params,parent_instance_id,actual_trigger_time,retry_times," +
+            "task_tracker_address,type,result,finished_time,create_time,status from task_instance_info t inner join " +
+            "( select id from task_instance_info  where parent_instance_id = null " + taskCodeFilter + "  limit ?,? ) " +
+            "as  d on t.id = d.id order by create_time desc;";
+        try {
+            return qr.query(sql, new BeanListHandler<TaskInstanceInfo>(TaskInstanceInfo.class,
+                new BasicRowProcessor(new GenerousBeanProcessor())), (pageIndex - 1) * pageSize, pageSize);
+
+        } catch (SQLException e) {
+            log.error("query instances exception," + e);
             throw new RepositoryException(e);
         }
     }
