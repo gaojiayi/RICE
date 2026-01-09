@@ -916,3 +916,7 @@ h4 {
    font-size: small;
    text-align :center;
  }
+
+ #beian  a{
+    color: inherit;
+  }
