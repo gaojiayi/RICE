@@ -24,15 +24,15 @@ RICE可以实现动态任务分配，当一个server调度器挂机之后，原�
 
 ****
 
-[RICE官网](http://www.ricescheduler.com)
+[RICE官网](http://gjy-storage.xyz:8080)
 
 ****
 
-[RICE在线demo](http://demo.ricescheduler.com)
+[RICE在线demo](http://gjy-storage.xyz:8081)
 
 ****
 
-[RICE开发文档](http://doc.ricescheduler.com)
+[RICE开发文档](http://gjy-storage.xyz:8082)
 
 ****
 
